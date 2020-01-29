@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+# Copyright (c) 2019, PhysK
+# All rights reserved.
+
+if grep -q GDSA01 /config/rclone-docker.conf && grep -q GDSA02 /config/rclone-docker.conf; then
+    touch /etc/services.d/uploader-gdrive/down
+else
+    touch /etc/services.d/uploader-tdrive/down
+fi
