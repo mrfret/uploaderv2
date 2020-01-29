@@ -83,9 +83,9 @@ RUN cd /app && \
     chown 911:911 gdrive/upload.sh && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
-    chmod 911:911 plex/bwlimit.plex && \
-    chmod 911:911 plex/plex.streams && \
-    chmod 911:911 plex/plexstreams.sh.basic && \
+    chown 911:911 plex/bwlimit.plex && \
+    chown 911:911 plex/plex.streams && \
+    chown 911:911 plex/plexstreams.sh.basic && \
     chown 911:911 mergerfs.sh
 
 #Install Uploader UI
