@@ -49,7 +49,7 @@ rclone moveto --tpslimit 6 --checkers=20 \
 
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
-    sleep 60s
+    sleep 10s
     rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
 fi
 #update json file for Uploader GUI

@@ -78,7 +78,6 @@ else
     GDSAUSE=0
     GDSAAMOUNT=0
 fi
-
 # Run Loop
 while true; do
     #Find files to transfer
@@ -120,7 +119,6 @@ while true; do
                             else
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
-
                             # Run upload script demonised
                             /app/tdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
 

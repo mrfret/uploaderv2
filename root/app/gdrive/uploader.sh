@@ -60,7 +60,6 @@ if [ -e /config/vars/lastGDSA ]; then
 else
     GDSAAMOUNT=0
 fi
-
 # Run Loop
 while true; do
 
