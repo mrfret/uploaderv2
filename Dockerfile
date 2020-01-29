@@ -75,13 +75,17 @@ RUN cd /app && \
     chmod +x gdrive/upload.sh && \
     chmod +x tdrive/uploader.sh && \
     chmod +x tdrive/upload.sh && \
-    chmod +x plex/plexstreams.sh && \
+    chmod +x plex/bwlimit.plex && \
+    chmod +x plex/plex.streams && \
+    chmod +x plex/plexstreams.sh.basic && \
     chmod +x mergerfs.sh && \
     chown 911:911 gdrive/uploader.sh && \
     chown 911:911 gdrive/upload.sh && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
-    chown 911:911 plex/plexstreams.sh && \
+    chmod 911:911plex/bwlimit.plex && \
+    chmod 911:911 plex/plex.streams && \
+    chmod 911:911 plex/plexstreams.sh.basic && \
     chown 911:911 mergerfs.sh
 
 #Install Uploader UI
