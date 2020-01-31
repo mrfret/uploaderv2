@@ -95,6 +95,6 @@ EXPOSE 8080
 
 ENV ADDITIONAL_IGNORES=null
 
-HEALTHCHECK --timeout=s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
+HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
 ENTRYPOINT [ "/init" ]
