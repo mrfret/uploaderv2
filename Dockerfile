@@ -1,7 +1,5 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-
-
 # Lightweight Linux Node base
 FROM alpine:latest
 LABEL maintainer="PhysK <PhysK @ gitlab.com>"
@@ -34,10 +32,13 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposi
         php7-gd \
         curl \
         nginx \
-        libxml2-utils
+        libxml2-utils \
+        htop \
+        nano \
+        mc
 
 # InstalL s6 overlay
-RUN wget https://github.com/just-containers/s6-overlay/releases/download/v1.21.4.0/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
+RUN wget https://github.com/just-containers/s6-overlay/releases/download/v1.22.1.0/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
     tar xfv s6-overlay.tar.gz -C / && \
     rm -r s6-overlay.tar.gz
 
@@ -94,6 +95,6 @@ EXPOSE 8080
 
 ENV ADDITIONAL_IGNORES=null
 
-HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
+HEALTHCHECK --timeout=s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
 ENTRYPOINT [ "/init" ]
