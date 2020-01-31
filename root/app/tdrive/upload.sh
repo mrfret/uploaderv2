@@ -21,6 +21,7 @@ FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 
 JSONFILE="/config/json/${FILEBASE}.json"
+BWLIMITFILE="/app/plex/bwlimit.plex"
 
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
@@ -32,7 +33,13 @@ REMOTE=$GDSA
 
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
-BWLIMIT="$(cat /app/plex/bwlimit.plex)"
+if [ -f "${BWLIMITFILE}" ]; then
+    BWLIMITSPEED="$(cat ${BWLIMITFILE})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}"
+else
+    BWLIMIT=""
+fi
+
 
 #create and chmod the log file so that webui can read it
 touch "${LOGFILE}"
@@ -44,7 +51,7 @@ log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=20 \
     --config /config/rclone-docker.conf \
     --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-    --drive-chunk-size=32M --bwlimit="${BWLIMIT}" \
+    --drive-chunk-size=32M ${BWLIMIT} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 
 ENDTIME=$(date +%s)

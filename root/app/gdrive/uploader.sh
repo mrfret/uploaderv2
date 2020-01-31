@@ -60,13 +60,22 @@ if [ -e /config/vars/lastGDSA ]; then
 else
     GDSAAMOUNT=0
 fi
+
 # Run Loop
 while true; do
 
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
     for file in "${timestamps[@]}";
     do
-        [ "$file" -le "$(echo "$(date +%s) + 86400" | bc)" ] && GDSAAMOUNT=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
+        if [ "$file" -le "$(echo "$(date +%s) + 86400" | bc)" ]; then
+            tmpamount=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
+            if [[ "${tmpamount}" =~ ^[0-9]+$ ]]; then
+                GDSAAMOUNT=${tmpamount}
+            else
+                GDSAAMOUNT=0
+            fi
+            rm -fr "${file}"
+        fi
     done
     #Find files to transfer
     IFS=$'\n'
@@ -118,6 +127,9 @@ while true; do
 
                             # Add filesize to file
                             echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
+
+                            # Run Plex stream checker script
+                            /app/plex/plexstreams.sh
 
                             # Run upload script demonised
                             /app/gdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
