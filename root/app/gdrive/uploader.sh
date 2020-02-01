@@ -128,9 +128,6 @@ while true; do
                             # Add filesize to file
                             echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
 
-                            # Run Plex stream checker script
-                            /app/plex/plexstreams.sh
-
                             # Run upload script demonised
                             /app/gdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
 
