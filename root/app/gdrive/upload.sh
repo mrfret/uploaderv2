@@ -51,6 +51,7 @@ rclone moveto --tpslimit 6 \
     --config /config/rclone-docker.conf \
     --log-file="${LOGFILE}" --log-level INFO --stats 2s \
     --drive-chunk-size=32M ${BWLIMIT} \
+    --drive-stop-on-upload-limit \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 
 ENDTIME=$(date +%s)
