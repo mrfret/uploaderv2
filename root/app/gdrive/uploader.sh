@@ -67,9 +67,10 @@ while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
     for file in "${timestamps[@]}";
     do
-        if [ "$file" -le "$(echo "$(date +%s) + 86400" | bc)" ]; then
+        if [ "$(basename "${file}")" -ge "$(date +%s)" ]; then
             tmpamount=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
             if [[ "${tmpamount}" =~ ^[0-9]+$ ]]; then
+                log "taking $(cat "${file}") from ${GDSAAMOUNT}"
                 GDSAAMOUNT=${tmpamount}
             else
                 GDSAAMOUNT=0
@@ -140,6 +141,7 @@ while true; do
                             log "gdrive is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
 
                             # Record GDSA transfered in case of crash/reboot
+                            echo "gdrive" >/config/vars/lastGDSA
                             echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
                         else
                             log "File ${i} seems to have dissapeared"
