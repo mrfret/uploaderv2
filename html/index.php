@@ -49,23 +49,23 @@
         <div class="row">
             <h1>Completed</h1>
             <div class="table-responsive">
-                <table id="done" class="table table-striped table-bordered table-hover table-dark">
-                    <thead>
-                        <tr>
-                            <th>Filename</th>
-                            <th>Filesize</th>
-                            <th>GDSA</th>
-                            <th>Time spent</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-muted" colspan="4">No entries found.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+			     <table id="done" class="table table-striped table-bordered table-hover table-dark">
+					<thead>
+						<tr>
+							<th>Filename</th>
+							<th>Filesize</th>
+							<th>GDSA</th>
+							<th>Time spent</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="text-muted" colspan="4">No entries found.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
     </div>
 <!-- container -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
