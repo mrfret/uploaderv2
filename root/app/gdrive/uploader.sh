@@ -1,11 +1,14 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
+
 # Copyright (c) 2019, PhysK
 # All rights reserved.
+
 # Logging Function
 function log() {
     echo "[Uploader] ${1}"
 }
+
 #Make sure all the folders we need are created
 mkdir -p /config/pid/
 mkdir -p /config/json/
@@ -14,6 +17,7 @@ mkdir -p /config/vars/
 mkdir -p /config/vars/gdrive/
 downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
+
 # Check encryption status
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
@@ -22,21 +26,27 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
           ENCRYPTED=true
     fi
 fi
+
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
     ADDITIONAL_IGNORES=""
 fi
+
 #Header
 log "Uploader v3.0 Started"
 log "Started for the First Time - Cleaning up if from reboot"
+
 # Remove left over webui and transfer files
 rm -f /config/pid/*
 rm -f /config/json/*
 rm -f /config/logs/*
+
 # delete any lock files for files that failed to upload
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
+
+
 # Check if BC is installed
 if [ "$(echo "10 + 10" | bc)" == "20" ]; then
     log "BC Found! All good :)"
@@ -50,8 +60,10 @@ if [ -e /config/vars/lastGDSA ]; then
 else
     GDSAAMOUNT=0
 fi
+
 # Run Loop
 while true; do
+
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
     for file in "${timestamps[@]}";
     do
@@ -89,6 +101,7 @@ while true; do
                         log "File is still getting bigger ${i}"
                         continue
                     fi
+
                     # Check if we have any upload slots available
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
@@ -105,27 +118,28 @@ while true; do
                             else
                                 GDSA_TO_USE="gdrive"
                             fi
+
                             # Increase or reset $GDSAUSE?
                             # shellcheck disable=SC2086
                             if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
                                 log "gdrive has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮"
                                 break
                             fi
+
                             # Add filesize to file
                             echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
+
                             # Run upload script demonised
                             /app/gdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
+
                             PID=$!
                             FILEBASE=$(basename "${i}")
+
                             # Add transfer to pid directory
                             echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+
                             log "gdrive is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                            FIND=$(find /config/json -type f | wc -l)
-                            if [ ${FIND} -ge 10 ]; then
-                                for oldFile in `ls -t1 "/config/json/" | head -n10`; do
-									rm ${oldFile}
-								done
-                            fi
+
                             # Record GDSA transfered in case of crash/reboot
                             echo "gdrive" >/config/vars/lastGDSA
                             echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
