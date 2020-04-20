@@ -20,9 +20,6 @@
 <!-- UI BY Bryde ツ -->
 <!-- DarkMode Mod by DOOB -->
 <body>
-    <div class="switch">Dark mode:
-        <span class="inner-switch">OFF</span>
-    </div>
     <div class="container-responsive jumbotron">
         <div class="row">
             <h1>Uploads</h1>
