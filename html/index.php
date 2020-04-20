@@ -14,17 +14,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="app.js"></script>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-  <title>Uploader Tracker</title>
+  <title>Uploader</title>
   <link rel="stylesheet" href="style.css"
 </head>
 <!-- UI BY Bryde ツ -->
 <!-- DarkMode Mod by DOOB -->
 <body>
+    </br>
+    </br>
+    </br>
     <div class="container-responsive jumbotron">
         <div class="row">
             <h1>Uploads</h1>
             <div class="table-responsive">
-                <table id="uploading" class="table table-striped table-bordered table-hover table-dark">
+                <table id="uploading" class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Filename</th>
@@ -43,10 +46,13 @@
                 </table>
             </div>
         </div>
+       </br>
+       </br>
+      </br>
         <div class="row">
             <h1>Completed</h1>
             <div class="table-responsive">
-                <table id="done" class="table table-striped table-bordered table-hover table-dark">
+                <table id="done" class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Filename</th>
@@ -65,6 +71,4 @@
         </div>
     </div>
 <!-- container -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<script src="script.js"></script>
 </body>
