@@ -32,8 +32,17 @@ if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
     ADDITIONAL_IGNORES=""
 fi
 
+UPLOADS=${UPLOADS}
+if [ "${UPLOADS}" == 'null' ]; then
+   UPLOADS="8"
+elif [ "${UPLOADS}" -ge '20' ]; then
+   UPLOADS="8"
+else
+   UPLOADS="4"
+fi
+
 #Header
-log "Uploader v3.0 Started"
+log "Upload Docker is Starting"
 log "Started for the First Time - Cleaning up if from reboot"
 
 # Remove left over webui and transfer files
@@ -106,7 +115,7 @@ while true; do
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [ ! ${TRANSFERS} -ge 4 ]; then
+                    if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                         if [ -e "${i}" ]; then
                             log "Starting upload of ${i}"
                             # Append filesize to GDSAAMOUNT
@@ -147,7 +156,7 @@ while true; do
                             log "File ${i} seems to have dissapeared"
                         fi
                     else
-                        log "Already 4 transfers running, waiting for next loop"
+                        log "Already ${UPLOADS} transfers running, waiting for next loop"
                         break
                     fi
                 else

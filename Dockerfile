@@ -1,8 +1,7 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-# Lightweight Linux Node base
 FROM alpine:latest
-LABEL maintainer="PhysK <PhysK @ gitlab.com>"
+LABEL maintainer="MrDoob made my day"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
@@ -57,7 +56,6 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
     mv rclone*/rclone /usr/bin && rm -r rclone* && \
     mkdir -p /mnt/tdrive && \
     mkdir -p /mnt/gdrive && \
-    mkdir -p /move/Media && \
     chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
@@ -91,7 +89,8 @@ COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 EXPOSE 8080
 
-ENV ADDITIONAL_IGNORES=null
+ENV ADDITIONAL_IGNORES=null \
+    UPLOADS="4"
 
 HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
