@@ -37,13 +37,14 @@ if [ "${UPLOADS}" == 'null' ]; then
 elif [ "${UPLOADS}" -ge '20' ]; then
    UPLOADS="8"
 else
-   UPLOADS="4"
+   UPLOADS=${UPLOADS}
 fi
 
 
 #Header
 log "Upload Docker is Starting"
 log "Started for the First Time - Cleaning up if from reboot"
+log "Uploads is set to ${UPLOADS}"
 
 # Remove left over webui and transfer files
 rm -f /config/pid/*
