@@ -174,7 +174,7 @@ while true; do
         done
         log "Finished looking for files, sleeping 5 secs"
     else
-        log "Nothing to upload, sleeping 5 secs"
+        log "Nothing to upload, sleeping 5 secs" 2>/dev/null
     fi
     sleep 5
 done
