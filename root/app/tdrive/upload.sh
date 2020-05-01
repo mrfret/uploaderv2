@@ -19,9 +19,9 @@ log "[Upload] Upload started for $FILE using $GDSA"
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
-
-JSONFILE="/config/json/${FILEBASE}.json"
 BWLIMITFILE="/app/plex/bwlimit.plex"
+PLEX="/app/plex/Preferences.xml"
+JSONFILE="/config/json/${FILEBASE}.json"
 
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
@@ -33,13 +33,20 @@ REMOTE=$GDSA
 
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
-if [ -f "${BWLIMITFILE}" ]; then
+
+if [ -f "${PLEX}" ]; then
     BWLIMITSPEED="$(cat ${BWLIMITFILE})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}"
+elif [ "${BWLIMITSET}" != 'null' ]; then
+    UPLOADS=${UPLOADS}
+    BWLIMITSET=${BWLIMITSET}
+    BWLIMITSPEED="$((${BWLIMITSET}/${UPLOADS}))"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
     BWLIMIT=""
 fi
 
+CHECKERS="$((${UPLOADS}*2))"
 
 #create and chmod the log file so that webui can read it
 touch "${LOGFILE}"
@@ -48,10 +55,10 @@ chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
-rclone moveto --tpslimit 6 --checkers=20 \
+rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
     --config /config/rclone-docker.conf \
     --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-    --drive-chunk-size=32M ${BWLIMIT} \
+    --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 
 ENDTIME=$(date +%s)
@@ -70,5 +77,5 @@ rm -f "${FILE}.lck"
 rm -f "${LOGFILE}"
 rm -f "/config/pid/${FILEBASE}.trans"
 find "${downloadpath}" -mindepth 2 -type d -empty -delete
-sleep 60
+sleep 30
 rm -f "${JSONFILE}"

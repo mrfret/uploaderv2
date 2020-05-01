@@ -90,7 +90,9 @@ COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 EXPOSE 8080
 
 ENV ADDITIONAL_IGNORES=null \
-    UPLOADS="4"
+    UPLOADS="4" \
+    BWLIMITSET="60" \
+    CHUNK="32"
 
 HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
