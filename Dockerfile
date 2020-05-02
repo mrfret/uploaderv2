@@ -6,9 +6,7 @@ LABEL maintainer="MrDoob made my day"
 ENV ADDITIONAL_IGNORES=null \
     UPLOADS="4" \
     BWLIMITSET="60" \
-    CHUNK="32" \
-    SET_CONTAINER_TIMEZONE="true" \
-    CONTAINER_TIMEZONE="Europe/Berlin"
+    CHUNK="32"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
@@ -72,9 +70,6 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
 RUN addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
 
-#timecode
-COPY root/time/timecommand.sh /timecommand.sh
-CMD /timecommand.sh
 # Copy Files to root
 COPY root/ /
 
