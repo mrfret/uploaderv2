@@ -47,7 +47,7 @@ $(document).ready(function() {
                             }
                             else {
                                 data["uploading"].push( "<tr>" );
-                                data["uploading"].push( "  <td class=\"text-muted\" colspan=\"6\"><i class=\"fas fa-spinner\" style=\"color:blue; float:right;\">No entries found.</id></td>");
+                                data["uploading"].push( "  <td class=\"text-muted\" colspan=\"6\">No entries found.</td>");
                                 data["uploading"].push( "</tr>" );
                             }
                             break;
@@ -81,7 +81,7 @@ $(document).ready(function() {
                             }
                             else {
                                 data["done"].push( "<tr>" );
-                                data["done"].push( "  <td class=\"text-muted\" colspan=\"6\"><i class=\"fas fa-spinner\" style=\"color:blue; float:right;\">No entries found.</id></td>");
+                                data["done"].push( "  <td class=\"text-muted\" colspan=\"6\">No entries found.</td>");
                                 data["done"].push( "</tr>" );
                             }
                             break;
