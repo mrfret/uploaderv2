@@ -3,6 +3,13 @@
 FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
 
+ENV ADDITIONAL_IGNORES=null \
+    UPLOADS="4" \
+    BWLIMITSET="60" \
+    CHUNK="32" \
+    SET_CONTAINER_TIMEZONE="true" \
+    CONTAINER_TIMEZONE="Europe/Berlin"
+
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
     apk update && apk upgrade && \
@@ -81,6 +88,10 @@ RUN cd /app && \
     chown 911:911 tdrive/upload.sh && \
     chown 911:911 mergerfs.sh
 
+#timecode
+ADD app/time/timecommand.sh /
+CMD ['/timecommand.sh']
+
 #Install Uploader UI
 RUN mkdir -p /var/www/html
 COPY --chown=abc html/ /var/www/html
@@ -88,11 +99,6 @@ COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 EXPOSE 8080
-
-ENV ADDITIONAL_IGNORES=null \
-    UPLOADS="4" \
-    BWLIMITSET="60" \
-    CHUNK="32"
 
 HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
