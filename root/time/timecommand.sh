@@ -7,7 +7,3 @@ if [ "$SET_CONTAINER_TIMEZONE" = "true" ]; then
 else
 	echo "Container timezone not modified"
 fi
-
-ntpd -s
-
-exec "$@"
