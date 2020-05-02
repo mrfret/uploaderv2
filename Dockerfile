@@ -5,8 +5,10 @@ LABEL maintainer="MrDoob made my day"
 
 ENV ADDITIONAL_IGNORES=null \
     UPLOADS="4" \
-    BWLIMITSET="60" \
-    CHUNK="32"
+    BWLIMITSET="80" \
+    CHUNK="32" \
+    PLEX="true" \
+    GCE="false"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \

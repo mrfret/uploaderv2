@@ -29,17 +29,17 @@ $(document).ready(function() {
                                     {
                                         if(speed >= 50)
                                         {
-                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:green; float:right;\"></i></td>" );
+                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:green; float:right;\"></i></td>" );
                                         }
                                         else if(speed < 50 && speed >= 20) {
-                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:yellow; float:right;\"></i></td>" );
+                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:yellow; float:right;\"></i></td>" );
                                         }
                                         else {
-                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:red; float:right;\"></i></td>" );
+                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:red; float:right;\"></i></td>" );
                                         }
                                     }
                                     else {
-                                        data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:red; float:right;\"></i></td>" );
+                                        data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:red; float:right;\"></i></td>" );
                                     }
                                     data["uploading"].push( "  <td>" + array.upload["time"] + "</td>" );
                                     data["uploading"].push( "</tr>" );
@@ -47,7 +47,7 @@ $(document).ready(function() {
                             }
                             else {
                                 data["uploading"].push( "<tr>" );
-                                data["uploading"].push( "  <td class=\"text-muted\" colspan=\"6\">No entries found.</td>");
+                                data["uploading"].push( "  <td class=\"text-muted\" colspan=\"6\"><i class=\"fas fa-spinner\" style=\"color:blue; float:right;\">No entries found.</id></td>");
                                 data["uploading"].push( "</tr>" );
                             }
                             break;
@@ -81,7 +81,7 @@ $(document).ready(function() {
                             }
                             else {
                                 data["done"].push( "<tr>" );
-                                data["done"].push( "  <td class=\"text-muted\" colspan=\"4\">No entries found.</td>");
+                                data["done"].push( "  <td class=\"text-muted\" colspan=\"6\"><i class=\"fas fa-spinner\" style=\"color:blue; float:right;\">No entries found.</id></td>");
                                 data["done"].push( "</tr>" );
                             }
                             break;

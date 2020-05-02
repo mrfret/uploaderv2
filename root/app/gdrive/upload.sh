@@ -1,42 +1,36 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-
 # Logging Function
 function log() {
     echo "[Uploader] ${1}"
 }
-
 downloadpath=/move
 IFS=$'\n'
-
 FILE=$1
 GDSA=$2
 log "[Upload] Upload started for $FILE using $GDSA"
-
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 BWLIMITFILE="/app/plex/bwlimit.plex"
-PLEX="/app/plex/Preferences.xml"
+PLEX=$(PLEX)
+GCE=$(GCE)
 JSONFILE="/config/json/${FILEBASE}.json"
-
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
-
 #get Human readable filesize
 HRFILESIZE=$(stat -c %s "${FILE}" | numfmt --to=iec-i --suffix=B --padding=7)
-
 REMOTE=$GDSA
-
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
-
-if [ -f "${PLEX}" ]; then
+if [ ${PLEX} == 'true' ]; then
     BWLIMITSPEED="$(cat ${BWLIMITFILE})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}"
+elif [ ${GCE} == 'true' ]; then
+    UPLOADS=${UPLOADS}
+    BWLIMIT=""
 elif [ "${BWLIMITSET}" != 'null' ]; then
     UPLOADS=${UPLOADS}
     BWLIMITSET=${BWLIMITSET}
@@ -45,13 +39,10 @@ elif [ "${BWLIMITSET}" != 'null' ]; then
 else
     BWLIMIT=""
 fi
-
 CHECKERS="$((${UPLOADS}*2))"
-
 #create and chmod the log file so that webui can read it
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
-
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
@@ -61,7 +52,6 @@ rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
     --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
     --drive-stop-on-upload-limit \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
-
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
     sleep 10s
@@ -69,9 +59,7 @@ if [ "${RC_ENABLED}" == "true" ]; then
 fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
-
 log "[Upload] Upload complete for $FILE, Cleaning up"
-
 #cleanup
 #remove file lock
 rm -f "${FILE}.lck"
