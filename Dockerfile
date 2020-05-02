@@ -9,11 +9,7 @@ ENV ADDITIONAL_IGNORES=null \
     CHUNK="32" \
     PLEX="true" \
     GCE="false" \
-    SET_CONTAINER_TIMEZONE="true" \
-    CONTAINER_TIMEZONE="Europe/Berlin" \
-    DISCORD_WEBHOOK_URL="" \
-    DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
-    DISCORD_NAME_OVERRIDE="RCLONE"
+    TZ="Europe/Berlin"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
@@ -80,9 +76,6 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
 RUN addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
 
-#timecode
-COPY root/time/timecommand.sh /timecommand.sh
-CMD /timecommand.sh
 # Copy Files to root
 COPY root/ /
 
