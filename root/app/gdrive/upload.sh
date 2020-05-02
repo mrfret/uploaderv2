@@ -15,9 +15,9 @@ STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 BWLIMITFILE="/app/plex/bwlimit.plex"
-PLEX=$(PLEX)
-GCE=$(GCE)
 JSONFILE="/config/json/${FILEBASE}.json"
+PLEX=${PLEX}
+GCE=${GCE}
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 #get Human readable filesize
@@ -25,6 +25,7 @@ HRFILESIZE=$(stat -c %s "${FILE}" | numfmt --to=iec-i --suffix=B --padding=7)
 REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
+##bwlimitpart
 if [ ${PLEX} == 'true' ]; then
     BWLIMITSPEED="$(cat ${BWLIMITFILE})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}"
