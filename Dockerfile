@@ -89,7 +89,7 @@ RUN cd /app && \
     chown 911:911 mergerfs.sh
 
 #timecode
-ADD app/time/timecommand.sh /
+ADD time/timecommand.sh /
 CMD ['/timecommand.sh']
 
 #Install Uploader UI
