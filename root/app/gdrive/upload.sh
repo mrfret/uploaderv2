@@ -18,7 +18,6 @@ BWLIMITFILE="/app/plex/bwlimit.plex"
 JSONFILE="/config/json/${FILEBASE}.json"
 PLEX=${PLEX}
 GCE=${GCE}
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 #get Human readable filesize
@@ -48,18 +47,12 @@ chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
-rclone_move() {
-   rclone_command=$(
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
     --config /config/rclone-docker.conf \
     --log-file="${LOGFILE}" --log-level INFO --stats 2s \
     --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
     --drive-stop-on-upload-limit \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
-    )
-    echo "$rclone_command"
-  }
-  rclone_move
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
     sleep 10s
@@ -67,67 +60,6 @@ if [ "${RC_ENABLED}" == "true" ]; then
 fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
-### send note to discod 
-  if [ "$DISCORD_WEBHOOK_URL" != "" ]; then
-    rclone_sani_command="$(echo $rclone_command | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g')" # Remove all escape sequences
-    # Notifications assume following rclone ouput: 
-    # Transferred: 0 / 0 Bytes, -, 0 Bytes/s, ETA - Errors: 0 Checks: 0 / 0, - Transferred: 0 / 0, - Elapsed time: 0.0s
-    transferred_amount=${rclone_sani_command#*Transferred: }
-    transferred_amount=${transferred_amount%% /*}
-
-    send_notification() {
-      output_transferred_main=${rclone_sani_command#*Transferred: }
-      output_transferred_main=${output_transferred_main% Errors*}
-      output_errors=${rclone_sani_command#*Errors: }
-      output_errors=${output_errors% Checks*}
-      output_checks=${rclone_sani_command#*Checks: }
-      output_checks=${output_checks% Transferred*}
-      output_transferred=${rclone_sani_command##*Transferred: }
-      output_transferred=${output_transferred% Elapsed*}
-      output_elapsed=${rclone_sani_command##*Elapsed time: }
-      
-      notification_data='{
-        "username": "'"$DISCORD_NAME_OVERRIDE"'",
-        "avatar_url": "'"$DISCORD_ICON_OVERRIDE"'",
-        "content": null,
-        "embeds": [
-          {
-            "title": "Rclone Upload Task: Success!",
-            "color": 4094126,
-            "fields": [
-              {
-                "name": "Transferred",
-                "value": "'"$output_transferred_main"'"
-              },
-              {
-                "name": "Errors",
-                "value": "'"$output_errors"'"
-              },
-              {
-                "name": "Checks",
-                "value": "'"$output_checks"'"
-              },
-              {
-                "name": "Transferred",
-                "value": "'"$output_transferred"'"
-              },
-              {
-                "name": "Elapsed time",
-                "value": "'"$output_elapsed"'"
-              }
-            ],
-            "thumbnail": {
-              "url": null
-            }
-          }
-        ]
-      }'
-      /usr/local/bin/curl -H "Content-Type: application/json" -d "$notification_data" $DISCORD_WEBHOOK_URL 
-    }
-    if [ "$transferred_amount" != "0" ]; then
-      send_notification
-    fi
-  fi
 log "[Upload] Upload complete for $FILE, Cleaning up"
 #cleanup
 #remove file lock
