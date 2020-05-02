@@ -18,6 +18,7 @@ BWLIMITFILE="/app/plex/bwlimit.plex"
 JSONFILE="/config/json/${FILEBASE}.json"
 PLEX=${PLEX}
 GCE=${GCE}
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 #get Human readable filesize
@@ -65,10 +66,8 @@ if [ "${RC_ENABLED}" == "true" ]; then
 fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
-log "[Upload] Upload complete for $FILE, Cleaning up"
-#cleanup
-### send note to discod 
-  if [ ${DISCORD_WEBHOOK_URL} != "" ]; then
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+  if [ "$DISCORD_WEBHOOK_URL" != "" ]; then
     rclone_sani_command="$(echo $rclone_command | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g')" # Remove all escape sequences
     # Notifications assume following rclone ouput: 
     # Transferred: 0 / 0 Bytes, -, 0 Bytes/s, ETA - Errors: 0 Checks: 0 / 0, - Transferred: 0 / 0, - Elapsed time: 0.0s
@@ -122,12 +121,13 @@ log "[Upload] Upload complete for $FILE, Cleaning up"
           }
         ]
       }'
-      /usr/local/bin/curl -H "Content-Type: application/json" -d "$notification_data" ${DISCORD_WEBHOOK_URL} 
+      /usr/local/bin/curl -H "Content-Type: application/json" -d "$notification_data" $DISCORD_WEBHOOK_URL
     }
     if [ "$transferred_amount" != "0" ]; then
       send_notification
     fi
   fi
+log "[Upload] Upload complete for $FILE, Cleaning up"
 #remove file lock
 rm -f "${FILE}.lck"
 rm -f "${LOGFILE}"
