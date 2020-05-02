@@ -8,7 +8,8 @@ ENV ADDITIONAL_IGNORES=null \
     BWLIMITSET="80" \
     CHUNK="32" \
     PLEX="true" \
-    GCE="false"
+    GCE="false" \
+    TZ="Europe/Berlin"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
@@ -41,6 +42,9 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposi
         libxml2-utils \
         htop \
         nano \
+        tzdata \
+        openntpd \
+        grep \
         mc -qq
 
 # InstalL s6 overlay
