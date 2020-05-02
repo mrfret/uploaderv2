@@ -29,17 +29,17 @@ $(document).ready(function() {
                                     {
                                         if(speed >= 50)
                                         {
-                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:green; float:right;\"></i></td>" );
+                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:green; float:right;\"></i></td>" );
                                         }
                                         else if(speed < 50 && speed >= 20) {
-                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:yellow; float:right;\"></i></td>" );
+                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:yellow; float:right;\"></i></td>" );
                                         }
                                         else {
-                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:red; float:right;\"></i></td>" );
+                                            data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:red; float:right;\"></i></td>" );
                                         }
                                     }
                                     else {
-                                        data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-cloud-upload-alt\" style=\"color:red; float:right;\"></i></td>" );
+                                        data["uploading"].push( "  <td>" + array.upload["rate"] + " <i class=\"fas fa-spinner\" style=\"color:red; float:right;\"></i></td>" );
                                     }
                                     data["uploading"].push( "  <td>" + array.upload["time"] + "</td>" );
                                     data["uploading"].push( "</tr>" );
