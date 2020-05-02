@@ -12,7 +12,7 @@ ENV ADDITIONAL_IGNORES=null \
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-    apk update && apk upgrade && \
+    apk update -qq && apk upgrade -qq && \
     apk add --no-cache \
         ca-certificates \
         logrotate \
@@ -41,7 +41,7 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposi
         libxml2-utils \
         htop \
         nano \
-        mc
+        mc -qq
 
 # InstalL s6 overlay
 RUN wget https://github.com/just-containers/s6-overlay/releases/download/v1.22.1.0/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
@@ -72,6 +72,9 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
 RUN addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
 
+#timecode
+COPY root/time/timecommand.sh /timecommand.sh
+CMD /timecommand.sh
 # Copy Files to root
 COPY root/ /
 
@@ -87,10 +90,6 @@ RUN cd /app && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
     chown 911:911 mergerfs.sh
-
-#timecode
-ADD time/timecommand.sh /
-CMD ['/timecommand.sh']
 
 #Install Uploader UI
 RUN mkdir -p /var/www/html
