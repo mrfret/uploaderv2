@@ -15,19 +15,19 @@ RC_USER=${RC_USER:-user}
 RC_PASS=${RC_PASS:-xxx}
 POLL_INTERVAL=${POLL_INTERVAL:-5m}
 
-echo "
-Rclone ENV vars
-------------------------------------------------
---dir-cache-time              ${DIR_CACHE_TIME}
---vfs-read-chunk-size         ${VFS_READ_CHUNK_SIZE}
---vfs-cache-max-age           ${VFS_CACHE_MAX_AGE}
---vfs-read-chunk-size-limit   ${VFS_READ_CHUNK_SIZE_LIMIT}
---vfs-cache-mode              ${VFS_CACHE_MODE}
---buffer-size                 ${BUFFER_SIZE}
---poll-interval               ${POLL_INTERVAL}
---rc                          ${RC_ENABLED}
---rc-addr                     ${RC_ADDR}
---rc-user                     ${RC_USER}
---rc-pass                     REDACTED
-------------------------------------------------
-"
+# echo "
+# Rclone ENV vars
+# ------------------------------------------------
+# --dir-cache-time              ${DIR_CACHE_TIME}
+# --vfs-read-chunk-size         ${VFS_READ_CHUNK_SIZE}
+# --vfs-cache-max-age           ${VFS_CACHE_MAX_AGE}
+# --vfs-read-chunk-size-limit   ${VFS_READ_CHUNK_SIZE_LIMIT}
+# --vfs-cache-mode              ${VFS_CACHE_MODE}
+# --buffer-size                 ${BUFFER_SIZE}
+# --poll-interval               ${POLL_INTERVAL}
+# --rc                          ${RC_ENABLED}
+# --rc-addr                     ${RC_ADDR}
+# --rc-user                     ${RC_USER}
+# --rc-pass                     REDACTED
+# ------------------------------------------------
+# "

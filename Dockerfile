@@ -3,9 +3,16 @@
 FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
 
+ENV ADDITIONAL_IGNORES=null \
+    UPLOADS="4" \
+    BWLIMITSET="60" \
+    CHUNK="32" \
+    SET_CONTAINER_TIMEZONE="true" \
+    CONTAINER_TIMEZONE="Europe/Berlin"
+
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-    apk update && apk upgrade && \
+    apk update -qq && apk upgrade -qq && \
     apk add --no-cache \
         ca-certificates \
         logrotate \
@@ -34,7 +41,7 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposi
         libxml2-utils \
         htop \
         nano \
-        mc
+        mc -qq
 
 # InstalL s6 overlay
 RUN wget https://github.com/just-containers/s6-overlay/releases/download/v1.22.1.0/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
@@ -65,6 +72,9 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
 RUN addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
 
+#timecode
+COPY root/time/timecommand.sh /timecommand.sh
+CMD /timecommand.sh
 # Copy Files to root
 COPY root/ /
 
@@ -88,11 +98,6 @@ COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 EXPOSE 8080
-
-ENV ADDITIONAL_IGNORES=null \
-    UPLOADS="4" \
-    BWLIMITSET="60" \
-    CHUNK="32"
 
 HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
