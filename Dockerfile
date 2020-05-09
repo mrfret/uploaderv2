@@ -9,11 +9,14 @@ ENV ADDITIONAL_IGNORES=null \
     CHUNK="32" \
     PLEX="true" \
     GCE="false" \
-    TZ="Europe/Berlin"
+    TZ="Europe/Berlin" \
+    DISCORD_WEBHOOK_URL="" \
+    DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
+    DISCORD_NAME_OVERRIDE="RCLONE"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-    apk update -qq && apk upgrade -qq && \
+    apk update -qq && apk upgrade -qq && apk fix -qq && \
     apk add --no-cache \
         ca-certificates \
         logrotate \
@@ -91,6 +94,8 @@ RUN cd /app && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
     chown 911:911 mergerfs.sh
+
+RUN apk update -qq && apk upgrade -qq && apk fix -qq
 
 #Install Uploader UI
 RUN mkdir -p /var/www/html
