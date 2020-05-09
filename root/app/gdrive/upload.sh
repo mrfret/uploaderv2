@@ -6,7 +6,6 @@
 function log() {
     echo "[Uploader] ${1}"
 }
-function basic() {
 downloadpath=/move
 IFS=$'\n'
 FILE=$1
@@ -50,8 +49,6 @@ touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
-}
-function rclone_move() {
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
     --config /config/rclone-docker.conf \
@@ -66,8 +63,6 @@ if [ "${RC_ENABLED}" == "true" ]; then
 fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
-}
-function send_data() {
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     log "Upload complete for $FILE" >/tmp/${FILE}.done
@@ -80,8 +75,6 @@ function send_data() {
   else
       log "[Upload] Upload complete for $FILE, Cleaning up"
   fi
-}
-function cleanup() {
 #cleanup
 #remove file lock
 sleep 10
@@ -92,10 +85,3 @@ rm -f "/tmp/${FILE}.done"
 find "${downloadpath}" -mindepth 2 -type d -empty -delete
 rm -f "${JSONFILE}"
 sleep 10
-}
-###############################
-####functions-start-up
-basic
-rclone_move
-send_data
-cleanup
