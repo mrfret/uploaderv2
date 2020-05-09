@@ -42,7 +42,7 @@ DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
     IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
-    DISCORD_WEBHOOK_URL="https://discordapp.com/api/webhooks/696323114383966268/EFLjnupPrRc-vs87fJAB2alXNWRhoj6XrZsE3iw0K7AV2LN_6IxNsrohN8cxjWoy6qrO"
+    DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL}"
     curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
 	rm -f /tmp/startup.done
   else
