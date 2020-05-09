@@ -19,6 +19,9 @@ JSONFILE="/config/json/${FILEBASE}.json"
 PLEX=${PLEX}
 GCE=${GCE}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+
 CHECKERS="$((${UPLOADS}*2))"
 
 # add to file lock to stop another process being spawned while file is moving
