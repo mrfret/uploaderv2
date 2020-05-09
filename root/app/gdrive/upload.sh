@@ -16,6 +16,8 @@ FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 BWLIMITFILE="/app/plex/bwlimit.plex"
 JSONFILE="/config/json/${FILEBASE}.json"
+DISCORD="/config/discord/${FILEBASE}.discord"
+PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -24,7 +26,7 @@ DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 CHECKERS="$((${UPLOADS}*2))"
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
-echo "lock" >"${FILEBASE}.discord"
+echo "lock" >"${DISCORD}"
 #get Human readable filesize
 HRFILESIZE=$(stat -c %s "${FILE}" | numfmt --to=iec-i --suffix=B --padding=7)
 REMOTE=$GDSA
@@ -66,8 +68,8 @@ fi
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-    log "Upload complete for ${FILEDIR}/${FILEBASE} | SIZE : ${HRFILESIZE} | Speed : ${BWLIMIT}" >"${FILEBASE}.discord"
-    message=$(cat ${FILEBASE}.discord)
+    printf "Upload complete for \nFILE: ${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMIT} \nTime : ${ENDTIME}" >"${DISCORD}"
+    message=$(cat "${DISCORD}")
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
     IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
@@ -81,8 +83,8 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 sleep 10
 rm -f "${FILE}.lck"
 rm -f "${LOGFILE}"
-rm -f "/config/pid/${FILEBASE}.trans"
-rm -f "${FILEBASE}.discord"
+rm -f "${PID}/${FILEBASE}.trans"
+rm -f "${DISCORD}"
 find "${downloadpath}" -mindepth 2 -type d -empty -delete
 rm -f "${JSONFILE}"
 sleep 10

@@ -12,6 +12,7 @@ mkdir -p /config/json/
 mkdir -p /config/logs/
 mkdir -p /config/vars/
 mkdir -p /config/vars/gdrive/
+mkdir -p /config/discord/
 downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
@@ -37,15 +38,15 @@ fi
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+DISCORD="/config/discord/startup.discord"
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-    log "Upload Docker is Starting and Uploads is set to ${UPLOADS}" >/tmp/startup.done
-    message=$(cat /tmp/startup.done)
+    printf "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
+    message=$(cat "${DISCORD}")
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
     IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
     DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL}"
     curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
-	rm -f /tmp/startup.done
   else
     log "Upload Docker is Starting"
     log "Started for the First Time - Cleaning up if from reboot"
@@ -55,6 +56,7 @@ DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 rm -f /config/pid/*
 rm -f /config/json/*
 rm -f /config/logs/*
+rm -f /config/discord/*
 # delete any lock files for files that failed to upload
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
