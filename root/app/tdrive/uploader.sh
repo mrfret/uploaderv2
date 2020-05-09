@@ -39,7 +39,7 @@ DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-    printf "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
+    echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
