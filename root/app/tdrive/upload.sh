@@ -64,7 +64,7 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     log "Upload complete for $FILE" >/tmp/${FILE}.done
-    message=$(cat /tmp/upload.done)
+    message=$(cat /tmp/${FILE}.done)
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
     IMAGE=\"${DISCORD_ICON_OVERRIDE}\"

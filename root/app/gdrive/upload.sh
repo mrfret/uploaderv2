@@ -66,14 +66,14 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     log "Upload complete for $FILE" >/tmp/${FILE}.done
-    message=$(cat /tmp/upload.done)
+    message=$(cat /tmp/${FILE}.done)
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
     IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
     DISCORD_WEBHOOK_URL="https://discordapp.com/api/webhooks/696323114383966268/EFLjnupPrRc-vs87fJAB2alXNWRhoj6XrZsE3iw0K7AV2LN_6IxNsrohN8cxjWoy6qrO"
     curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
   else
-      log "[Upload] Upload complete for $FILE, Cleaning up"
+    log "[Upload] Upload complete for $FILE, Cleaning up"
   fi
 #cleanup
 #remove file lock

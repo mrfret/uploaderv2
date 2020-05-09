@@ -34,10 +34,23 @@ elif [ "${UPLOADS}" -ge '20' ]; then
 else
    UPLOADS=${UPLOADS}
 fi
-#Header
-log "Upload Docker is Starting"
-log "Started for the First Time - Cleaning up if from reboot"
-log "Uploads is set to ${UPLOADS}"
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+  if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+    log "Upload Docker is Starting and Uploads is set to ${UPLOADS}" >/tmp/startup.done
+    message=$(cat /tmp/startup.done)
+    msg_content=\"$message\"
+    USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
+    IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
+    DISCORD_WEBHOOK_URL="https://discordapp.com/api/webhooks/696323114383966268/EFLjnupPrRc-vs87fJAB2alXNWRhoj6XrZsE3iw0K7AV2LN_6IxNsrohN8cxjWoy6qrO"
+    curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
+	rm -f /tmp/startup.done
+  else
+    log "Upload Docker is Starting"
+    log "Started for the First Time - Cleaning up if from reboot"
+    log "Uploads is set to ${UPLOADS}"
+  fi
 # Remove left over webui and transfer files
 rm -f /config/pid/*
 rm -f /config/json/*
