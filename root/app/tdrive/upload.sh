@@ -24,7 +24,6 @@ DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 CHECKERS="$((${UPLOADS}*2))"
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
-echo "lock" >"${FILEBASE}.discord"
 #get Human readable filesize
 HRFILESIZE=$(stat -c %s "${FILE}" | numfmt --to=iec-i --suffix=B --padding=7)
 REMOTE=$GDSA
@@ -61,11 +60,11 @@ if [ "${RC_ENABLED}" == "true" ]; then
     rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
 fi
 #update json file for Uploader GUI
-echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"discord\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
+echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-    log "Upload complete for ${FILEDIR}/${FILEBASE}" >"${FILEBASE}.discord"
-    message=$(cat ${FILEBASE}.discord)
+    log "Upload complete for $FILE" >/tmp/${FILE}.done
+    message=$(cat /tmp/${FILE}.done)
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
     IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
@@ -80,7 +79,7 @@ sleep 10
 rm -f "${FILE}.lck"
 rm -f "${LOGFILE}"
 rm -f "/config/pid/${FILEBASE}.trans"
-rm -f "${FILEBASE}.discord"
+rm -f "/tmp/${FILE}.done"
 find "${downloadpath}" -mindepth 2 -type d -empty -delete
 rm -f "${JSONFILE}"
 sleep 10
