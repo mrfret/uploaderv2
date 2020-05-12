@@ -12,7 +12,8 @@ ENV ADDITIONAL_IGNORES=null \
     TZ="Europe/Berlin" \
     DISCORD_WEBHOOK_URL="" \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
-    DISCORD_NAME_OVERRIDE="RCLONE"
+    DISCORD_NAME_OVERRIDE="RCLONE" \
+    LOGHOLDUI="10"
 
 # Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
