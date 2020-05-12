@@ -47,7 +47,7 @@ elif [ ${BWLIMITSET} != 'null' ]; then
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
     BWLIMIT=""
-	BWLIMITSPEED="no LIMIT was set"
+    BWLIMITSPEED="no LIMIT was set"
 fi
 #create and chmod the log file so that webui can read it
 touch "${LOGFILE}"
@@ -71,7 +71,7 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     TIME="$((count=${ENDTIME}-${STARTTIME}))"
-	duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
     echo "Upload complete for \nFILE: ${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
     msg_content=\"$message\"
