@@ -20,6 +20,7 @@ DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
+LOGHOLDUI=${LOGTIME}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -82,12 +83,24 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
     log "[Upload] Upload complete for $FILE, Cleaning up"
   fi
 #cleanup
+#cleanup
+TIMESAVER="$((count=${ENDTIME}+${LOGTIME}))"
 #remove file lock
-sleep 10
-rm -f "${FILE}.lck"
-rm -f "${LOGFILE}"
-rm -f "${PID}/${FILEBASE}.trans"
-rm -f "${DISCORD}"
-find "${downloadpath}" -mindepth 2 -type d -empty -delete
-rm -f "${JSONFILE}"
-sleep 10
+if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+ sleep 5
+ rm -f "${FILE}.lck"
+ rm -f "${LOGFILE}"
+ rm -f "${PID}/${FILEBASE}.trans"
+ rm -f "${DISCORD}"
+ find "${downloadpath}" -mindepth 2 -type d -empty -delete
+ rm -f "${JSONFILE}"
+else
+ sleep 5
+ rm -f "${FILE}.lck"
+ rm -f "${LOGFILE}"
+ rm -f "${PID}/${FILEBASE}.trans"
+ rm -f "${DISCORD}"
+ find "${downloadpath}" -mindepth 2 -type d -empty -delete
+ sleep "$(($TIMESAVER / 60))"
+ rm -f "${JSONFILE}"
+fi
