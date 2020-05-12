@@ -47,18 +47,18 @@ elif [ ${BWLIMITSET} != 'null' ]; then
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
     BWLIMIT=""
-	BWLIMITSPEED="no LIMIT was set"
+    BWLIMITSPEED="no LIMIT was set"
 fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
-    rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
-		--config /config/rclone-docker.conf \
-		--log-file="${LOGFILE}" --log-level INFO --stats 2s \
-		--drive-chunk-size=${CHUNK}M ${BWLIMIT} \
-		"${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
+rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
+       --config /config/rclone-docker.conf \
+       --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+       --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
+       "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
     sleep 10s
