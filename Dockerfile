@@ -13,7 +13,7 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_WEBHOOK_URL=null \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
     DISCORD_NAME_OVERRIDE="RCLONE" \
-    LOGHOLDUI="5"
+    LOGHOLDUI="5m"
 
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
     apk update -qq && apk upgrade -qq && apk fix -qq && \

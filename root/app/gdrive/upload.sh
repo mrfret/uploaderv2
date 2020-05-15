@@ -20,7 +20,7 @@ DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
-LOGHOLDUI=${LOGTIME}
+LOGHOLDUI=${LOGHOLDUI}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -83,8 +83,6 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
     log "[Upload] Upload complete for $FILE, Cleaning up"
   fi
 #cleanup
-#cleanup
-TIMESAVER="$((count=${ENDTIME}+${LOGTIME}))"
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  sleep 5
@@ -101,6 +99,6 @@ else
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
  find "${downloadpath}" -mindepth 2 -type d -empty -delete
- sleep "$(($TIMESAVER / 60))"
+ sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
