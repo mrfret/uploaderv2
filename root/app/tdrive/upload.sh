@@ -23,6 +23,7 @@ GCE=${GCE}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+LOGHOLDUI=${LOGTIME}
 CHECKERS="$((${UPLOADS}*2))"
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
@@ -46,18 +47,18 @@ elif [ ${BWLIMITSET} != 'null' ]; then
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
     BWLIMIT=""
-	BWLIMITSPEED="no LIMIT was set"
+    BWLIMITSPEED="no LIMIT was set"
 fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
-    rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
-		--config /config/rclone-docker.conf \
-		--log-file="${LOGFILE}" --log-level INFO --stats 2s \
-		--drive-chunk-size=${CHUNK}M ${BWLIMIT} \
-		"${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
+rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
+       --config /config/rclone-docker.conf \
+       --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+       --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
+       "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
     sleep 10s
@@ -68,7 +69,7 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     TIME="$((count=${ENDTIME}-${STARTTIME}))"
-	duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
     echo "Upload complete for \nFILE: ${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
     msg_content=\"$message\"
@@ -80,13 +81,23 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
     log "[Upload] Upload complete for $FILE, Cleaning up"
   fi
 #cleanup
+TIMESAVER="$((count=${ENDTIME}+${LOGTIME}))"
 #remove file lock
-#remove file lock
-sleep 10
-rm -f "${FILE}.lck"
-rm -f "${LOGFILE}"
-rm -f "${PID}/${FILEBASE}.trans"
-rm -f "${DISCORD}"
-find "${downloadpath}" -mindepth 2 -type d -empty -delete
-rm -f "${JSONFILE}"
-sleep 10
+if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+ sleep 5
+ rm -f "${FILE}.lck"
+ rm -f "${LOGFILE}"
+ rm -f "${PID}/${FILEBASE}.trans"
+ rm -f "${DISCORD}"
+ find "${downloadpath}" -mindepth 2 -type d -empty -delete
+ rm -f "${JSONFILE}"
+else
+ sleep 5
+ rm -f "${FILE}.lck"
+ rm -f "${LOGFILE}"
+ rm -f "${PID}/${FILEBASE}.trans"
+ rm -f "${DISCORD}"
+ find "${downloadpath}" -mindepth 2 -type d -empty -delete
+ sleep "$(($TIMESAVER / 60))"
+ rm -f "${JSONFILE}"
+fi

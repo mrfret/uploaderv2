@@ -10,11 +10,11 @@ ENV ADDITIONAL_IGNORES=null \
     PLEX="true" \
     GCE="false" \
     TZ="Europe/Berlin" \
-    DISCORD_WEBHOOK_URL="" \
+    DISCORD_WEBHOOK_URL=null \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
-    DISCORD_NAME_OVERRIDE="RCLONE"
+    DISCORD_NAME_OVERRIDE="RCLONE" \
+    LOGHOLDUI="5"
 
-# Install certifacates, required dependencies
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
     apk update -qq && apk upgrade -qq && apk fix -qq && \
     apk add --no-cache \
@@ -50,10 +50,11 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposi
         grep \
         mc -qq
 
-# InstalL s6 overlay
-RUN wget https://github.com/just-containers/s6-overlay/releases/download/v1.22.1.0/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
+## InstalL s6 overlay
+RUN wget https://github.com/just-containers/s6-overlay/releases/download/v2.0.0.1/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
     tar xfv s6-overlay.tar.gz -C / && \
     rm -r s6-overlay.tar.gz
+RUN apk update -qq && apk upgrade -qq && apk fix -qq
 
 # Install Unionfs
 RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
