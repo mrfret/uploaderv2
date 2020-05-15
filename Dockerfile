@@ -15,9 +15,7 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     LOGHOLDUI="5"
 
-ADD https://github.com/just-containers/s6-overlay/releases/download/v2.0.0.1/s6-overlay-amd64.tar.gz /tmp/
-RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C / --exclude='./bin' && tar xzf /tmp/s6-overlay-amd64.tar.gz -C /usr ./bin && \
-    echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
     apk update -qq && apk upgrade -qq && apk fix -qq && \
     apk add --no-cache \
         ca-certificates \
@@ -53,12 +51,12 @@ RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C / --exclude='./bin' && tar xzf /tmp/
         mc -qq
 
 ## InstalL s6 overlay
-#RUN wget https://github.com/just-containers/s6-overlay/releases/download/v2.0.0.1/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
-#    tar xfv s6-overlay.tar.gz -C / && \
-#    rm -r s6-overlay.tar.gz
+RUN wget https://github.com/just-containers/s6-overlay/releases/download/v2.0.0.1/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
+    tar xfv s6-overlay.tar.gz -C / && \
+    rm -r s6-overlay.tar.gz
 #ADD https://github.com/just-containers/s6-overlay/releases/download/v2.0.0.1/s6-overlay-amd64.tar.gz /tmp/
 #RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C / --exclude='./bin' && tar xzf /tmp/s6-overlay-amd64.tar.gz -C /usr ./bin
-#RUN apk update -qq && apk upgrade -qq && apk fix -qq
+RUN apk update -qq && apk upgrade -qq && apk fix -qq
 
 # Install Unionfs
 RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
