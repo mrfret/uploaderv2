@@ -18,9 +18,7 @@ ENV ADDITIONAL_IGNORES=null \
     LOGHOLDUI="5m"
 
 # install packages
-RUN \
- echo "**** install build packages ****" && \
-  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \
   apk add --no-cache \
     ca-certificates \
@@ -31,10 +29,7 @@ RUN \
     coreutils \
     openssl \
     php7 \
-    php7-fpm \
     php7-mysqli \
-    php7-json \
-    php7-openssl \
     php7-curl \
     php7-zlib \
     php7-xml \
@@ -48,6 +43,7 @@ RUN \
     openntpd \
     grep \
     mc && \
+    echo "**** configure S6 ****" && \
     OVERLAY_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'); && \
     echo "**** add s6 overlay ****" && \
       curl -o \
@@ -55,11 +51,10 @@ RUN \
 	   "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
       tar xfz \
         /tmp/s6-overlay.tar.gz -C / && \
-      apk update -qq && apk upgrade -qq && apk fix -qq
-
-# Install Unionfs
-RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
-    sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+      apk update -qq && apk upgrade -qq && apk fix -qq && \ 
+      echo "**** configure meegerfs ****" && \
+      apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
+      sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
 
 # Add volumes
 VOLUME [ "/unionfs" ]
