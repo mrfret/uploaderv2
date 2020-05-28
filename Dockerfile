@@ -3,9 +3,6 @@
 FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
 
-ARG OVERLAY_ARCH="amd64"
-ARG OVERLAY_VERSION=null
-
 ENV ADDITIONAL_IGNORES=null \
     UPLOADS="4" \
     BWLIMITSET="80" \
@@ -18,12 +15,9 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     LOGHOLDUI="5m"
 
-# install packages
-RUN \
- echo "**** install build packages ****" && \
- echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk update -qq && apk upgrade -qq && apk fix -qq && \
- apk add --no-cache \
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+    apk update -qq && apk upgrade -qq && apk fix -qq && \
+    apk add --no-cache \
         ca-certificates \
         logrotate \
         shadow \
@@ -55,23 +49,17 @@ RUN \
         openntpd \
         grep \
         vnstat \
-        mc 
+        mc -qq
 
-RUN && \
- echo "**** add s6 overlay ****" && \
-    if [ "$OVERLAY_VERSION" == 'null' ]; then 
-         S6_RELEASE=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'); \" | awk '/tag_name/{print $4;exit}' FS='[""]'
-    fi && \
- echo "**** ${S6_RELEASE} used ****" && \
-  curl -o \
-    /tmp/s6-overlay.tar.gz -L \
-      "https://github.com/just-containers/s6-overlay/releases/download/${S6_RELEASE}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
-  tar xfz
-     /tmp/s6-overlay.tar.gz -C / && \
-  apk update -qq && apk upgrade -qq && apk fix -qq && \ 
- echo "**** configure meegerfs ****" && \
-  apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
-  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
+## InstalL s6 overlay latest version
+RUN S6_RELEASE=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'); \
+    wget https://github.com/just-containers/s6-overlay/releases/download/${S6_RELEASE}/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
+    tar xfv s6-overlay.tar.gz -C / && \
+    rm -r s6-overlay.tar.gz
+
+# Install Unionfs
+RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
+    sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
 
 # Add volumes
 VOLUME [ "/unionfs" ]
@@ -108,6 +96,8 @@ RUN cd /app && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
     chown 911:911 mergerfs.sh
+
+RUN apk update -qq && apk upgrade -qq && apk fix -qq
 
 #Install Uploader UI
 RUN mkdir -p /var/www/html
