@@ -4,7 +4,7 @@ FROM lsiobase/alpine.nginx
 LABEL maintainer="MrDoob made my day"
 
 ARG OVERLAY_ARCH="amd64"
-ARF OVERLAY_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]')
+ARG OVERLAY_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]')
 
 ENV ADDITIONAL_IGNORES=null \
     UPLOADS="4" \
