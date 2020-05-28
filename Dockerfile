@@ -55,11 +55,8 @@ RUN \
         tar \
         mc && \
  echo "**** ${OVERLAY_VERSION} used ****" && \
-  curl -o \
-    /tmp/s6-overlay.tar.gz -L \
-      "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
-  tar xfz
-     /tmp/s6-overlay.tar.gz -C / && \
+  curl -o /tmp/s6-overlay.tar.gz -L  "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
+  tar xfz /tmp/s6-overlay.tar.gz -C / && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \ 
  echo "**** configure meegerfs ****" && \
   apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
