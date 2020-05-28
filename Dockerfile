@@ -4,7 +4,7 @@ FROM lsiobase/alpine.nginx
 LABEL maintainer="MrDoob made my day"
 
 ARG OVERLAY_ARCH="amd64"
-ARG OVERLAY_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]')
+ARG VCS_REF=null
 
 ENV ADDITIONAL_IGNORES=null \
     UPLOADS="4" \
@@ -47,6 +47,9 @@ RUN \
         grep \
         mc && \
  echo "**** add s6 overlay ****" && \
+ if [ #{VCS_REF} == 'null' ]; then 
+   OVERLAY_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]');
+ fi
  echo "**** ${OVERLAY_VERSION} used ****" && \
   curl -o \
     /tmp/s6-overlay.tar.gz -L \
