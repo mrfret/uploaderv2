@@ -1,6 +1,6 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-FROM lsiobase/alpine.nginx
+FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
 
 ARG OVERLAY_ARCH="amd64"
@@ -24,16 +24,19 @@ RUN \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
  apk update -qq && apk upgrade -qq && apk fix -qq && \
  apk add --no-cache \
-	ca-certificates \
+        ca-certificates \
+        logrotate \
         shadow \
         bash \
-        cjrl \
         bc \
         findutils \
         coreutils \
         openssl \
         php7 \
+        php7-fpm \
         php7-mysqli \
+        php7-json \
+        php7-openssl \
         php7-curl \
         php7-zlib \
         php7-xml \
@@ -43,9 +46,15 @@ RUN \
         php7-ctype \
         php7-mbstring \
         php7-gd \
+        curl \
+        nginx \
         libxml2-utils \
+        htop \
+        nano \
+        tzdata \
         openntpd \
         grep \
+        vnstat \
         mc && \
  echo "**** add s6 overlay ****" && \
     if [ "$OVERLAY_VERSION" == 'null' ]; then 
