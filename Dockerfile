@@ -23,7 +23,7 @@ RUN \
  echo "**** install build packages ****" && \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
  apk update -qq && apk upgrade -qq && apk fix -qq && \
- apk add   --quiet --no-cache \
+ apk add  --quiet --no-cache \
         ca-certificates \
         logrotate \
         shadow \
