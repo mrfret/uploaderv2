@@ -55,7 +55,9 @@ RUN \
         openntpd \
         grep \
         vnstat \
-        mc && \
+        mc 
+
+RUN && \
  echo "**** add s6 overlay ****" && \
     if [ "$OVERLAY_VERSION" == 'null' ]; then 
          S6_RELEASE=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'); \" | awk '/tag_name/{print $4;exit}' FS='[""]'
