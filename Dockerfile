@@ -48,13 +48,13 @@ RUN \
         grep \
         mc && \
  echo "**** add s6 overlay ****" && \
- if [ "$OVERLAY_VERSION" == 'null' ]; then 
-   curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'
- fi
- echo "**** ${OVERLAY_VERSION} used ****" && \
+    if [ "$OVERLAY_VERSION" == 'null' ]; then 
+         S6_RELEASE=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'); \" | awk '/tag_name/{print $4;exit}' FS='[""]'
+    fi && \
+ echo "**** ${S6_RELEASE} used ****" && \
   curl -o \
     /tmp/s6-overlay.tar.gz -L \
-      "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
+      "https://github.com/just-containers/s6-overlay/releases/download/${S6_RELEASE}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
   tar xfz
      /tmp/s6-overlay.tar.gz -C / && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \ 
