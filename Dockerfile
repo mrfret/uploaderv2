@@ -55,7 +55,7 @@ RUN \
         tar \
         mc && \
  echo "**** ${OVERLAY_VERSION} used ****" && \
-  curl -o /tmp/s6-overlay.tar.gz -L  "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" && \
+  curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \ 
  echo "**** configure mergerfs ****" && \
@@ -68,7 +68,7 @@ VOLUME [ "/config" ]
 VOLUME [ "/move" ]
 
 # Install RCLONE
-RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip && \
+RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -r rclone* && \
     mkdir -p /mnt/tdrive && \
