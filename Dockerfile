@@ -23,7 +23,7 @@ RUN \
  echo "**** install build packages ****" && \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
  apk update -qq && apk upgrade -qq && apk fix -qq && \
- apk add  --quiet --no-cache \
+ apk add --quiet --no-cache \
         ca-certificates \
         logrotate \
         shadow \
@@ -59,7 +59,7 @@ RUN \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \ 
  echo "**** configure mergerfs ****" && \
-  apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
+  apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
   sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
 
 # Add volumes
@@ -70,7 +70,7 @@ VOLUME [ "/move" ]
 # Install RCLONE
 RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -r rclone* && \
+    mv rclone*/rclone /usr/bin && rm -rf rclone* && \
     mkdir -p /mnt/tdrive && \
     mkdir -p /mnt/gdrive && \
     chown 911:911 /unionfs && \
