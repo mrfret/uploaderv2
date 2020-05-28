@@ -27,6 +27,7 @@ RUN \
 	ca-certificates \
         shadow \
         bash \
+        cjrl \
         bc \
         findutils \
         coreutils \
@@ -47,7 +48,7 @@ RUN \
         grep \
         mc && \
  echo "**** add s6 overlay ****" && \
- if [ #{VCS_REF} == 'null' ]; then 
+ if [ ${VCS_REF} == 'null' ]; then 
    OVERLAY_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]');
  fi
  echo "**** ${OVERLAY_VERSION} used ****" && \
