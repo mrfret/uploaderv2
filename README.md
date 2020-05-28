@@ -10,7 +10,7 @@ Copy your rclone file to ``/opt/uploader``
 Use the following to fix the service file paths
 
 ```sh
-OLDPATH=/youtoldpath/keys/
+OLDPATH=/youroldpath/keys/
 sed -i "s#${OLDPATH}#/config/keys/#g" /opt/uploader/rclone.conf
 ```
 
