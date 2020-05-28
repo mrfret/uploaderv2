@@ -1,6 +1,6 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-FROM lsiodev/baseimage-nginx
+FROM lsiobase/alpine.nginx
 LABEL maintainer="MrDoob made my day"
 
 ARG OVERLAY_ARCH="amd64"
@@ -44,9 +44,7 @@ RUN \
     php7-ctype \
     php7-mbstring \
     php7-gd \
-    curl \
     libxml2-utils \
-    tzdata \
     openntpd \
     grep \
     mc && \
@@ -58,7 +56,6 @@ RUN \
       tar xfz \
         /tmp/s6-overlay.tar.gz -C / && \
       apk update -qq && apk upgrade -qq && apk fix -qq
-
 
 # Install Unionfs
 RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
