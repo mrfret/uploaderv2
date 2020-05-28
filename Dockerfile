@@ -3,6 +3,9 @@
 FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
 
+ARG OVERLAY_ARCH="amd64"
+ARG OVERLAY_VERSION="v2.0.0.1"
+
 ENV ADDITIONAL_IGNORES=null \
     UPLOADS="4" \
     BWLIMITSET="80" \
@@ -15,9 +18,12 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     LOGHOLDUI="5m"
 
-RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
-    apk update -qq && apk upgrade -qq && apk fix -qq && \
-    apk add --no-cache \
+# install packages
+RUN \
+ echo "**** install build packages ****" && \
+ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
+ apk update -qq && apk upgrade -qq && apk fix -qq && \
+ apk add --quiet --no-cache \
         ca-certificates \
         logrotate \
         shadow \
@@ -43,24 +49,18 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposi
         curl \
         nginx \
         libxml2-utils \
-        htop \
-        nano \
         tzdata \
         openntpd \
         grep \
-        vnstat \
-        mc -qq
-
-## InstalL s6 overlay latest version
-RUN S6_RELEASE=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]'); \
-    wget https://github.com/just-containers/s6-overlay/releases/download/${S6_RELEASE}/s6-overlay-amd64.tar.gz -O s6-overlay.tar.gz && \
-    tar xfv s6-overlay.tar.gz -C / && \
-    rm -r s6-overlay.tar.gz
-RUN apk update -qq && apk upgrade -qq && apk fix -qq
-
-# Install Unionfs
-RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
-    sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+        tar \
+        mc && \
+ echo "**** ${OVERLAY_VERSION} used ****" && \
+  curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
+  tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
+  apk update -qq && apk upgrade -qq && apk fix -qq && \ 
+ echo "**** configure mergerfs ****" && \
+  apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
+  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
 
 # Add volumes
 VOLUME [ "/unionfs" ]
@@ -68,9 +68,9 @@ VOLUME [ "/config" ]
 VOLUME [ "/move" ]
 
 # Install RCLONE
-RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip && \
-    unzip rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -r rclone* && \
+RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
+    unzip -qq rclone.zip && rm rclone.zip && \
+    mv rclone*/rclone /usr/bin && rm -rf rclone* && \
     mkdir -p /mnt/tdrive && \
     mkdir -p /mnt/gdrive && \
     chown 911:911 /unionfs && \
@@ -97,8 +97,6 @@ RUN cd /app && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
     chown 911:911 mergerfs.sh
-
-RUN apk update -qq && apk upgrade -qq && apk fix -qq
 
 #Install Uploader UI
 RUN mkdir -p /var/www/html
