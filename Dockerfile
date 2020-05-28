@@ -49,12 +49,10 @@ RUN \
         curl \
         nginx \
         libxml2-utils \
-        htop \
-        nano \
         tzdata \
         openntpd \
         grep \
-        vnstat \
+        tar \
         mc && \
  echo "**** ${OVERLAY_VERSION} used ****" && \
   curl -o \
