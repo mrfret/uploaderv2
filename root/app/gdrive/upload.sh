@@ -14,27 +14,27 @@ log "[Upload] Upload started for $FILE using $GDSA"
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
-BWLIMITFILE="/app/plex/bwlimit.plex"
 JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
-LOGHOLDUI=${LOGHOLDUI}
 PLEX_PREFERENCE_FILE=${PLEX_PREFERENCE_FILE}
 PLEX_SERVER_IP=${PLEX_SERVER_IP}
 PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+LOGHOLDUI=${LOGHOLDUI}
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 echo "${PLEX_PLAYS}" >${plex_script_root_folder}/plex.streams
+plex_script_root_folder="/app/plex"
+touch ${plex_script_root_folder}/bwlimit.plex
+touch ${plex_script_root_folder}/plex.streams
 if [ ${PLEX} == 'true' ]; then
-   bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${BWLIMITSPEED}
-else 
-   bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${BWLIMITSPEED}
+   bc -l <<< "scale=0; ${BWLIMITSET}/(${PLEX_PLAYS}*1.25)" >${plex_script_root_folder}/bwlimit.plex
 fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
@@ -45,8 +45,9 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
+BWLIMITFILE="/app/plex/bwlimit.plex"
 if [ ${PLEX} == 'true' ]; then
-    BWLIMITSPEED=${BWLIMITSPEED}
+    BWLIMITSPEED="$(cat ${BWLIMITFILE})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == 'true' ]; then
     UPLOADS=${UPLOADS}
