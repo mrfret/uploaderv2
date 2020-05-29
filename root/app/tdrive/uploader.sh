@@ -38,6 +38,7 @@ DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
+
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
@@ -130,16 +131,13 @@ while true; do
                             else
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
-                            # Run plex & upload script demonised
-                            if [ ${PLEX} == "true" ]; then
-							    /app/plex/plex.sh "${i}" &
-							    PID=$!
-							fi
+                            # Run upload script demonised
                             /app/tdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
                             # Add transfer to pid directory
                             echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+
                             # Increase or reset $GDSAUSE?
                             # shellcheck disable=SC2086
                             if [ ${GDSAAMOUNT} -gt "783831531520" ]; then

@@ -104,17 +104,11 @@ RUN cd /app && \
     chmod +x tdrive/upload.sh && \
 	chmod -x plex/plex.sh && \
     chmod +x mergerfs.sh && \
-	chmod +x plex/plex.sh && \
-	chmod +x plex/plex.streams && \
-	chmod +x plex/bwlimit.plex && \
     chown 911:911 gdrive/uploader.sh && \
     chown 911:911 gdrive/upload.sh && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
-    chown 911:911 mergerfs.sh && \
-	chown 911:911 plex/plex.sh && \
-	chown 911:911 plex/plex.streams && \
-	chown 911:911 plex/bwlimit.plex
+    chown 911:911 mergerfs.sh
 
 #Install Uploader UI
 RUN mkdir -p /var/www/html
