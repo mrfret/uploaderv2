@@ -130,7 +130,10 @@ while true; do
                             else
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
-                            # Run upload script demonised
+                            # Run plex & upload script demonised
+                            if [ ${PLEX} == "true" ]; then
+							    /app/plex/plex.sh
+							fi
                             /app/tdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")

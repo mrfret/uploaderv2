@@ -1,5 +1,13 @@
-# Copyright (c) 2019, PhysK
-# All rights reserved.
+######################################################
+######################################################
+# Original coder PhysK                               #
+# All rights reserved.                               #
+# mod from MrDoob                                    #
+# plex stream checker is owned by my self            #
+# no one is allowed to modifie or use for his projekt#
+######################################################
+########## fuck of the hater bitches ! ###############
+######################################################
 FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
 
@@ -16,7 +24,10 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_WEBHOOK_URL=null \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
     DISCORD_NAME_OVERRIDE="RCLONE" \
-    LOGHOLDUI="5m"
+    LOGHOLDUI="5m" \
+    PLEX_PREFERENCE_FILE="/app/plex/Preferences.xml" \
+    PLEX_SERVER_IP="plex" \
+    PLEX_SERVER_PORT="32400"
 
 # install packages
 RUN \
@@ -91,12 +102,19 @@ RUN cd /app && \
     chmod +x gdrive/upload.sh && \
     chmod +x tdrive/uploader.sh && \
     chmod +x tdrive/upload.sh && \
+	chmod -x plex/plex.sh && \
     chmod +x mergerfs.sh && \
+	chmod +x plex/plex.sh && \
+	chmod +x plex/plex.streams && \
+	chmod +x plex/bwlimit.plex
     chown 911:911 gdrive/uploader.sh && \
     chown 911:911 gdrive/upload.sh && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 tdrive/upload.sh && \
-    chown 911:911 mergerfs.sh
+    chown 911:911 mergerfs.sh && \
+	chown 911:911 plex/plex.sh && \
+	chown 911:911 plex/plex.streams && \
+	chown 911:911 plex/bwlimit.plex
 
 #Install Uploader UI
 RUN mkdir -p /var/www/html

@@ -136,14 +136,16 @@ while true; do
                             fi
                             # Add filesize to file
                             echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
-                            # Run upload script demonised
+                            # Run plex & upload script demonised
+                            if [ ${PLEX} == "true" ]; then
+							    /app/plex/plex.sh
+							fi
                             /app/gdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
                             # Add transfer to pid directory
                             echo "${PID}" > "/config/pid/${FILEBASE}.trans"
                             log "gdrive is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-
                             # Record GDSA transfered in case of crash/reboot
                             echo "gdrive" >/config/vars/lastGDSA
                             echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
