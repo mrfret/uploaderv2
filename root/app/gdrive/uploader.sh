@@ -138,7 +138,8 @@ while true; do
                             echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
                             # Run plex & upload script demonised
                             if [ ${PLEX} == "true" ]; then
-							    /app/plex/plex.sh
+							    /app/plex/plex.sh "${i}" &
+							    PID=$!
 							fi
                             /app/gdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!

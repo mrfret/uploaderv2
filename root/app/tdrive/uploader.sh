@@ -132,7 +132,8 @@ while true; do
                             fi
                             # Run plex & upload script demonised
                             if [ ${PLEX} == "true" ]; then
-							    /app/plex/plex.sh
+							    /app/plex/plex.sh "${i}" &
+							    PID=$!
 							fi
                             /app/tdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
