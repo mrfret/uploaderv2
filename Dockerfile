@@ -106,7 +106,7 @@ RUN cd /app && \
     chmod +x mergerfs.sh && \
 	chmod +x plex/plex.sh && \
 	chmod +x plex/plex.streams && \
-	chmod +x plex/bwlimit.plex
+	chmod +x plex/bwlimit.plex && \
     chown 911:911 gdrive/uploader.sh && \
     chown 911:911 gdrive/upload.sh && \
     chown 911:911 tdrive/uploader.sh && \
