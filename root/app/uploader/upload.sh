@@ -27,12 +27,14 @@ DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
 CHECKERS="$((${UPLOADS}*2))"
-PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
-PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-echo "${PLEX_PLAYS}" >${plex_script_root_folder}/plex.streams
 plex_script_root_folder="/app/plex"
 touch ${plex_script_root_folder}/bwlimit.plex
 touch ${plex_script_root_folder}/plex.streams
+chown -cR 1000:1000 ${plex_script_root_folder}
+chmod -cR 777 ${plex_script_root_folder}
+PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
+PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
+echo "${PLEX_PLAYS}" >${plex_script_root_folder}/plex.streams
 if [ ${PLEX} == 'true' ]; then
    bc -l <<< "scale=0; ${BWLIMITSET}/(${PLEX_PLAYS}*1.25)" >${plex_script_root_folder}/bwlimit.plex
 fi
