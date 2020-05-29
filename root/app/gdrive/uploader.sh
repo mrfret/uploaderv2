@@ -137,7 +137,7 @@ while true; do
                             # Add filesize to file
                             echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
                             # Run plex & upload script demonised
-                            /app/gdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
                             # Add transfer to pid directory

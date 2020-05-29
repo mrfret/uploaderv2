@@ -99,14 +99,12 @@ COPY root/ /
 # Install Uploader
 RUN cd /app && \
     chmod +x gdrive/uploader.sh && \
-    chmod +x gdrive/upload.sh && \
-    chmod +x tdrive/uploader.sh && \
-    chmod +x tdrive/upload.sh && \
+    chmod +x tdrive/uploader.sh && \	
+    chmod +x uploader/upload.sh && \
     chmod +x mergerfs.sh && \
-    chown 911:911 gdrive/uploader.sh && \
+    chown 911:911 uploader/upload.sh && \
     chown 911:911 gdrive/upload.sh && \
-    chown 911:911 tdrive/uploader.sh && \
-    chown 911:911 tdrive/upload.sh && \
+    chown 911:911 tdrive/upload.sh && \	
     chown 911:911 mergerfs.sh
 
 #Install Uploader UI

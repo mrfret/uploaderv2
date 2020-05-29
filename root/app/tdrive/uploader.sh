@@ -132,7 +132,7 @@ while true; do
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
                             # Run upload script demonised
-                            /app/tdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
                             # Add transfer to pid directory
