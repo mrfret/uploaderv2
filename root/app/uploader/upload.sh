@@ -36,7 +36,7 @@ PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' 
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 echo "${PLEX_PLAYS}" >${plex_script_root_folder}/plex.streams
 if [ ${PLEX} == 'true' ]; then
-   bc -l <<< "scale=0; ${BWLIMITSET}/(${PLEX_PLAYS}*1.25)" >${plex_script_root_folder}/bwlimit.plex
+   bc -l <<< "scale=0; ${BWLIMITSET}/${PLEX_PLAYS}" >${plex_script_root_folder}/bwlimit.plex
 fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
