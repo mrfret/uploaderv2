@@ -82,7 +82,7 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     TIME="$((count=${ENDTIME}-${STARTTIME}))"
     duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-    echo "Upload complete for \nFILE: ${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
+    echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
