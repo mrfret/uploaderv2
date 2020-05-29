@@ -102,7 +102,6 @@ RUN cd /app && \
     chmod +x gdrive/upload.sh && \
     chmod +x tdrive/uploader.sh && \
     chmod +x tdrive/upload.sh && \
-	chmod -x plex/plex.sh && \
     chmod +x mergerfs.sh && \
     chown 911:911 gdrive/uploader.sh && \
     chown 911:911 gdrive/upload.sh && \
