@@ -36,13 +36,13 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
         grep \
         tar \
         mc 
-  echo "base install done"
+
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \ 
   apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
   sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-  echo "S6 install done \n with ${OVERLAY_ARCH} - ${OVERLAY_VERSION} installed"
+
   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -rf rclone* && \
