@@ -104,12 +104,14 @@ You can add additional ignores using the ENV ``ADDITIONAL_IGNORES`` e.g.
 Whats new in this UPLOADER : 
 
 - WebUI is colored 
-- s6-overlay is using the latest version 
-- alpine docker is using latest version
-- some ENV are adddd for more user friendly systems
+- s6_overlay is using the latest version 
+- alpine_docker is using latest version
+- some ENV are added for more user friendly systems
 - mobile version is included 
-- it will automatically  reduce the bandwidth when plex is running
+- it will automatically reduce the bandwidth when plex is running
 - it will not max out the upload speed
+- massive removed lines and docker file
+- one uploader now for each part ( its not need anymore )
 
 -----
 
