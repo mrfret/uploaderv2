@@ -38,13 +38,15 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
         mc && \
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
-  apk update -qq && apk upgrade -qq && apk fix -qq && \ 
   apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
   sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf && \
   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -rf rclone* && \
-	mkdir -p /{unionfs,config,move,mnt} &&  \
+    mkdir -p /unionfs && \
+    mkdir -p /config && \
+    mkdir -p /move && \
+    mkdir -p /mnt && \
     chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
