@@ -27,17 +27,19 @@ DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
 BWLIMITSET=${BWLIMITSET}
+UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
-plex_script_root_folder="/app/plex"
-touch ${plex_script_root_folder}/bwlimit.plex
-touch ${plex_script_root_folder}/plex.streams
+PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
+PLEX_STREAMS="/config/json/${FILEBASE}.streams"
 PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-echo "${PLEX_PLAYS}" >${plex_script_root_folder}/plex.streams
-if [ ${PLEX} == 'true' && ${PLEX_PLAYS} -gt "0" ]; then
-   bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${plex_script_root_folder}/bwlimit.plex
+echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
+if [ ${PLEX} == 'true' ]; then
+  if [ ${PLEX_PLAYS} -ge "0" ]; then
+   bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
+  fi
 else
-   bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}"  >${plex_script_root_folder}/bwlimit.plex
+   bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
 fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
@@ -48,9 +50,8 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-BWLIMITFILE="/app/plex/bwlimit.plex"
 if [ ${PLEX} == 'true' ]; then
-    BWLIMITSPEED="$(cat ${BWLIMITFILE})"
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == 'true' ]; then
     UPLOADS=${UPLOADS}
@@ -100,6 +101,8 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  sleep 5
  rm -f "${FILE}.lck"
+ rm -f "${PLEX_JSON}"
+ rm -f "${PLEX_STREAMS}"
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
@@ -108,6 +111,8 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
 else
  sleep 5
  rm -f "${FILE}.lck"
+ rm -f "${PLEX_JSON}"
+ rm -f "${PLEX_STREAMS}"
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
