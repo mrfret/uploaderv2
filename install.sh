@@ -61,9 +61,9 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
     chown 911:911 /app/gdrive/uploader.sh && \
     chown 911:911 /app/tdrive/uploader.sh && \
     chown 911:911 /app/mergerfs.sh && \
-    cp html/ /var/www/html && \
+    mv /html /var/www && \
 	chown -hR 911:911 /var/www/html && \
 	chown 911:911 /var/www/html && \
-    cp config/nginx.conf /etc/nginx/nginx.conf && \
-    cp config/fpm-pool.conf /etc/php7/php-fpm.d/www.confcp && \
-	cp config/php.ini /etc/php7/conf.d/zzz_custom.ini
+    mv /config/nginx.conf /etc/nginx/nginx.conf && \
+    mv /config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf && \
+	mv /config/php.ini /etc/php7/conf.d/zzz_custom.ini
