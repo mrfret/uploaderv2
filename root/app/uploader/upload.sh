@@ -14,17 +14,35 @@ log "[Upload] Upload started for $FILE using $GDSA"
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
-BWLIMITFILE="/app/plex/bwlimit.plex"
 JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
+PLEX_PREFERENCE_FILE=${PLEX_PREFERENCE_FILE}
+PLEX_SERVER_IP=${PLEX_SERVER_IP}
+PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
+BWLIMITSET=${BWLIMITSET}
+UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
+PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
+PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
+PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
+echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
+if [ ${PLEX} == 'true' ]; then
+  if [ ${PLEX_PLAYS} -ge "2" ]; then
+    bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
+  elif [ ${PLEX_PLAYS} -lt ${UPLOADS} ]; then
+    bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+  else
+    bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+  fi
+fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 echo "lock" >"${DISCORD}"
@@ -35,15 +53,13 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [ ${PLEX} == 'true' ]; then
-    BWLIMITSPEED="$(cat ${BWLIMITFILE})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}"
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == 'true' ]; then
-    UPLOADS=${UPLOADS}
     BWLIMIT=""
 elif [ ${BWLIMITSET} != 'null' ]; then
-    UPLOADS=${UPLOADS}
-    BWLIMITSET=${BWLIMITSET}
-    BWLIMITSPEED="$((${BWLIMITSET}/${UPLOADS}))"
+    bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
     BWLIMIT=""
@@ -70,7 +86,7 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     TIME="$((count=${ENDTIME}-${STARTTIME}))"
     duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-    echo "Upload complete for \nFILE: ${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
+    echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
     msg_content=\"$message\"
     USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
@@ -85,6 +101,8 @@ echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": 
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  sleep 5
  rm -f "${FILE}.lck"
+ rm -f "${PLEX_JSON}"
+ rm -f "${PLEX_STREAMS}"
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
@@ -93,6 +111,8 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
 else
  sleep 5
  rm -f "${FILE}.lck"
+ rm -f "${PLEX_JSON}"
+ rm -f "${PLEX_STREAMS}"
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
