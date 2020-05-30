@@ -30,9 +30,10 @@ COPY root/ /
 RUN apk update -qq && apk upgrade -qq && apk fix -qq && \
     apk add --quiet --no-cache \
         wget \
-        curl \ 
-		chmod +x /app/install/install.sh
-RUN /app/install/install.sh
+        curl
+
+RUN chmod +x /install.sh
+RUN /install.sh
 
 # Add volumes
 VOLUME [ "/unionfs" ]
