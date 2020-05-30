@@ -26,8 +26,8 @@ ENV ADDITIONAL_IGNORES=null \
     PLEX_SERVER_IP="plex" \
     PLEX_SERVER_PORT="32400"
 
-COPY root/ /
 COPY ./install.sh /
+COPY root/ /
 RUN chmod +x /install.sh
 RUN /install.sh
 
