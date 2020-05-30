@@ -27,8 +27,12 @@ ENV ADDITIONAL_IGNORES=null \
     PLEX_SERVER_PORT="32400"
 
 COPY root/ /
-RUN chmod +x app/install/install.sh
-RUN app/install/install.sh
+RUN apk update -qq && apk upgrade -qq && apk fix -qq && \
+    apk add --quiet --no-cache \
+        wget \
+        curl \ 
+		chmod +x /app/install/install.sh
+RUN /app/install/install.sh
 
 # Add volumes
 VOLUME [ "/unionfs" ]
