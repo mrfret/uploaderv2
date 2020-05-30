@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #### INSTALL COMMANDS
 
 OVERLAY_ARCH="amd64"
@@ -36,18 +36,18 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
         grep \
         tar \
         mc 
-
+  echo "base install done"
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \ 
   apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
   sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-
+  echo "S6 install done \n with ${OVERLAY_ARCH} - ${OVERLAY_VERSION} installed"
   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -rf rclone* && \
-    mkdir -p /mnt/tdrive && \
-    mkdir -p /mnt/gdrive && \
+	mkdir -p /{unionfs,config,move,mnt} &&  \
+	mkdir -p /config && \
     chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
@@ -62,8 +62,11 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
     chown 911:911 /app/gdrive/uploader.sh && \
     chown 911:911 /app/tdrive/uploader.sh && \
     chown 911:911 /app/mergerfs.sh && \
-    mkdir -p /var/www/html
-    cp --chown=abc html/ /var/www/html
-    cp config/nginx.conf /etc/nginx/nginx.conf
-    cp config/fpm-pool.conf /etc/php7/php-fpm.d/www.confcp
-	cp config/php.ini /etc/php7/conf.d/zzz_custom.ini
+    mkdir -p /var/www/html && \
+    cp html/ /var/www/html && \
+	chown -hR 911:911 /var/www/html && \
+	chown 911:911 /var/www/html && \
+    cp config/nginx.conf /etc/nginx/nginx.conf && \
+    cp config/fpm-pool.conf /etc/php7/php-fpm.d/www.confcp && \
+	cp config/php.ini /etc/php7/conf.d/zzz_custom.ini && \
+	echo "Install done"
