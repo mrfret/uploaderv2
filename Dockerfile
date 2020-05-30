@@ -27,8 +27,9 @@ ENV ADDITIONAL_IGNORES=null \
     PLEX_SERVER_PORT="32400"
 
 COPY root/ /
-RUN chmod +x install.sh
-RUN install.sh
+COPY ./install.sh /
+RUN chmod +x /install.sh
+RUN /install.sh
 
 # Add volumes
 VOLUME [ "/unionfs" ]
