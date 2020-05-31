@@ -21,7 +21,7 @@ sed -i "s#${OLDPATH}#/config/keys/#g" /opt/uploader/rclone.conf
 
 ## ENVS for the setup 
 
-```
+```sh
 UPLOADS = can be used from 1 - 20
 BWLIMITSET = 10 - 100
 GCE = true or false  for maxout  the upload speed 
@@ -34,29 +34,34 @@ LOGHOLDUI = When Diacord-Webhook is not used, the Complete Uploads will stay the
 PLEX_PREFERENCE_FILE="/app/plex/Preferences.xml" ( DONT EDIT THIS LINE )
 PLEX_SERVER_IP="plex" = you can use IP and localhost and traefik_proxy part 
 PLEX_SERVER_PORT="32400" = the plex port (! local accesible !)
+
 ```
 
 -----
 
 ## NOTE 1: 
 
-``` 
+``` sh
+
 SAMPLE FOR BWLIMITSET  AND UPLOADS 
 
 BWLIMITSET  is set to 100
 UPLOADS     is set to 10 
 
 BWLIMITSET  / UPLOADS  = REAL UPLOADSPEED PER FILE 
+
 ```
 -----
 
 ## VOLUMES:
 
 ```sh
+
 Folder for uploads              =  - /mnt/move:/move
 Folder for config               =  - /opt/uploader:/config
 Folder for the plex Preference  =  - /opt/uploader/plex:/app/plex
 Dolder for merged contest       =  - /mnt/<pathofmergerfsrootfolder>:/unionfs
+
 ```
 
 -----
@@ -81,6 +86,7 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 Default files to be ignored by Uploader are
 
 ```sh
+
 ! -name '*partial~'
 ! -name '*_HIDDEN~'
 ! -name '*.fuse_hidden*'
@@ -89,12 +95,15 @@ Default files to be ignored by Uploader are
 ! -path '.unionfs-fuse/*'
 ! -path '.unionfs/*'
 ! -path '*.inProgress/*'
+
 ```
 
 You can add additional ignores using the ENV ``ADDITIONAL_IGNORES`` e.g.
 
 ```sh
+
 -e "ADDITIONAL_IGNORES=! -path '*/SocialMediaDumper/*' ! -path '*/test/*'"
+
 ```
 
 -----
@@ -115,7 +124,8 @@ Whats new in this UPLOADER :
 
 NOTE: Running Plex Server and Docker Uploader at the same time / same host
 - it will automatically  reduce tbe bandwidth when plex is running
-``` 
+
+``` sh
 it will use follow variables for this 
 When streams are running :
 BWLIMITSET = see above 
@@ -128,13 +138,14 @@ BWLIMITSET = see above
 UPLOADS = see above 
 
 BWLIMITSET / UPLOADS = UPLOADSPEED per file
+
 ```
 
------
+--------
 
 ## TRAEFIK
 
-```
+```sh
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.redirect.entryPoint=https"
@@ -151,6 +162,7 @@ BWLIMITSET / UPLOADS = UPLOADSPEED per file
       - "traefik.port=8080"
     networks:
       - traefik_proxy_sample_network
+
 ```
 
 -----
@@ -163,7 +175,8 @@ Original coder is ```physk/rclone-mergerfs``` on gitlab
 
 docker-composer.yml 
 
-```
+```sh
+
 version: "3"
 services:
   uploader:
