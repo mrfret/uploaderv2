@@ -76,6 +76,7 @@ RUN \
 VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
+VOLUME [ "/app/plex" ]
 
 # Install RCLONE
 RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
