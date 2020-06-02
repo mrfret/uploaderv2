@@ -3,6 +3,16 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
 # Logging Function
+# shellcheck disable=SC2003
+# shellcheck disable=SC2006
+# shellcheck disable=SC2207
+# shellcheck disable=SC2012
+# shellcheck disable=SC2086
+# shellcheck disable=SC2196
+# shellcheck disable=SC2004
+# shellcheck disable=SC2034
+# shellcheck disable=SC2002
+# shellcheck disable=SC2028
 function log() {
     echo "[Uploader] ${1}"
 }
@@ -35,7 +45,8 @@ PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' 
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 if [ ${PLEX} == 'true' ]; then
-  if [ ${PLEX_PLAYS} -ge "2" ]; then
+  # shellcheck disable=SC2086
+  if [ ${PLEX_PLAYS} -ge 2 ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
   elif [ ${PLEX_PLAYS} -lt ${UPLOADS} ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
@@ -84,6 +95,7 @@ fi
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+   # shellcheck disable=SC2003
     TIME="$((count=${ENDTIME}-${STARTTIME}))"
     duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
     echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"

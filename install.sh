@@ -47,6 +47,7 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
     mkdir -p /config && \
     mkdir -p /move && \
     mkdir -p /mnt && \
+	mkdir -p /app/plex && \
     chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
@@ -57,6 +58,8 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
     chmod +x /app/tdrive/uploader.sh && \
     chmod +x /app/uploader/upload.sh && \
     chmod +x /app/mergerfs.sh && \
+    chown -hR 911:911 /app/plex && \
+    chown 911:911 /app/plex && \
     chown 911:911 /app/uploader/upload.sh && \
     chown 911:911 /app/gdrive/uploader.sh && \
     chown 911:911 /app/tdrive/uploader.sh && \
@@ -67,3 +70,4 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
     mv /config/nginx.conf /etc/nginx/nginx.conf && \
     mv /config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf && \
 	mv /config/php.ini /etc/php7/conf.d/zzz_custom.ini
+	

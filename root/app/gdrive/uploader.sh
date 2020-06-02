@@ -39,6 +39,7 @@ DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
+
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
@@ -61,6 +62,18 @@ rm -f /config/discord/*
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
+PLEX_FOLDER="/app/plex"
+if [ ${PLEX} == 'true' ]; then
+   if [ -d ${PLEX_FOLDER} ]; then
+       mkdir -p /app/plex
+       chown -hR 911:911 ${PLEX_FOLDER}
+       chown 911:911 ${PLEX_FOLDER}
+       log "${PLEX_FOLDER} is created"
+    else 
+       log "${PLEX_FOLDER} is already created | done"
+else 
+       log "${PLEX_FOLDER} is unwanted | done"
+fi
 # Check if BC is installed
 if [ "$(echo "10 + 10" | bc)" == "20" ]; then
     log "BC Found! All good :)"
