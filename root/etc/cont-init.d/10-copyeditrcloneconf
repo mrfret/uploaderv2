@@ -4,9 +4,15 @@
 # All rights reserved.
 
 echo "-> Copying rclone conf <-"
-
-cp /config/rclone.conf /config/rclone-docker.conf
-
+      cp /config/rclone.conf /config/rclone-docker.conf
 echo "-> Make needed edits to rclone conf <-"
-
 sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone-docker.conf
+
+echo "-> Copying Plex Preference.xml if exists <-"
+if [ "${DISABLE_TDRIVE1}" == "true" ]; then 
+   mkdir -p /app/plex
+   cp /app/plex/Preferences.xml /app/plex/docker-preferences.xml
+   echo "-> Copying Plex Preference.xml done  <-"
+else
+   echo "-> PLEX is not true | so skipping  <-
+fi
