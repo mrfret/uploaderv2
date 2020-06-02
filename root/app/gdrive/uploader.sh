@@ -71,6 +71,7 @@ if [ ${PLEX} == 'true' ]; then
        log "${PLEX_FOLDER} is created"
     else 
        log "${PLEX_FOLDER} is already created | done"
+	fi
 else 
        log "${PLEX_FOLDER} is unwanted | done"
 fi
