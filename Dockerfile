@@ -25,7 +25,6 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     LOGHOLDUI="5m" \
-    PLEX_PREFERENCE_FILE="/app/plex/Preferences.xml" \
     PLEX_SERVER_IP="plex" \
     PLEX_SERVER_PORT="32400"
 
