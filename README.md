@@ -8,10 +8,14 @@ mkdir -p /opt/uploader/{keys,plex}
 
 Copy your rclone file to ``/opt/uploader``
 Use the following to fix the service file paths
+```sh
+(( RUNNING PLEX SERVER SAME HOST ))
+```
+Copy your PLEX - Preference.xml file to ```/opt/uploader/plex```
+```sh
+(( RUNNING PLEX SERVER SAME HOST ))
+```
 
-(( RUNNING PLEX SERVER SAME HOST ))
-Copy your PLEX - Preference.xml file to ``/opt/uploader/plex``
-(( RUNNING PLEX SERVER SAME HOST ))
 
 ```sh
 OLDPATH=/youroldpath/keys/
@@ -31,7 +35,6 @@ DISCORD_WEBHOOK_URL = for using Discord to track the Uploads
 DISCORD_ICON_OVERRIDE = Discord Avatar 
 DISCORD_NAME_OVERRIDE = Name for the Discord Webhook User
 LOGHOLDUI = When Diacord-Webhook is not used, the Complete Uploads will stay there for the minutes you setup
-PLEX_PREFERENCE_FILE="/app/plex/Preferences.xml" ( DONT EDIT THIS LINE )
 PLEX_SERVER_IP="plex" = you can use IP and localhost and traefik_proxy part 
 PLEX_SERVER_PORT="32400" = the plex port (! local accesible !)
 
@@ -114,11 +117,17 @@ Whats new in this UPLOADER :
 
 - WebUI is colored 
 - s6-overlay is using the latest version 
-- alpine docker is using latest version
-- some ENV are adddd for more user friendly systems
+- alpine-docker-image is using latest version
+- some ENV are adddd for more user friendly systems [ see above ENVS ]
 - mobile version is included 
-- it will automatically  reduce the bandwidth when plex is running
-- it will not max out the upload speed
+- it will automatically reduce the bandwidth when plex is running [ see above ENVS ]
+- it will not max out the upload speed [ see above ENVS ]
+- Preference.xml will now edit to docker-preferences.xml
+- VOLUME added [app/plex] 
+- 2 failsafe mods for reading/edit the docker-preferences.xml  and /app/plex folder 
+
+- NEW FEATURE in the next time !! 
+
 
 -----
 
@@ -133,7 +142,7 @@ PLEX_PLAYS = inside running command
 
 BWLIMITSET / PLEX_PLAYS = UPLOADSPEED per file
 
-When no_streams are running :
+When no_streams are running or under 2 streams :
 BWLIMITSET = see above
 UPLOADS = see above 
 
