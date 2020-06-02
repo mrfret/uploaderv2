@@ -2,17 +2,8 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-# Logging Function
-# shellcheck disable=SC2003
-# shellcheck disable=SC2006
-# shellcheck disable=SC2207
-# shellcheck disable=SC2012
-# shellcheck disable=SC2086
-# shellcheck disable=SC2196
-# shellcheck disable=SC2004
-# shellcheck disable=SC2034
-# shellcheck disable=SC2002
-# shellcheck disable=SC2028
+# Logging Functio
+####
 function log() {
     echo "[Uploader] ${1}"
 }
@@ -29,7 +20,7 @@ DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
-PLEX_PREFERENCE_FILE="/app/plex/Preferences.xml"
+PLEX_PREFERENCE_FILE="/app/plex/docker-preferences.xml"
 PLEX_SERVER_IP=${PLEX_SERVER_IP}
 PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
