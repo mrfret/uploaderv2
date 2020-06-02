@@ -37,9 +37,9 @@ PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/
 PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
 echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 if [ "${PLEX}" == "true" ]; then
-  if [ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]; then
+  if [[ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]]; then
     # shellcheck disable=SC2086
-    if [ ${PLEX_PLAYS} -ge "2" && ${PLEX_PLAYS} -le ${UPLOADS}  ]; then
+    if [[ ${PLEX_PLAYS} -ge "2" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
     elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
