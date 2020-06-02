@@ -31,7 +31,6 @@ DISCORD_WEBHOOK_URL = for using Discord to track the Uploads
 DISCORD_ICON_OVERRIDE = Discord Avatar 
 DISCORD_NAME_OVERRIDE = Name for the Discord Webhook User
 LOGHOLDUI = When Diacord-Webhook is not used, the Complete Uploads will stay there for the minutes you setup
-PLEX_PREFERENCE_FILE="/app/plex/Preferences.xml" ( DONT EDIT THIS LINE )
 PLEX_SERVER_IP="plex" = you can use IP and localhost and traefik_proxy part 
 PLEX_SERVER_PORT="32400" = the plex port (! local accesible !)
 
