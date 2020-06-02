@@ -3,6 +3,16 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
 # Logging Function
+# shellcheck disable=SC2003
+# shellcheck disable=SC2006
+# shellcheck disable=SC2207
+# shellcheck disable=SC2012
+# shellcheck disable=SC2086
+# shellcheck disable=SC2196
+# shellcheck disable=SC2004
+# shellcheck disable=SC2034
+# shellcheck disable=SC2002
+# shellcheck disable=SC2028
 function log() {
     echo "[Uploader] ${1}"
 }
@@ -84,6 +94,7 @@ fi
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+   # shellcheck disable=SC2003
     TIME="$((count=${ENDTIME}-${STARTTIME}))"
     duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
     echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
