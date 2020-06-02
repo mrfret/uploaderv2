@@ -38,6 +38,7 @@ DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
+
   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
     echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
     message=$(cat "${DISCORD}")
@@ -60,6 +61,20 @@ rm -f /config/discord/*
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
+PLEX_FOLDER="/app/plex"
+if [ ${PLEX} == 'true' ]; then
+   if [ ! -d ${PLEX_FOLDER} ]; then
+       mkdir -p ${PLEX_FOLDER}
+       chmod +x ${PLEX_FOLDER}
+       chown -R 911:911 ${PLEX_FOLDER}
+       log "${PLEX_FOLDER} is created"
+    else 
+       log "${PLEX_FOLDER} is already created | done"
+	fi
+else 
+       log "${PLEX_FOLDER} is unwanted | done"
+fi
+
 #### Generates the GDSA List from the Processed Keys
 # shellcheck disable=SC2003
 # shellcheck disable=SC2006
@@ -131,11 +146,12 @@ while true; do
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
                             # Run upload script demonised
-                            /app/tdrive/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
                             # Add transfer to pid directory
                             echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+
                             # Increase or reset $GDSAUSE?
                             # shellcheck disable=SC2086
                             if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
