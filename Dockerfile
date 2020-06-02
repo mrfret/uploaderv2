@@ -107,6 +107,10 @@ RUN cd /app && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 mergerfs.sh
 
+RUN mkdir -p /app/plex && \
+    chown -hR 911:911 /app/plex && \
+    chown 911:911 /app/plex
+
 #Install Uploader UI
 RUN mkdir -p /var/www/html
 COPY --chown=abc html/ /var/www/html

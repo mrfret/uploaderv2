@@ -45,7 +45,8 @@ PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' 
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 if [ ${PLEX} == 'true' ]; then
-  if [ ${PLEX_PLAYS} -ge "2" ]; then
+  # shellcheck disable=SC2086
+  if [ ${PLEX_PLAYS} -ge 2 ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
   elif [ ${PLEX_PLAYS} -lt ${UPLOADS} ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
