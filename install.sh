@@ -47,7 +47,7 @@ echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositori
     mkdir -p /config && \
     mkdir -p /move && \
     mkdir -p /mnt && \
-	mkdir -p /app/plex && \
+    mkdir -p /app/plex && \
     chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
