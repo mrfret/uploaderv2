@@ -63,10 +63,10 @@ log "Cleaned up - Sleeping 10 secs"
 sleep 10
 PLEX_FOLDER="/app/plex"
 if [ ${PLEX} == 'true' ]; then
-   if [ -d ${PLEX_FOLDER} ]; then
-       mkdir -p /app/plex
-       chown -hR 911:911 ${PLEX_FOLDER}
-       chown 911:911 ${PLEX_FOLDER}
+   if [ ! -d ${PLEX_FOLDER} ]; then
+       mkdir -p ${PLEX_FOLDER}
+       chmod +x ${PLEX_FOLDER}
+       chown -R 911:911 ${PLEX_FOLDER}
        log "${PLEX_FOLDER} is created"
     else 
        log "${PLEX_FOLDER} is already created | done"
