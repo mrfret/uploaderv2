@@ -56,6 +56,7 @@ fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 echo "lock" >"${DISCORD}"
+
 #get Human readable filesize
 HRFILESIZE=$(stat -c %s "${FILE}" | numfmt --to=iec-i --suffix=B --padding=7)
 REMOTE=$GDSA
