@@ -34,7 +34,6 @@ RUN /install.sh
 VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
-VOLUME [ "/app/plex" ]
 
 EXPOSE 8080
 

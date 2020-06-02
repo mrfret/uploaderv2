@@ -62,19 +62,6 @@ rm -f /config/discord/*
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
-PLEX_FOLDER="/app/plex"
-if [ ${PLEX} == 'true' ]; then
-   if [ ! -d ${PLEX_FOLDER} ]; then
-       mkdir -p ${PLEX_FOLDER}
-       chmod +x ${PLEX_FOLDER}
-       chown -R 911:911 ${PLEX_FOLDER}
-       log "${PLEX_FOLDER} is created"
-    else 
-       log "${PLEX_FOLDER} is already created | done"
-	fi
-else 
-       log "${PLEX_FOLDER} is unwanted | done"
-fi
 # Check if BC is installed
 if [ "$(echo "10 + 10" | bc)" == "20" ]; then
     log "BC Found! All good :)"

@@ -20,7 +20,7 @@ DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
-PLEX_PREFERENCE_FILE="/app/plex/docker-preferences.xml"
+PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
 PLEX_SERVER_IP=${PLEX_SERVER_IP}
 PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -35,7 +35,7 @@ PLEX_STREAMS="/config/json/${FILEBASE}.streams"
 PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-if [ ${PLEX} == 'true' ]; then
+if [ "${PLEX}" == "true" ]; then
   # shellcheck disable=SC2086
   if [ ${PLEX_PLAYS} -ge 2 ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
