@@ -1,0 +1,29 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+# Copyright (c) 2019, PhysK
+# All rights reserved.
+PLEX_FOLDER="/config/plex"
+PLEX_PRE="docker-preferences.xml"
+PLEX_OLD="/config/plexstreams"
+
+echo "-> Copying Plex Preference.xml if exists <-"
+if [ "${PLEX}" == "true" ]; then
+   if [ ! -f ${PLEX_FOLDER}/${PLEX_PRE} ]; then
+      if [ -d ${PLEX_OLD} ]; then
+	     echo -e "-> existing ${PLEX_PRE} found ! <- \n-> symlink to new location ${PLEX_FOLDER} <-"
+	     ln -s ${PLEX_OLD} ${PLEX_FOLDER}
+	  fi
+   else 
+	  if [ ! -d ${PLEX_FOLDER} ]; then 
+	  	  mkdir -p ${PLEX_FOLDER}
+	  	  echo "-> Creating folder for ${PLEX_PRE} done <-"
+	  	  find ./config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FOLDER}/${PLEX_PRE} \;
+	  	  find ./app -name "Pre*.xml" -type f -exec cp {} ${PLEX_FOLDER}/${PLEX_PRE} \;
+	  	  echo "-> Copying ${PLEX_PRE} done  <-"
+	  fi
+   fi
+   chown -hR 911:911 ${PLEX_FOLDER} && chown 911:911 ${PLEX_FOLDER}
+   echo "-> Permission done  <-"
+else
+   echo "-> PLEX is not true | so skipping  <-"
+fi

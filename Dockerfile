@@ -28,7 +28,6 @@ ENV ADDITIONAL_IGNORES=null \
     PLEX_SERVER_IP="plex" \
     PLEX_SERVER_PORT="32400"
 
-# install packages
 RUN \
  echo "**** install build packages ****" && \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
@@ -72,13 +71,10 @@ RUN \
   apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
   sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
 
-# Add volumes
 VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
-VOLUME [ "/app/plex" ]
 
-# Install RCLONE
 RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -rf rclone* && \
@@ -88,15 +84,9 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
     chown -hR 911:911 /mnt
-
-# Add user
 RUN addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
-
-# Copy Files to root
 COPY root/ /
-
-# Install Uploader
 RUN cd /app && \
     chmod +x gdrive/uploader.sh && \
     chmod +x tdrive/uploader.sh && \
@@ -107,11 +97,6 @@ RUN cd /app && \
     chown 911:911 tdrive/uploader.sh && \
     chown 911:911 mergerfs.sh
 
-RUN mkdir -p /app/plex && \
-    chown -hR 911:911 /app/plex && \
-    chown 911:911 /app/plex
-
-#Install Uploader UI
 RUN mkdir -p /var/www/html
 COPY --chown=abc html/ /var/www/html
 COPY config/nginx.conf /etc/nginx/nginx.conf
