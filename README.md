@@ -2,13 +2,13 @@
 
 ## Inital Setup
 
-```sh
+```
 mkdir -p /opt/uploader/{keys,plex}
 ```
 
 Copy your rclone file to ``/opt/uploader``
 Use the following to fix the service file paths
-```sh
+```
 (( RUNNING PLEX SERVER SAME HOST ))
 ```
 Copy your PLEX - Preference.xml file to ```/opt/uploader/plex```
@@ -25,7 +25,7 @@ sed -i "s#${OLDPATH}#/config/keys/#g" /opt/uploader/rclone.conf
 
 ## ENVS for the setup 
 
-```sh
+```
 UPLOADS = can be used from 1 - 20
 BWLIMITSET = 10 - 100
 GCE = true or false  for maxout  the upload speed 
@@ -42,11 +42,11 @@ PLEX_SERVER_PORT="32400" = the plex port (! local accesible !)
 
 -----
 
-## NOTE 1: 
+## NOTE: 
 
-``` sh
+```
 
-SAMPLE FOR BWLIMITSET  AND UPLOADS 
+SAMPLE FOR BWLIMITSET AND UPLOADS 
 
 BWLIMITSET  is set to 100
 UPLOADS     is set to 10 
@@ -58,7 +58,7 @@ BWLIMITSET  / UPLOADS  = REAL UPLOADSPEED PER FILE
 
 ## VOLUMES:
 
-```sh
+```
 
 Folder for uploads              =  - /mnt/move:/move
 Folder for config               =  - /opt/uploader:/config
@@ -71,7 +71,7 @@ Dolder for merged contest       =  - /mnt/<pathofmergerfsrootfolder>:/unionfs
 
 ## PORTS 
 
-```sh
+```
 
 PORT A ( HOST )      = 7777
 PORT B ( CONTAINER ) = 8080
@@ -88,7 +88,7 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 
 Default files to be ignored by Uploader are
 
-```sh
+```
 
 ! -name '*partial~'
 ! -name '*_HIDDEN~'
@@ -103,7 +103,7 @@ Default files to be ignored by Uploader are
 
 You can add additional ignores using the ENV ``ADDITIONAL_IGNORES`` e.g.
 
-```sh
+```
 
 -e "ADDITIONAL_IGNORES=! -path '*/SocialMediaDumper/*' ! -path '*/test/*'"
 
@@ -118,31 +118,47 @@ Whats new in this UPLOADER :
 - WebUI is colored 
 - s6-overlay is using the latest version 
 - alpine-docker-image is using latest version
-- some ENV are adddd for more user friendly systems [ see above ENVS ]
+- some ENV are added for more user friendly systems [ see above ENVS ]
 - mobile version is included 
 - it will automatically reduce the bandwidth when plex is running [ see above ENVS ]
 - it will not max out the upload speed [ see above ENVS ]
 - Preference.xml will now edit to docker-preferences.xml
-- VOLUME added [app/plex] 
-- 2 failsafe mods for reading/edit the docker-preferences.xml  and /app/plex folder 
+- 2 failsafe mods for reading/edit the docker-preferences.xml and /app/plex folder 
 
-- NEW FEATURE in the next time !! 
 
+
+- NEW FEATURES in the next time !! 
+
+-----
+
+## Bug or Feature Requests 
+
+I don't open the original repo for the world,
+
+You want a feature or you found a bug,
+
+https://github.com/doob187/uploader-bug-tracker/issues
+
+sinple create here a issue for bug or feature requests 
 
 -----
 
 NOTE: Running Plex Server and Docker Uploader at the same time / same host
-- it will automatically  reduce tbe bandwidth when plex is running
 
-``` sh
-it will use follow variables for this 
+- it will automatically  reduce the bandwidth when plex is running
+
+```
+it will use follow variables for this
+
 When streams are running :
+
 BWLIMITSET = see above 
 PLEX_PLAYS = inside running command
 
 BWLIMITSET / PLEX_PLAYS = UPLOADSPEED per file
 
 When no_streams are running or under 2 streams :
+
 BWLIMITSET = see above
 UPLOADS = see above 
 
@@ -154,7 +170,7 @@ BWLIMITSET / UPLOADS = UPLOADSPEED per file
 
 ## TRAEFIK
 
-```sh
+```
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.redirect.entryPoint=https"
@@ -184,7 +200,7 @@ Original coder is ```physk/rclone-mergerfs``` on gitlab
 
 docker-composer.yml 
 
-```sh
+```
 
 version: "3"
 services:
