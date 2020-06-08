@@ -93,7 +93,7 @@ while true; do
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version'  ! -path 'torrent/*' ! -path 'nzb/*' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*' ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -type f ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version'  ! -path '**torrent/**' ! -path '**nzb/**' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*' ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
 
         # If files are found loop though and upload
