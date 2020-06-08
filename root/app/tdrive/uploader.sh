@@ -102,6 +102,7 @@ while true; do
                 if [ -e "${i}" ]; then
                     # Check if file is still getting bigger
                     FILESIZE1=$(stat -c %s "${i}")
+                    sleep 10
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
                       continue

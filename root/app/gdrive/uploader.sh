@@ -102,13 +102,13 @@ while true; do
             FILEDIR=$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g")
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
-                log "Lock File found for ${i}"
-                continue
+               log "Lock File found for ${i}"
+               continue
             else
                 if [ -e "${i}" ]; then
                     # Check if file is still getting bigger
                     FILESIZE1=$(stat -c %s "${i}")
-                    sleep 3
+                    sleep 10
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
                         log "File is still getting bigger ${i}"
