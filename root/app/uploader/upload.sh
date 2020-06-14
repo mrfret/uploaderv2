@@ -29,7 +29,6 @@ DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
 BWLIMITSET=${BWLIMITSET}
 UPLOADS=${UPLOADS}
-USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 PLEX_STREAMS="/config/json/${FILEBASE}.streams"
@@ -82,30 +81,29 @@ rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
        --config /config/rclone-docker.conf \
        --log-file="${LOGFILE}" --log-level INFO --stats 2s \
        --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
-       --user-agent=${USERAGENT} --no-traverse --fast-list \ 
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
-  sleep 10s
-  rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
+    sleep 10s
+    rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
 fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
-if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
- # shellcheck disable=SC2003
- TIME="$((count=${ENDTIME}-${STARTTIME}))"
- duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
- echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
- message=$(cat "${DISCORD}")
- msg_content=\"$message\"
- USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
- IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
- DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL}"
- curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
-else
- log "[Upload] Upload complete for $FILE, Cleaning up"
- fi
+  if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+   # shellcheck disable=SC2003
+    TIME="$((count=${ENDTIME}-${STARTTIME}))"
+    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+    echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
+    message=$(cat "${DISCORD}")
+    msg_content=\"$message\"
+    USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
+    IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
+    DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL}"
+    curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
+  else
+    log "[Upload] Upload complete for $FILE, Cleaning up"
+  fi
 #cleanup
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
