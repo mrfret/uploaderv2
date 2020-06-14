@@ -23,6 +23,8 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
           ENCRYPTED=true
     fi
 fi
+BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
     ADDITIONAL_IGNORES=""
@@ -93,7 +95,7 @@ while true; do
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*' ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
 
         # If files are found loop though and upload
@@ -102,16 +104,17 @@ while true; do
             FILEDIR=$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g")
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
-                log "Lock File found for ${i}"
-                continue
+               log "Lock File found for ${i}"
+               continue
             else
                 if [ -e "${i}" ]; then
                     # Check if file is still getting bigger
                     FILESIZE1=$(stat -c %s "${i}")
-                    sleep 3
+                    sleep 5
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
                         log "File is still getting bigger ${i}"
+                        sleep 10
                         continue
                     fi
                     # Check if we have any upload slots available
