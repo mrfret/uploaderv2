@@ -8,11 +8,12 @@ function log() {
 }
 #Make sure all the folders we need are created
 path=/config/keys/
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
-mkdir -p /config/discord/
+mkdir -p /config/{pid,json,logs,vars,discord}
+# Remove left over webui and transfer files
+rm -f /config/pid/*
+rm -f /config/json/*
+rm -f /config/logs/*
+rm -f /config/discord/*
 downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
@@ -23,6 +24,8 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
  fi
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+BASICIGNORE=$(! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*')
+DOWNLOADIGNORE=$(! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**')
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
@@ -51,11 +54,6 @@ else
   log "Started for the First Time - Cleaning up if from reboot"
   log "Uploads is set to ${UPLOADS}"
 fi
-# Remove left over webui and transfer files
-rm -f /config/pid/*
-rm -f /config/json/*
-rm -f /config/logs/*
-rm -f /config/discord/*
 # delete any lock files for files that failed to upload
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
@@ -88,7 +86,7 @@ fi
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version'  ! -path '**torrent/**' ! -path '**nzb/**' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*' ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
@@ -100,70 +98,70 @@ while true; do
                continue
             else
                 if [ -e "${i}" ]; then
-                    # Check if file is still getting bigger
-                    FILESIZE1=$(stat -c %s "${i}")
-                    sleep 5
-                    FILESIZE2=$(stat -c %s "${i}")
-                    if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
-                        log "File is still getting bigger ${i}"
-                        sleep 10
-                        continue
-                    fi
-                    # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-                    # shellcheck disable=SC2086
-                    if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
-                       if [ -e "${i}" ]; then
-                          log "Starting upload of ${i}"
-                           GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
-                           # Set gdsa as crypt or not
-                           if [ ${ENCRYPTED} == "true" ]; then
-                              GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
-                           else
-                              GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
-                           fi
-                           /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                           PID=$!
-                           FILEBASE=$(basename "${i}")
-                           echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-                           # shellcheck disable=SC2086
-                           if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                              log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
-                              if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
-                                 GDSAUSE=0
-                                 GDSAAMOUNT=0
-                              else
-                                 GDSAUSE=$(("${GDSAUSE}" + 1))
-                                 GDSAAMOUNT=0
-                              fi
-                              # Record next GDSA in case of crash/reboot
-                              echo "${GDSAUSE}" >/config/vars/lastGDSA
-                           fi
-                           log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                           # Record GDSA transfered in case of crash/reboot
-                           echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                       else
-                          log "File ${i} seems to have dissapeared"
-                       fi
-                   else
-                      log "Already ${UPLOADS} transfers running, waiting for next loop"
-                      break
+                   # Check if file is still getting bigger
+                   FILESIZE1=$(stat -c %s "${i}")
+                   sleep 5
+                   FILESIZE2=$(stat -c %s "${i}")
+                   if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
+                      log "File is still getting bigger ${i}"
+                      sleep 10
+                      continue
                    fi
-               else
-                  log "File not found: ${i}"
-                  continue
-               fi
-           fi
-           if [[ -d "/mnt/tdrive1/${FILEDIR}" || -d "/mnt/tdrive2/${FILEDIR}" ]]; then
-              continue
-           else
-              log "Sleeping 5s before looking at next file"
-              sleep 5
-           fi
-       done
-       log "Finished looking for files, sleeping 5 secs"
-   else
-       log "Nothing to upload, sleeping 5 secs"
-   fi
-   sleep 5
+                   # shellcheck disable=SC2010
+                   TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                   # shellcheck disable=SC2086
+                   if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
+                      if [ -e "${i}" ]; then
+                         log "Starting upload of ${i}"
+                          GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
+                          # Set gdsa as crypt or not
+                          if [ ${ENCRYPTED} == "true" ]; then
+                             GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
+                          else
+                             GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
+                          fi
+                          /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                          PID=$!
+                          FILEBASE=$(basename "${i}")
+                          echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                          # shellcheck disable=SC2086
+                          if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
+                             log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
+                             if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
+                                GDSAUSE=0
+                                GDSAAMOUNT=0
+                             else
+                                GDSAUSE=$(("${GDSAUSE}" + 1))
+                                GDSAAMOUNT=0
+                             fi
+                             # Record next GDSA in case of crash/reboot
+                             echo "${GDSAUSE}" >/config/vars/lastGDSA
+                          fi
+                          log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
+                          # Record GDSA transfered in case of crash/reboot
+                          echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
+                      else
+                         log "File ${i} seems to have dissapeared"
+                      fi
+                  else
+                     log "Already ${UPLOADS} transfers running, waiting for next loop"
+                     break
+                  fi
+              else
+                 log "File not found: ${i}"
+                 continue
+              fi
+          fi
+          if [[ -d "/mnt/tdrive1/${FILEDIR}" || -d "/mnt/tdrive2/${FILEDIR}" ]]; then
+             continue
+          else
+             log "Sleeping 5s before looking at next file"
+             sleep 5
+          fi
+      done
+      log "Finished looking for files, sleeping 5 secs"
+  else
+      log "Nothing to upload, sleeping 5 secs"
+  fi
+  sleep 5
 done

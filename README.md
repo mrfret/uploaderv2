@@ -54,6 +54,34 @@ UPLOADS     is set to 10
 BWLIMITSET  / UPLOADS  = REAL UPLOADSPEED PER FILE 
 
 ```
+## NOTE: Running Plex Server and Docker Uploader at the same time / same host
+
+it will use follow variables for this
+
+When streams are running :
+```
+
+BWLIMITSET = see above 
+PLEX_PLAYS = inside running command
+
+BWLIMITSET / PLEX_PLAYS = UPLOADSPEED per file
+
+```
+
+When no_streams are running or under 2 streams :
+
+```
+
+BWLIMITSET = see above
+UPLOADS = see above 
+
+BWLIMITSET / UPLOADS = UPLOADSPEED per file
+
+```
+
+--------
+
+
 -----
 
 ## VOLUMES:
@@ -83,7 +111,7 @@ PORT B ( CONTAINER ) = 8080
 
 ## Uploader
 
-Uploader will look for remotes in the ``rclone.conf``
+Uploader will look for remotes in the ``*rclone.conf*``
 starting with ``PG``, ``GD``, ``GS`` to upload with
 
 Default files to be ignored by Uploader are
@@ -95,11 +123,29 @@ Default files to be ignored by Uploader are
 ! -name '*.fuse_hidden*'
 ! -name '*.lck'
 ! -name '*.version'
+
+```
+
+Default folders to be ignored by Uploader are
+
+```
+
 ! -path '.unionfs-fuse/*'
 ! -path '.unionfs/*'
 ! -path '*.inProgress/*'
+! -path '**torrent/**' 
+! -path '**nzb/**' 
+! -path '**backup/**' 
+! -path '**nzbget/**' 
+! -path '**jdownloader2/**' 
+! -path '**sabnzbd/**' 
+! -path '**rutorrent/**' 
+! -path '**deluge/**' 
+! -path '**qbittorrent/**')
 
 ```
+
+-----
 
 You can add additional ignores using the ENV ``ADDITIONAL_IGNORES`` e.g.
 
@@ -143,32 +189,7 @@ sinple create here a issue for bug or feature requests
 
 -----
 
-NOTE: Running Plex Server and Docker Uploader at the same time / same host
-
-- it will automatically  reduce the bandwidth when plex is running
-
-```
-it will use follow variables for this
-
-When streams are running :
-
-BWLIMITSET = see above 
-PLEX_PLAYS = inside running command
-
-BWLIMITSET / PLEX_PLAYS = UPLOADSPEED per file
-
-When no_streams are running or under 2 streams :
-
-BWLIMITSET = see above
-UPLOADS = see above 
-
-BWLIMITSET / UPLOADS = UPLOADSPEED per file
-
-```
-
---------
-
-## TRAEFIK
+## TRAEFIK v1.7
 
 ```
     labels:
