@@ -25,6 +25,7 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     LOGHOLDUI="5m" \
+    HOLDFILESONDRIVE=null \
     PLEX_SERVER_IP="plex" \
     PLEX_SERVER_PORT="32400"
 
@@ -91,10 +92,12 @@ RUN cd /app && \
     chmod +x gdrive/uploader.sh && \
     chmod +x tdrive/uploader.sh && \
     chmod +x uploader/upload.sh && \
+    chmod +x update-alpine/update-alpine.sh && \
     chmod +x mergerfs.sh && \
     chown 911:911 uploader/upload.sh && \
     chown 911:911 gdrive/uploader.sh && \
     chown 911:911 tdrive/uploader.sh && \
+    chown 911:911 update-alpine/update-alpine.sh && \
     chown 911:911 mergerfs.sh
 
 RUN mkdir -p /var/www/html
