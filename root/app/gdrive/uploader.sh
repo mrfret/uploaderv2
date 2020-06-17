@@ -99,7 +99,7 @@ while true; do
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
+    mapfile -t files < <(eval find ${downloadpath} -type f -mindepth 1 -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
 
         # If files are found loop though and upload
