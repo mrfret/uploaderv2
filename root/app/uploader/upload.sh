@@ -50,6 +50,9 @@ if [ "${PLEX}" == "true" ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
   fi
 fi
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+   ADDITIONAL_IGNORES=""
+fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 echo "lock" >"${DISCORD}"
