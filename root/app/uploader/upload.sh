@@ -114,7 +114,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
- find "${downloadpath}" -mindepth 2 -type d -empty -delete
+ find "${downloadpath}" -mindepth 2 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
  rm -f "${JSONFILE}"
 else
  sleep 5
@@ -124,7 +124,7 @@ else
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
- find "${downloadpath}" -mindepth 2 -type d -empty -delete
+ find "${downloadpath}" -mindepth 2 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi

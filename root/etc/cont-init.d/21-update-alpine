@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+echo "-> update packages || start <-"
+ apk update -qq && apk upgrade -qq && apk fix -qq
+echo "@daily /app/update-alpine/update-alpine.sh" > /crontab.conf
+crontab /crontab.conf
+echo "-> update packages || done <-"
