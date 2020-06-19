@@ -1,8 +1,11 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
+function log() {
+echo "[Uploader] ${1}"
+}
 
-echo "-> update packages || start <-"
+log "-> update packages || start <-"
  apk update -qq && apk upgrade -qq && apk fix -qq
 echo "@daily /app/update-alpine/update-alpine.sh" > /crontab.conf
 crontab /crontab.conf
-echo "-> update packages || done <-"
+log "-> update packages || done <-"
