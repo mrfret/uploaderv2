@@ -44,7 +44,7 @@ if [ "${PLEX}" == "true" ]; then
 	if [[ ${PLEX_PLAYS} == "0" || ${UPLOADS} -le ${TRANSFERS} ]]; then
      bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
     elif [[ ${PLEX_PLAYS} -ge "0" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
-      bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+      bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
     elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
     else
