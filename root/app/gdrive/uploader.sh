@@ -46,7 +46,7 @@ DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delayis set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
+  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delay is set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
   msg_content=$(cat "${DISCORD}")
   if [[ "${ENCRYPTED}" == "false" ]]; then
     TITEL="Start of GDrive Uploader"
