@@ -2,12 +2,13 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-
+function log() {
+echo "[Uploader] ${1}"
+}
 DISABLE_TDRIVE2=${DISABLE_TDRIVE2:-false}
-
 if [ "${DISABLE_TDRIVE2}" == "true" ] || ! grep -q tdrive2 /config/rclone-docker.conf; then
     touch /etc/services.d/mount-tdrive2/down
-    echo "-> Disabled tdrive2 Mount <-"
+    log "-> Disabled tdrive2 Mount <-"
 else
     echo "${UFSTMP}:/mnt/tdrive2=NC" > /tmp/ufs.path
 fi

@@ -5,22 +5,30 @@
 function log() {
 echo "[Uploader] ${1}"
 }
-log "-> Copying rclone conf <-"
+function rclone() {
+rclone=/config/rclone-docker.conf
+if [ ! -f ${rclone} ]; then
+  log "-> Copying rclone conf <-"
       cp /config/rclone.conf /config/rclone-docker.conf
       sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone-docker.conf
       sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone-docker.conf
       sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone-docker.conf
-log "-> Make needed edits to rclone conf <-"
-
-log "-> install rclone || start <-"
+  log "-> Make needed edits to rclone conf <-"
+else
+  log "-> rclone conf exist <-"
+fi
+}
+function rcloneinstall() {
+if [ ! -f "/usr/bin/rclone" ]; then
+  log "-> install rclone || start <-"
       wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
       unzip -qq rclone.zip && rm rclone.zip && \
       mv rclone*/rclone /usr/bin && rm -rf rclone* 
-log "-> install rclone || done <-"
+  log "-> install rclone || done <-"
+else
+  log "-> rclone is current installed <-"
+fi
+}
 
-log "-> configure mergerfs || start <-"
-      apk --no-cache add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs
-      apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
-      sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
-      rm -rf /var/cache/apk/*
-log "-> configure mergerfs || done <-"
+rclone
+rcloneinstall

@@ -2,14 +2,15 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-
+function log() {
+echo "[Uploader] ${1}"
+}
 DISABLE_TDRIVE1=${DISABLE_TDRIVE1:-false}
 MOVE_BASE=${MOVE_BASE:-/}
-
 if [ "${DISABLE_TDRIVE1}" == "true" ] || ! grep -q tdrive /config/rclone-docker.conf; then
     UFS_PATH="/move${MOVE_BASE}"
     touch /etc/services.d/mount-tdrive1/down
-    echo "-> Disabled tdrive1 Mount <-"
+    log "-> Disabled tdrive1 Mount <-"
 else
     UFS_PATH="/move${MOVE_BASE}:/mnt/tdrive1=NC"
 fi
