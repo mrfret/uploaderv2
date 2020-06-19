@@ -14,7 +14,7 @@ if [ "${PLEX}" == "true" ]; then
 	     echo -e "-> existing ${PLEX_PRE} found ! <- \n-> symlink to new location ${PLEX_FOLDER} <-"
 	     ln -s ${PLEX_OLD} ${PLEX_FOLDER}
 	  fi
-      if [ ! -d ${PLEX_FOLDER} && ! -d ${PLEX_OLD} ]; then
+      if [[ ! -d ${PLEX_FOLDER} && ! -d ${PLEX_OLD} ]]; then
 	  	  echo "-> Creating ${PLEX_PRE} start <-"
 	  	  mkdir -p ${PLEX_FOLDER}
 	  	  find ./config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
