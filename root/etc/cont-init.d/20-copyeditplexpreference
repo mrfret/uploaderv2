@@ -30,7 +30,9 @@ if [ "${PLEX}" == "true" ]; then
       echo "-> Copying ${PLEX_PRE} done  <-"
     fi
    fi
-   chown -hR 911:911 ${PLEX_FOLDER} && chown 911:911 ${PLEX_FOLDER}
+   chown -hR 911:911 ${PLEX_FOLDER}
+   chown -cR 911:911 ${PLEX_FOLDER}
+   chmod +x ${PLEX_FILE}
    echo "-> Permission done  <-"
 else
    echo "-> PLEX is not true | so skipping  <-"
