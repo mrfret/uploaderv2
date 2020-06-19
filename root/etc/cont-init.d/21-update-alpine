@@ -1,8 +1,18 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-
-echo "-> update packages || start <-"
- apk update -qq && apk upgrade -qq && apk fix -qq
-echo "@daily /app/update-alpine/update-alpine.sh" > /crontab.conf
-crontab /crontab.conf
-echo "-> update packages || done <-"
+# Copyright (c) 2020, MrDoob
+# All rights reserved.
+function log() {
+echo "[Uploader] ${1}"
+}
+function update() {
+if [ ! -f "/crontab.conf" ]; then
+   log "-> update packages || start <-"
+   apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
+   echo "@daily /app/update-alpine/update-alpine.sh" > /crontab.conf
+   crontab /crontab.conf
+   log "-> update packages || done <-"
+else
+   log "-> packages up2date <-"
+fi
+}

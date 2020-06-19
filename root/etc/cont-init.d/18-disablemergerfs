@@ -2,10 +2,19 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-
+function log() {
+echo "[Uploader] ${1}"
+}
 DISABLE_MERGERFS=${DISABLE_MERGERFS:-false}
-
 if [ "${DISABLE_MERGERFS}" == "true" ]; then
     touch /etc/services.d/mergerfs/down
-    echo "-> Disabled MergerFS <-"
+    log "-> Disabled MergerFS <-"
+    log "-> configure mergerfs || start <-"
+      apk --no-cache add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs
+      apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
+      sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
+      rm -rf /var/cache/apk/*
+    log "-> configure mergerfs || done <-"
+else 
+    log "-> Disabled MergerFS <-"
 fi
