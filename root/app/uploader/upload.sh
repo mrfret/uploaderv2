@@ -23,6 +23,7 @@ GCE=${GCE}
 PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
 PLEX_SERVER_IP=${PLEX_SERVER_IP}
 PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
+TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -32,6 +33,7 @@ UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
@@ -39,7 +41,9 @@ echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 if [ "${PLEX}" == "true" ]; then
   if [[ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]]; then
     # shellcheck disable=SC2086
-    if [[ ${PLEX_PLAYS} -ge "2" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
+	if [[ ${PLEX_PLAYS} -le ${UPLOADS} && ${TRANSFERS} -le ${UPLOADS} ]]; then
+     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    elif [[ ${PLEX_PLAYS} -ge "2" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
     elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
@@ -68,7 +72,7 @@ if [ ${PLEX} == 'true' ]; then
 elif [ ${GCE} == 'true' ]; then
     BWLIMIT=""
 elif [ ${BWLIMITSET} != 'null' ]; then
-    bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
     BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
@@ -93,21 +97,16 @@ fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
-  if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-   # shellcheck disable=SC2003
-    TIME="$((count=${ENDTIME}-${STARTTIME}))"
-    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-    echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
-    message=$(cat "${DISCORD}")
-    msg_content=\"$message\"
-    USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
-    IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
-    DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL}"
-    curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
-  else
-    log "[Upload] Upload complete for $FILE, Cleaning up"
-  fi
-#cleanup
+if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+ # shellcheck disable=SC2003
+  TIME="$((count=${ENDTIME}-${STARTTIME}))"
+  duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+  echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
+  msg_content=$(cat "${DISCORD}")
+  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+else
+ log "[Upload] Upload complete for $FILE, Cleaning up"
+fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  sleep 5

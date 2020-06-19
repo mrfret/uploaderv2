@@ -5,22 +5,30 @@
 PLEX_FOLDER="/config/plex"
 PLEX_PRE="docker-preferences.xml"
 PLEX_OLD="/config/plexstreams"
+PLEX_FILE=/config/plex/docker-preferences.xml
 
 echo "-> Copying Plex Preference.xml if exists <-"
 if [ "${PLEX}" == "true" ]; then
-   if [ ! -f ${PLEX_FOLDER}/${PLEX_PRE} ]; then
-      if [ -d ${PLEX_OLD} ]; then
-	     echo -e "-> existing ${PLEX_PRE} found ! <- \n-> symlink to new location ${PLEX_FOLDER} <-"
-	     ln -s ${PLEX_OLD} ${PLEX_FOLDER}
-	  fi
-   else 
-	  if [ ! -d ${PLEX_FOLDER} ]; then 
-	  	  mkdir -p ${PLEX_FOLDER}
-	  	  echo "-> Creating folder for ${PLEX_PRE} done <-"
-	  	  find ./config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FOLDER}/${PLEX_PRE} \;
-	  	  find ./app -name "Pre*.xml" -type f -exec cp {} ${PLEX_FOLDER}/${PLEX_PRE} \;
-	  	  echo "-> Copying ${PLEX_PRE} done  <-"
-	  fi
+  if [ ! -f ${PLEX_FILE} ]; then
+    if [ -d ${PLEX_OLD} ]; then
+      echo -e "-> existing ${PLEX_PRE} found ! <- \n-> symlink to new location ${PLEX_FOLDER} <-"
+      ln -s ${PLEX_OLD} ${PLEX_FOLDER}
+    fi
+    if [ ! -f ${PLEX_FILE} ]; then
+      echo "-> Creating ${PLEX_PRE} start <-"
+      mkdir -p ${PLEX_FOLDER}
+      find /config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      find /app -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      echo "-> Copying ${PLEX_PRE} done  <-"
+    fi
+   else
+     if [ ! -d ${PLEX_FOLDER} ]; then
+      mkdir -p ${PLEX_FOLDER}
+      echo "-> Creating folder for ${PLEX_PRE} done <-"
+      find /config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      find /app -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      echo "-> Copying ${PLEX_PRE} done  <-"
+    fi
    fi
    chown -hR 911:911 ${PLEX_FOLDER} && chown 911:911 ${PLEX_FOLDER}
    echo "-> Permission done  <-"
