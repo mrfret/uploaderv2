@@ -63,15 +63,15 @@ RUN \
         tzdata \
         openntpd \
         grep \
-        tar \
-        mc && \
+        tar && \
  echo "**** ${OVERLAY_VERSION} used ****" && \
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
-  apk update -qq && apk upgrade -qq && apk fix -qq && \ 
+  apk update -qq && apk upgrade -qq && apk fix -qq && \
  echo "**** configure mergerfs ****" && \
   apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
-  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
+  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf && \ 
+  rm -rf /var/cache/apk/*
 
 VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
@@ -80,32 +80,20 @@ VOLUME [ "/move" ]
 RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -rf rclone* && \
-    mkdir -p /mnt/tdrive && \
-    mkdir -p /mnt/gdrive && \
     chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
-    chown -hR 911:911 /mnt
-RUN addgroup -g 911 abc && \
+    chown -hR 911:911 /mnt && \
+    mkdir -p /var/www/html && \
+    addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
-COPY root/ /
-RUN cd /app && \
-    chmod +x gdrive/uploader.sh && \
-    chmod +x tdrive/uploader.sh && \
-    chmod +x uploader/upload.sh && \
-    chmod +x update-alpine/update-alpine.sh && \
-    chmod +x mergerfs.sh && \
-    chown 911:911 uploader/upload.sh && \
-    chown 911:911 gdrive/uploader.sh && \
-    chown 911:911 tdrive/uploader.sh && \
-    chown 911:911 update-alpine/update-alpine.sh && \
-    chown 911:911 mergerfs.sh
 
-RUN mkdir -p /var/www/html
+COPY root/ /
 COPY --chown=abc html/ /var/www/html
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
+
 EXPOSE 8080
 
 HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
