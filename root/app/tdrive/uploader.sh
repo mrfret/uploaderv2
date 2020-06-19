@@ -36,22 +36,28 @@ elif [ "${UPLOADS}" -ge '20' ]; then
 else
    UPLOADS=${UPLOADS}
 fi
+HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
+if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
+   HOLDFILESONDRIVE="5"
+fi
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
-  message=$(cat "${DISCORD}")
-  msg_content=\"$message\"
-  USERNAME=\"${DISCORD_NAME_OVERRIDE}\"
-  IMAGE=\"${DISCORD_ICON_OVERRIDE}\"
-  DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL}"
-  curl -H "Content-Type: application/json" -X POST -d "{\"username\": $USERNAME, \"avatar_url\": $IMAGE, \"content\": $msg_content}" $DISCORD_WEBHOOK_URL
+  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delayis set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
+  msg_content=$(cat "${DISCORD}")
+  if [[ "${ENCRYPTED}" == "false" ]]; then
+    TITEL="Start of TDrive Uploader"
+  else
+    TITEL="Start of TCrypt Uploader"
+  fi
+  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
   log "Upload Docker is Starting"
   log "Started for the First Time - Cleaning up if from reboot"
   log "Uploads is set to ${UPLOADS}"
+  log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
 fi
 # Remove left over webui and transfer files
 rm -f /config/pid/*
@@ -90,7 +96,7 @@ fi
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -type f -mindepth 1 -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
