@@ -68,10 +68,10 @@ RUN \
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
   tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
   apk update -qq && apk upgrade -qq && apk fix -qq && \
-  rm -rf /var/cache/apk/* && \
  echo "**** configure mergerfs ****" && \
   apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
-  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf 
+  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf && \ 
+  rm -rf /var/cache/apk/*
 
 VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
@@ -89,10 +89,10 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.z
     adduser -u 911 -D -G abc abc
 
 COPY root/ /
-COPY --chown=abc html/ /var/www/html && \
-     config/nginx.conf /etc/nginx/nginx.conf && \
-     config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf && \
-     config/php.ini /etc/php7/conf.d/zzz_custom.ini
+COPY --chown=abc html/ /var/www/html
+COPY config/nginx.conf /etc/nginx/nginx.conf
+COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
+COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 
 EXPOSE 8080
 
