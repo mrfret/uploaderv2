@@ -19,8 +19,8 @@ log "-> install rclone || start <-"
 log "-> install rclone || done <-"
 
 log "-> configure mergerfs || start <-"
-      apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs
-      apk update -qq && apk upgrade -qq && apk fix -qq
+      apk --no-cache add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs
+      apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
       sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf
       rm -rf /var/cache/apk/*
 log "-> configure mergerfs || done <-"

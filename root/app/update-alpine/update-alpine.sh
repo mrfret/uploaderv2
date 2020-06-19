@@ -14,7 +14,7 @@ log "-> update rclone || done <-"
 
 function update() {
 log "-> update packages || start <-"
-      apk update -qq && apk upgrade -qq && apk fix -qq
+      apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
       rm -rf /var/cache/apk/*
 log "-> update packages || done <-"
 }
