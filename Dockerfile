@@ -33,7 +33,7 @@ ENV ADDITIONAL_IGNORES=null \
 RUN \
  echo "**** install build packages ****" && \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk update -qq && apk upgrade -qq && apk fix -qq && \
+ apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && \
  apk add --quiet --no-cache \
         ca-certificates \
         logrotate \
@@ -66,21 +66,13 @@ RUN \
         tar && \
  echo "**** ${OVERLAY_VERSION} used ****" && \
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
-  tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && \
-  apk update -qq && apk upgrade -qq && apk fix -qq && \
- echo "**** configure mergerfs ****" && \
-  apk add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs && \
-  sed -i 's/#user_allow_other/user_allow_other/' /etc/fuse.conf && \ 
-  rm -rf /var/cache/apk/*
+  tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && rm -rf /tmp/s6-overlay.tar.gz >/dev/null 2>&1
 
 VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
 
-RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
-    unzip -qq rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -rf rclone* && \
-    chown 911:911 /unionfs && \
+RUN chown 911:911 /unionfs && \
     chown 911:911 /config && \
     chown -hR 911:911 /move && \
     chown -hR 911:911 /mnt && \
