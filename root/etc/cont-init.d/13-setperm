@@ -4,20 +4,32 @@
 # All rights reserved.
 DISABLE_UNIONFS_CHOWN=${DISABLE_UNIONFS_CHOWN:-false}
 echo "-> Making sure we have the correct Directorys <-"
-mkdir -p /mnt/tdrive1
-mkdir -p /mnt/tdrive2
-mkdir -p /mnt/gdrive
+mkdir -p /mnt/tdrive1 \
+         /mnt/tdrive2 \
+         /mnt/gdrive \
+         /mnt/gcrypt
 echo "-> Setting Permissions <-"
-chown -hR abc:abc /config
-chown -hR abc:abc /mnt
-chown -hR abc:abc /move
+chown -hR abc:abc  \
+         /config \
+         /mnt \
+         /move
+chmod a+x /app/gdrive/uploader.sh \
+         /app/tdrive/uploader.sh \
+         /app/uploader/upload.sh \
+         /app/update-alpine/update-alpine.sh \
+         /app/mergerfs.sh
+chown -hR abc:abc /app/uploader/upload.sh \
+         /app/gdrive/uploader.sh \
+         /app/tdrive/uploader.sh \
+         /app/update-alpine/update-alpine.sh \
+         /app/mergerfs.sh
+
 if [ "${DISABLE_UNIONFS_CHOWN}" == "false" ]; then
     chown -hR abc:abc /unionfs
 else
     echo "-> Unionfs Chown disabled <-"
 fi
-chown -R abc:abc /run
-chown -R abc:abc /var/lib/nginx
-chown -R abc:abc /var/tmp/nginx
-chown -R abc:abc /var/log/nginx
-chown -R abc:abc /var/www
+chown -R abc:abc /run \
+         /var/lib/nginx \
+         /var/log/nginx \
+         /var/www

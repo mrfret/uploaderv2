@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2019, PhysK
+# Copyright (c) 2020, MrDoob
 # All rights reserved.
 PLEX_FOLDER="/config/plex"
 PLEX_PRE="docker-preferences.xml"
@@ -30,9 +30,7 @@ if [ "${PLEX}" == "true" ]; then
       echo "-> Copying ${PLEX_PRE} done  <-"
     fi
    fi
-   chown -hR 911:911 ${PLEX_FOLDER}
-   chown -cR 911:911 ${PLEX_FOLDER}
-   chmod +x ${PLEX_FILE}
+   chown -hR abc:abc ${PLEX_FOLDER} && chown -cR abc:abc ${PLEX_FILE}
    echo "-> Permission done  <-"
 else
    echo "-> PLEX is not true | so skipping  <-"

@@ -41,17 +41,17 @@ echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 if [ "${PLEX}" == "true" ]; then
   if [[ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]]; then
     # shellcheck disable=SC2086
-	if [[ ${PLEX_PLAYS} -le ${UPLOADS} && ${TRANSFERS} -le ${UPLOADS} ]]; then
+	if [[ ${PLEX_PLAYS} == "0" || ${UPLOADS} -le ${TRANSFERS} ]]; then
      bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    elif [[ ${PLEX_PLAYS} -ge "2" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
+    elif [[ ${PLEX_PLAYS} -ge "0" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
     elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
       bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
     else
-      bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+      bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
     fi
   else
-    bc -l <<< "scale=2; ${BWLIMITSET}/${UPLOADS}" >${PLEX_JSON}
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
   fi
 fi
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
