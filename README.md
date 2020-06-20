@@ -1,6 +1,8 @@
-# docker_uploader
+# DOCKER UPLOADER
 
-## Inital Setup
+----
+
+## INITIAL SETUP
 
 ```
 mkdir -p /opt/uploader/{keys,plex}
@@ -23,7 +25,7 @@ sed -i "s#${OLDPATH}#/config/keys/#g" /opt/uploader/rclone.conf
 ```
 -----
 
-## ENVS for the setup 
+## ENVS FOR THE SETUP
 
 ```
 UPLOADS = can be used from 1 - 20
@@ -42,23 +44,21 @@ PLEX_SERVER_PORT="32400" = the plex port (! local accesible !)
 
 -----
 
-## NOTE: 
+## SAMPLE FOR BWLIMITSET AND UPLOADS
 
 ```
-
-SAMPLE FOR BWLIMITSET AND UPLOADS 
 
 BWLIMITSET  is set to 100
 UPLOADS     is set to 10 
 
-BWLIMITSET  / UPLOADS  = REAL UPLOADSPEED PER FILE 
+BWLIMITSET  / UPLOADS  = REAL UPLOADSPEED PER FILE
 
 ```
-## NOTE: Running Plex Server and Docker Uploader at the same time / same host
 
-it will use follow variables for this
+## IF PLEX AND DOCKER UPLOADER ARE ON THE SAME HOST
 
-When streams are running :
+> **1. WHEN PLEX STREAMS ARE RUNNING :**
+
 ```
 
 BWLIMITSET = see above 
@@ -68,7 +68,7 @@ BWLIMITSET / PLEX_PLAYS = UPLOADSPEED per file
 
 ```
 
-When no_streams are running or under 2 streams :
+> **2. NO PLEX STREAMS ARE RUNNING OR PLEX STREAMS < 2 :**
 
 ```
 
@@ -79,12 +79,11 @@ BWLIMITSET / UPLOADS = UPLOADSPEED per file
 
 ```
 
---------
-
-
 -----
 
-## VOLUMES:
+
+## VOLUMES
+
 
 ```
 
@@ -97,7 +96,9 @@ Dolder for merged contest       =  - /mnt/<pathofmergerfsrootfolder>:/unionfs
 
 -----
 
-## PORTS 
+
+## PORTS
+
 
 ```
 
@@ -109,12 +110,12 @@ PORT B ( CONTAINER ) = 8080
 -----
 
 
-## Uploader
+## UPLOADER
 
 Uploader will look for remotes in the ``*rclone.conf*``
 starting with ``PG``, ``GD``, ``GS`` to upload with
 
-Default files to be ignored by Uploader are
+> **DEFAULT FILES TO BE IGNORED BY UPLOADER:**
 
 ```
 
@@ -126,7 +127,7 @@ Default files to be ignored by Uploader are
 
 ```
 
-Default folders to be ignored by Uploader are
+> **DEFAULT PATHS TO BE IGNORED BY UPLOADER:**
 
 ```
 
@@ -145,9 +146,7 @@ Default folders to be ignored by Uploader are
 
 ```
 
------
-
-You can add additional ignores using the ENV ``ADDITIONAL_IGNORES`` e.g.
+> **SIMILARLY ADDITIONAL IGNORES CAN BE SET USING ENV ``ADDITIONAL_IGNORES`` EXAMPLE:**
 
 ```
 
@@ -159,33 +158,28 @@ You can add additional ignores using the ENV ``ADDITIONAL_IGNORES`` e.g.
 
 ## CHANGELOG
 
-Whats new in this UPLOADER : 
-
-- WebUI is colored 
-- s6-overlay is using the latest version 
-- alpine-docker-image is using latest version
-- some ENV are added for more user friendly systems [ see above ENVS ]
-- mobile version is included 
-- it will automatically reduce the bandwidth when plex is running [ see above ENVS ]
-- it will not max out the upload speed [ see above ENVS ]
-- Preference.xml will now edit to docker-preferences.xml
-- 2 failsafe mods for reading/edit the docker-preferences.xml and /app/plex folder 
+> - WebUI is colored 
+> - s6-overlay:latest version 
+> - alpine-docker-image:latest version
+> - Additional ENV variables added
+> - WEB-UI is optimized for Cellphones 
+> - Automatic Bandwidth Throttling whilst two or more than two Plex streams are running
+> - Upload speed throtlling
+> - Preference.xml (used for bandwidth throtlling whilst a plex stream is running) is now automatically copied and named docker-preferences.xml
+> - 2 failsafe mods added reading/edit the docker-preferences.xml and /app/plex folder. 
 
 
 
-- NEW FEATURES in the next time !! 
+
+- NEW FEATURES COMING !! 
 
 -----
 
-## Bug or Feature Requests 
+## BUGS/FEATURE-REQUESTS  
 
-I don't open the original repo for the world,
-
-You want a feature or you found a bug,
-
+> **The repo is maintained privatley for any bug or feature requests:**
 https://github.com/doob187/uploader-bug-tracker/issues
 
-sinple create here a issue for bug or feature requests 
 
 -----
 
@@ -215,7 +209,7 @@ sinple create here a issue for bug or feature requests
 
 ## ORIGINAL CODER \ CREDITS
 
-Original coder is ```physk/rclone-mergerfs``` on gitlab
+> Original coder is ```physk/rclone-mergerfs``` on gitlab
 
 -----
 
