@@ -37,10 +37,6 @@ elif [ "${UPLOADS}" -ge '20' ]; then
 else
    UPLOADS=${UPLOADS}
 fi
-HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
-if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
-   HOLDFILESONDRIVE="5"
-fi
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -100,7 +96,7 @@ while true; do
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f -mindepth 1 -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
 
         # If files are found loop though and upload
