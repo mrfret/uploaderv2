@@ -33,19 +33,6 @@ find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
 }
-function ignore_files() {
-HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
-if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
-   HOLDFILESONDRIVE="5"
-fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
-find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1
-}
 function gdrive-discord_send_note() {
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}

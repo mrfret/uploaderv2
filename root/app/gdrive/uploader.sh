@@ -16,9 +16,6 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
     ENCRYPTED=true
  fi
 fi
-## function ignore_files
-ignore_files
-## function ignore_files
 UPLOADS=${UPLOADS}
 if [ "${UPLOADS}" == 'null' ]; then
    UPLOADS="8"
@@ -34,6 +31,16 @@ cleanup
 ## function bc-test
 bc-test
 ## function bc-test
+HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
+if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
+   HOLDFILESONDRIVE="5"
+fi
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+   ADDITIONAL_IGNORES=""
+fi
 # Grabs vars from files
 if [ -e /config/vars/lastGDSA ]; then
   GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
@@ -58,7 +65,7 @@ while true; do
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval basic_ignore)
+    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1)
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
