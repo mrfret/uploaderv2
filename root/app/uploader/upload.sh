@@ -54,6 +54,9 @@ if [ "${PLEX}" == "true" ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
   fi
 fi
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
@@ -116,7 +119,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
- find "${downloadpath}" -mindepth 2 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
+ find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
  rm -f "${JSONFILE}"
 else
  sleep 5
@@ -126,7 +129,7 @@ else
  rm -f "${LOGFILE}"
  rm -f "${PID}/${FILEBASE}.trans"
  rm -f "${DISCORD}"
- find "${downloadpath}" -mindepth 2 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
+ find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
