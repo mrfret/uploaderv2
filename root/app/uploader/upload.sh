@@ -30,6 +30,27 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ## bwlimitpart_function
 bwlimit_proccess
+UPLOADS=${UPLOADS}
+CHECKERS="$((${UPLOADS}*2))"
+GCE=${GCE}
+BWLIMITSET=${BWLIMITSET}
+UPLOADS=${UPLOADS}
+# PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
+####
+if [ ${PLEX} == 'true' ]; then
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+elif [ ${GCE} == 'true' ]; then
+    BWLIMIT=""
+elif [ ${BWLIMITSET} != 'null' ]; then
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+else
+    BWLIMIT=""
+    BWLIMITSPEED="no LIMIT was set"
+fi
 ## bwlimitpart_function
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"

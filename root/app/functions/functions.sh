@@ -34,12 +34,17 @@ log "Cleaned up - Sleeping 10 secs"
 sleep 10
 }
 function ignore_files() {
+HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
+if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
+   HOLDFILESONDRIVE="5"
+fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
+find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1
 }
 function gdrive-discord_send_note() {
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -119,7 +124,7 @@ PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
 PLEX_SERVER_IP=${PLEX_SERVER_IP}
 PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
 PLEX=${PLEX}
-PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+# PLEX_STREAMS="/config/json/${FILEBASE}.streams"
 TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
@@ -140,25 +145,5 @@ if [ "${PLEX}" == "true" ]; then
   else
     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
   fi
-fi
-}
-function bwlimit_proccess() {
-GCE=${GCE}
-BWLIMITSET=${BWLIMITSET}
-UPLOADS=${UPLOADS}
-PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
-####
-if [ ${PLEX} == 'true' ]; then
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == 'true' ]; then
-    BWLIMIT=""
-elif [ ${BWLIMITSET} != 'null' ]; then
-    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-else
-    BWLIMIT=""
-    BWLIMITSPEED="no LIMIT was set"
 fi
 }
