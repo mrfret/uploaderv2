@@ -20,10 +20,12 @@ chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
          /app/update-alpine/update-alpine.sh \
+         /app/functions/functions.sh \
          /app/mergerfs.sh
 chown -hR abc:abc /app/uploader/upload.sh \
          /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
+         /app/functions/functions.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
 

@@ -2,17 +2,13 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-# Logging Function
-function log() {
- echo "[Uploader] ${1}"
-}
-#Make sure all the folders we need are created
+## function source
+source /app/functions/functions.sh
 path=/config/keys/
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
-mkdir -p /config/discord/
+#Make sure all the folders we need are created
+## function folders
+folders
+## function folders
 downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
@@ -22,12 +18,9 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
     ENCRYPTED=true
  fi
 fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
+## function ignore_files
+ignore_files
+## function ignore_files
 UPLOADS=${UPLOADS}
 if [ "${UPLOADS}" == 'null' ]; then
    UPLOADS="8"
@@ -40,35 +33,13 @@ HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
 if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
    HOLDFILESONDRIVE="5"
 fi
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-DISCORD="/config/discord/startup.discord"
-if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delay is set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
-  msg_content=$(cat "${DISCORD}")
-  if [[ "${ENCRYPTED}" == "false" ]]; then
-    TITEL="Start of TDrive Uploader"
-  else
-    TITEL="Start of TCrypt Uploader"
-  fi
-  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-else
-  log "Upload Docker is Starting"
-  log "Started for the First Time - Cleaning up if from reboot"
-  log "Uploads is set to ${UPLOADS}"
-  log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
-fi
-# Remove left over webui and transfer files
-rm -f /config/pid/*
-rm -f /config/json/*
-rm -f /config/logs/*
-rm -f /config/discord/*
-# delete any lock files for files that failed to upload
-find ${downloadpath} -type f -name '*.lck' -delete
-log "Cleaned up - Sleeping 10 secs"
-sleep 10
-#### Generates the GDSA List from the Processed Keys
+## function discord-tdrive
+tdrive-discord_send_note
+## function cleanup
+cleanup
+## function bc-test
+bc-test
+## Generates the GDSA List from the Processed Keys
 # shellcheck disable=SC2003
 # shellcheck disable=SC2006
 # shellcheck disable=SC2207
@@ -96,7 +67,7 @@ fi
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f -mindepth 1 -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
+    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"

@@ -2,33 +2,23 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-# Logging Function
-function log() {
-    echo "[Uploader] ${1}"
-}
-#Make sure all the folders we need are created
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
+## function source
+source /app/functions/functions.sh
+## function folders
+folders
 mkdir -p /config/vars/gdrive/
-mkdir -p /config/discord/
 downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
-# Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
-    if grep -q gcrypt /config/rclone-docker.conf; then
-          ENCRYPTED=true
-    fi
+ if grep -q gcrypt /config/rclone-docker.conf; then
+    ENCRYPTED=true
+ fi
 fi
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-    ADDITIONAL_IGNORES=""
-fi
+## function ignore_files
+ignore_files
+## function ignore_files
 UPLOADS=${UPLOADS}
 if [ "${UPLOADS}" == 'null' ]; then
    UPLOADS="8"
@@ -41,68 +31,39 @@ HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
 if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
    HOLDFILESONDRIVE="5"
 fi
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-DISCORD="/config/discord/startup.discord"
-if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delay is set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
-  msg_content=$(cat "${DISCORD}")
-  if [[ "${ENCRYPTED}" == "false" ]]; then
-    TITEL="Start of GDrive Uploader"
-  else
-    TITEL="Start of GCrypt Uploader"
-  fi
-  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-else
-  log "Upload Docker is Starting"
-  log "Started for the First Time - Cleaning up if from reboot"
-  log "Uploads is set to ${UPLOADS}"
-  log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
-fi
-# Remove left over webui and transfer files
-rm -f /config/pid/*
-rm -f /config/json/*
-rm -f /config/logs/*
-rm -f /config/discord/*
-# delete any lock files for files that failed to upload
-find ${downloadpath} -type f -name '*.lck' -delete
-log "Cleaned up - Sleeping 10 secs"
-sleep 10
-# Check if BC is installed
-if [ "$(echo "10 + 10" | bc)" == "20" ]; then
-    log "BC Found! All good :)"
-else
-    log "BC Not installed, Exit"
-    exit 2
-fi
+## function gdrive-send-note
+gdrive-discord_send_note
+## function cleanup
+cleanup
+## function bc-test
+bc-test
+## function bc-test
 # Grabs vars from files
 if [ -e /config/vars/lastGDSA ]; then
-    GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
+  GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
 else
-    GDSAAMOUNT=0
+  GDSAAMOUNT=0
 fi
 # Run Loop
 while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
     for file in "${timestamps[@]}";
     do
-        if [ "$(basename "${file}")" -ge "$(date +%s)" ]; then
-            tmpamount=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
-            if [[ "${tmpamount}" =~ ^[0-9]+$ ]]; then
-                log "taking $(cat "${file}") from ${GDSAAMOUNT}"
-                GDSAAMOUNT=${tmpamount}
-            else
-                GDSAAMOUNT=0
-            fi
-            rm -fr "${file}"
-        fi
+      if [ "$(basename "${file}")" -ge "$(date +%s)" ]; then
+         tmpamount=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
+         if [[ "${tmpamount}" =~ ^[0-9]+$ ]]; then
+            log "taking $(cat "${file}") from ${GDSAAMOUNT}"
+            GDSAAMOUNT=${tmpamount}
+         else
+            GDSAAMOUNT=0
+         fi
+         rm -fr "${file}"
+      fi
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f -mindepth 1 -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
+    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
-
         # If files are found loop though and upload
         log "Files found to upload"
         for i in "${files[@]}"; do
