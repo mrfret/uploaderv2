@@ -33,6 +33,12 @@ UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+   ADDITIONAL_IGNORES=""
+fi
 TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
