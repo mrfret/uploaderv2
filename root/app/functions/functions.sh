@@ -1,39 +1,70 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2020, MrDoob || tHateS || tRiGG3R
+# Copyright (c) 2020, MrDoob || tHaTer || buGGprint
 # All rights reserved.
+## function source
+
 function log() {
     echo "[Uploader] ${1}"
 }
-function folders() {
-#Make sure all the folders we need are created
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
-mkdir -p /config/discord/
+
+function base_folder_gdrive() {
+mkdir -p /config/pid/ \
+         /config/json/ \
+         /config/logs/ \
+         /config/vars/ \
+         /config/discord/ \
+         /config/vars/gdrive/
 }
-function bc-test() {
-# Check if BC is installed
-if [ "$(echo "10 + 10" | bc)" == "20" ]; then
-    log "BC Found! All good :)"
-else
-    log "BC Not installed, Exit"
-    exit 2
-fi
+
+function base_folder_tdrive() {
+mkdir -p /config/pid/ \
+         /config/json/ \
+         /config/logs/ \
+         /config/vars/ \
+         /config/discord/
 }
-function cleanup() {
+
+function remove_old_files_start_up() {
 # Remove left over webui and transfer files
-rm -f /config/pid/*
-rm -f /config/json/*
-rm -f /config/logs/*
-rm -f /config/discord/*
+rm -f /config/pid/* \
+      /config/json/* \
+      /config/logs/* \
+      /config/discord/*
+}
+
+function cleanup_start() {
 # delete any lock files for files that failed to upload
 find ${downloadpath} -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
 }
-function gdrive-discord_send_note() {
+
+function bc_start_up_test() {
+# Check if BC is installed
+if [ "$(echo "10 + 10" | bc)" == "20" ]; then
+    log "BC Found! All good :)"
+else
+    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && apk add bc -qq \
+    rm -rf /var/cache/apk/*
+    log "BC reinstalled, Exit"
+fi
+}
+function rclone() {
+log "-> update rclone || start <-"
+      wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
+      unzip -qq rclone.zip && rm rclone.zip && \
+      mv rclone*/rclone /usr/bin && rm -rf rclone* 
+log "-> update rclone || done <-"
+}
+function update() {
+log "-> update packages || start <-"
+      apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
+      rm -rf /var/cache/apk/*
+log "-> update packages || done <-"
+}
+
+function discord_start_send_gdrive() {
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -55,7 +86,7 @@ else
 fi
 }
 
-function tdrive-discord_send_note() {
+function discord_start_send_tdrive() {
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -74,63 +105,5 @@ else
   log "Started for the First Time - Cleaning up if from reboot"
   log "Uploads is set to ${UPLOADS}"
   log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
-fi
-}
-function remove_left_over() {
-LOGHOLDUI=${LOGHOLDUI}
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
- rm -f "${FILE}.lck"
- rm -f "${PLEX_JSON}"
- rm -f "${PLEX_STREAMS}"
- rm -f "${LOGFILE}"
- rm -f "${PID}/${FILEBASE}.trans"
- rm -f "${DISCORD}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete
-}
-function discord_send_note() {
-TITEL=${DISCORD_EMBED_TITEL}
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
- # shellcheck disable=SC2003
-  TIME="$((count=${ENDTIME}-${STARTTIME}))"
-  duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-  echo "Upload complete for \nFILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED} \nTime : ${duration}" >"${DISCORD}"
-  msg_content=$(cat "${DISCORD}")
-  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-fi
-}
-function plex_process() {
-PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
-PLEX_SERVER_IP=${PLEX_SERVER_IP}
-PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
-PLEX=${PLEX}
-# PLEX_STREAMS="/config/json/${FILEBASE}.streams"
-TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
-PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
-echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-if [ "${PLEX}" == "true" ]; then
-  if [[ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]]; then
-    # shellcheck disable=SC2086
-	if [[ ${PLEX_PLAYS} == "0" || ${UPLOADS} -le ${TRANSFERS} ]]; then
-     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    elif [[ ${PLEX_PLAYS} -ge "0" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
-      bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
-    elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
-      bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
-    else
-      bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    fi
-  else
-    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-  fi
 fi
 }

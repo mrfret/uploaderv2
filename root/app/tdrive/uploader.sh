@@ -4,12 +4,10 @@
 # All rights reserved.
 ## function source
 source /app/functions/functions.sh
-path=/config/keys/
 #Make sure all the folders we need are created
-## function folders
-folders
-## function folders
+base_folder_tdrive
 downloadpath=/move
+path=/config/keys/
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
@@ -17,6 +15,12 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
  if grep -q GDSA01C /config/rclone-docker.conf && grep -q GDSA02C /config/rclone-docker.conf; then
     ENCRYPTED=true
  fi
+fi
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+   ADDITIONAL_IGNORES=""
 fi
 UPLOADS=${UPLOADS}
 if [ "${UPLOADS}" == 'null' ]; then
@@ -26,27 +30,11 @@ elif [ "${UPLOADS}" -ge '20' ]; then
 else
    UPLOADS=${UPLOADS}
 fi
-HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
-if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
-   HOLDFILESONDRIVE="5"
-fi
-## function discord-tdrive
-tdrive-discord_send_note
-## function cleanup
-cleanup
-## function bc-test
-bc-test
-HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
-if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
-   HOLDFILESONDRIVE="5"
-fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
-## Generates the GDSA List from the Processed Keys
+discord_start_send_tdrive
+remove_old_files_start_up
+cleanup_start
+bc_start_up_test
+#### Generates the GDSA List from the Processed Keys
 # shellcheck disable=SC2003
 # shellcheck disable=SC2006
 # shellcheck disable=SC2207
@@ -74,7 +62,7 @@ fi
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1)
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"

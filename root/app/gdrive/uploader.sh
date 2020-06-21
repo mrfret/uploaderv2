@@ -4,17 +4,22 @@
 # All rights reserved.
 ## function source
 source /app/functions/functions.sh
-## function folders
-folders
-mkdir -p /config/vars/gdrive/
+#Make sure all the folders we need are created
+base_folder_gdrive
 downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
- if grep -q gcrypt /config/rclone-docker.conf; then
-    ENCRYPTED=true
- fi
+    if grep -q gcrypt /config/rclone-docker.conf; then
+          ENCRYPTED=true
+    fi
+fi
+BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+    ADDITIONAL_IGNORES=""
 fi
 UPLOADS=${UPLOADS}
 if [ "${UPLOADS}" == 'null' ]; then
@@ -24,49 +29,37 @@ elif [ "${UPLOADS}" -ge '20' ]; then
 else
    UPLOADS=${UPLOADS}
 fi
-## function gdrive-send-note
-gdrive-discord_send_note
-## function cleanup
-cleanup
-## function bc-test
-bc-test
-## function bc-test
-HOLDFILESONDRIVE=${HOLDFILESONDRIVE}
-if [ "${HOLDFILESONDRIVE}" == 'null' ]; then
-   HOLDFILESONDRIVE="5"
-fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
+discord_start_send_gdrive
+remove_old_files_start_up
+cleanup_start
+bc_start_up_test
 # Grabs vars from files
 if [ -e /config/vars/lastGDSA ]; then
-  GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
+    GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
 else
-  GDSAAMOUNT=0
+    GDSAAMOUNT=0
 fi
 # Run Loop
 while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
     for file in "${timestamps[@]}";
     do
-      if [ "$(basename "${file}")" -ge "$(date +%s)" ]; then
-         tmpamount=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
-         if [[ "${tmpamount}" =~ ^[0-9]+$ ]]; then
-            log "taking $(cat "${file}") from ${GDSAAMOUNT}"
-            GDSAAMOUNT=${tmpamount}
-         else
-            GDSAAMOUNT=0
-         fi
-         rm -fr "${file}"
-      fi
+        if [ "$(basename "${file}")" -ge "$(date +%s)" ]; then
+            tmpamount=$(echo "${GDSAAMOUNT} - $(cat "${file}")" | bc)
+            if [[ "${tmpamount}" =~ ^[0-9]+$ ]]; then
+                log "taking $(cat "${file}") from ${GDSAAMOUNT}"
+                GDSAAMOUNT=${tmpamount}
+            else
+                GDSAAMOUNT=0
+            fi
+            rm -fr "${file}"
+        fi
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +${HOLDFILESONDRIVE} ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1)
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
     if [[ ${#files[@]} -gt 0 ]]; then
+
         # If files are found loop though and upload
         log "Files found to upload"
         for i in "${files[@]}"; do
