@@ -65,16 +65,19 @@ while true; do
             FILEDIR=$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g")
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
-               log "Lock File found for ${i}" && continue
+               log "Lock File found for ${i}" 
+			   continue
             else
                if [ -e "${i}" ]; then
-                  sleep 10
+                  sleep 5
                   # Check if file is still getting bigger
                   FILESIZE1=$(stat -c %s "${i}")
-                  sleep 10
+                  sleep 5
                   FILESIZE2=$(stat -c %s "${i}")
                   if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
-                     log "File is still getting bigger ${i}" && sleep 10 && continue
+                     ##log "File is still getting bigger ${i}" 
+					 sleep 5 
+					 continue
                   fi
                   # Check if we have any upload slots available
                   # shellcheck disable=SC2010
@@ -94,7 +97,8 @@ while true; do
                         # Increase or reset $GDSAUSE?
                         # shellcheck disable=SC2086
                         if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                           log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" && break
+                           log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
+                           break
                         fi
                         # Add filesize to file
                         echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
@@ -112,7 +116,7 @@ while true; do
                         log "File ${i} seems to have dissapeared"
                       fi
                    else
-                      log "Already ${UPLOADS} transfers running, waiting for next loop"
+                      ##log "Already ${UPLOADS} transfers running, waiting for next loop"
                       sleep 10       
                       break
                     fi

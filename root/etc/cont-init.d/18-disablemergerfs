@@ -6,9 +6,8 @@ function log() {
 echo "[Uploader] ${1}"
 }
 DISABLE_MERGERFS=${DISABLE_MERGERFS:-false}
-if [ "${DISABLE_MERGERFS}" == "true" ]; then
-    touch /etc/services.d/mergerfs/down
-    log "-> Disabled MergerFS <-"
+if [ "${DISABLE_MERGERFS}" == "false" ]; then
+    log "-> Enabled MergerFS <-"
     log "-> configure mergerfs || start <-"
       apk --no-cache add --quiet --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mergerfs
       apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
@@ -16,5 +15,6 @@ if [ "${DISABLE_MERGERFS}" == "true" ]; then
       rm -rf /var/cache/apk/*
     log "-> configure mergerfs || done <-"
 else 
+    touch /etc/services.d/mergerfs/down
     log "-> Disabled MergerFS <-"
 fi
