@@ -32,7 +32,7 @@ umask 022
 mount_command="/usr/bin/rclone \
 --allow-non-empty \
 --allow-other \
-mount tdrive:Media /mnt/tdrive1 \
+mount tdrive1: /mnt/tdrive1 \
 --uid=${PUID} \
 --gid=${PGID} \
 --size-only \
