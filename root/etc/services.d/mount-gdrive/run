@@ -20,7 +20,7 @@ umask 022
 mount_command="/usr/bin/rclone \
 --allow-non-empty \
 --allow-other \
-mount gdrive:Media /mnt/gdrive \
+mount gdrive: /mnt/gdrive \
 --uid=${PUID} \
 --gid=${PGID} \
 --size-only \

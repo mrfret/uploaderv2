@@ -25,7 +25,7 @@ umask 022
 mount_command="/usr/bin/rclone \
 --allow-non-empty \
 --allow-other \
-mount tdrive-backup:Media /mnt/tdrive2 \
+mount tdrive2: /mnt/tdrive2 \
 --uid=${PUID} \
 --gid=${PGID} \
 --size-only \
