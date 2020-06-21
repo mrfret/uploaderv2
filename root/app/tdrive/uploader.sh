@@ -2,18 +2,12 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-# Logging Function
-function log() {
- echo "[Uploader] ${1}"
-}
+## function source
+source /app/functions/functions.sh
 #Make sure all the folders we need are created
-path=/config/keys/
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
-mkdir -p /config/discord/
+base_folder_tdrive
 downloadpath=/move
+path=/config/keys/
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
@@ -36,34 +30,10 @@ elif [ "${UPLOADS}" -ge '20' ]; then
 else
    UPLOADS=${UPLOADS}
 fi
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-DISCORD="/config/discord/startup.discord"
-if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delay is set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
-  msg_content=$(cat "${DISCORD}")
-  if [[ "${ENCRYPTED}" == "false" ]]; then
-    TITEL="Start of TDrive Uploader"
-  else
-    TITEL="Start of TCrypt Uploader"
-  fi
-  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-else
-  log "Upload Docker is Starting"
-  log "Started for the First Time - Cleaning up if from reboot"
-  log "Uploads is set to ${UPLOADS}"
-  log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
-fi
-# Remove left over webui and transfer files
-rm -f /config/pid/*
-rm -f /config/json/*
-rm -f /config/logs/*
-rm -f /config/discord/*
-# delete any lock files for files that failed to upload
-find ${downloadpath} -type f -name '*.lck' -delete
-log "Cleaned up - Sleeping 10 secs"
-sleep 10
+discord_start_send_tdrive
+remove_old_files_start_up
+cleanup_start
+bc_start_up_test
 #### Generates the GDSA List from the Processed Keys
 # shellcheck disable=SC2003
 # shellcheck disable=SC2006
@@ -77,8 +47,7 @@ GDSACOUNT=$(expr ${#GDSAARRAY[@]} - 1)
 # Check to see if we have any keys
 # shellcheck disable=SC2086
 if [ ${GDSACOUNT} -lt 1 ]; then
-   log "No accounts found to upload with, Exit" 
-   exit 1
+   log "No accounts found to upload with, Exit" || exit 1
 fi
 # Grabs vars from files
 if [ -e /config/vars/lastGDSA ]; then
@@ -92,7 +61,7 @@ fi
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} | sort -k1 )
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
@@ -100,18 +69,16 @@ while true; do
             FILEDIR=$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g")
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
-               log "Lock File found for ${i}"
-               continue
+               log "Lock File found for ${i}" && continue
             else
                 if [ -e "${i}" ]; then
+                    sleep 10
                     # Check if file is still getting bigger
                     FILESIZE1=$(stat -c %s "${i}")
-                    sleep 5
+                    sleep 10
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
-                        log "File is still getting bigger ${i}"
-                        sleep 10
-                        continue
+                       log "File is still getting bigger ${i}" && sleep 10 && continue
                     fi
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
@@ -150,24 +117,22 @@ while true; do
                           log "File ${i} seems to have dissapeared"
                        fi
                    else
-                      log "Already ${UPLOADS} transfers running, waiting for next loop"
-                      break
+                      log "Already ${UPLOADS} transfers running, waiting for next loop" || break
                    fi
                else
-                  log "File not found: ${i}"
-                  continue
+                  log "File not found: ${i}" && continue
                fi
            fi
            if [[ -d "/mnt/tdrive1/${FILEDIR}" || -d "/mnt/tdrive2/${FILEDIR}" ]]; then
               continue
            else
               log "Sleeping 5s before looking at next file"
-              sleep 5
+              sleep 10
            fi
        done
-       log "Finished looking for files, sleeping 5 secs"
+       log "Finished looking for files, sleeping 10 secs"
    else
-       log "Nothing to upload, sleeping 5 secs"
+       log "Nothing to upload, sleeping 10 secs"
    fi
-   sleep 5
+   sleep 10
 done
