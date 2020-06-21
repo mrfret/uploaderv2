@@ -45,7 +45,7 @@ function bc_start_up_test() {
 if [ "$(echo "10 + 10" | bc)" == "20" ]; then
     log "BC Found! All good :)"
 else
-    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && apk add bc -qq \
+    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && apk add bc -qq
     rm -rf /var/cache/apk/*
     log "BC reinstalled, Exit"
 fi
@@ -70,7 +70,7 @@ DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delay is set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
+  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
   msg_content=$(cat "${DISCORD}")
   if [[ "${ENCRYPTED}" == "false" ]]; then
     TITEL="Start of GDrive Uploader"
@@ -82,7 +82,6 @@ else
   log "Upload Docker is Starting"
   log "Started for the First Time - Cleaning up if from reboot"
   log "Uploads is set to ${UPLOADS}"
-  log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
 fi
 }
 
@@ -92,7 +91,7 @@ DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}\nUpload Delay is set to ${HOLDFILESONDRIVE} min" >"${DISCORD}"
+  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
   msg_content=$(cat "${DISCORD}")
   if [[ "${ENCRYPTED}" == "false" ]]; then
     TITEL="Start of TDrive Uploader"
@@ -104,6 +103,5 @@ else
   log "Upload Docker is Starting"
   log "Started for the First Time - Cleaning up if from reboot"
   log "Uploads is set to ${UPLOADS}"
-  log "Upload Delay is set to ${HOLDFILESONDRIVE} min"
 fi
 }
