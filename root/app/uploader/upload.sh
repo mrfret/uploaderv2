@@ -112,23 +112,23 @@ else
 fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
- sleep 5
- rm -f "${FILE}.lck"
- rm -f "${PLEX_JSON}"
- rm -f "${PLEX_STREAMS}"
- rm -f "${LOGFILE}"
- rm -f "${PID}/${FILEBASE}.trans"
- rm -f "${DISCORD}"
+ sleep 1
+ rm -f "${FILE}.lck" \
+       "${PLEX_JSON}" \
+       "${PLEX_STREAMS}" \
+       "${LOGFILE}" \
+       "${PID}/${FILEBASE}.trans" \
+       "${DISCORD}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
  rm -f "${JSONFILE}"
 else
- sleep 5
- rm -f "${FILE}.lck"
- rm -f "${PLEX_JSON}"
- rm -f "${PLEX_STREAMS}"
- rm -f "${LOGFILE}"
- rm -f "${PID}/${FILEBASE}.trans"
- rm -f "${DISCORD}"
+ sleep 1
+ rm -f "${FILE}.lck" \
+       "${PLEX_JSON}" \
+       "${PLEX_STREAMS}" \
+       "${LOGFILE}" \
+       "${PID}/${FILEBASE}.trans" \
+       "${DISCORD}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"

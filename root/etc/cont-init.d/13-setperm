@@ -12,7 +12,7 @@ mkdir -p /mnt/tdrive1 \
          /mnt/tdrive2 \
          /mnt/gdrive \
          /mnt/gcrypt
-log "-> Setting Permissions <-"
+log "-> Setting Permissions || start <-"
 chown -hR abc:abc  \
          /config \
          /mnt \
@@ -29,13 +29,13 @@ chown -hR abc:abc /app/uploader/upload.sh \
          /app/functions/functions.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
-
+chown -R abc:abc /run \
+         /var/lib/nginx \
+         /var/log/nginx \
+         /var/www
+log "-> Setting Permissions || done <-"
 if [ "${DISABLE_UNIONFS_CHOWN}" == "false" ]; then
     chown -hR abc:abc /unionfs
 else
     log "-> Unionfs Chown disabled <-"
 fi
-chown -R abc:abc /run \
-         /var/lib/nginx \
-         /var/log/nginx \
-         /var/www
