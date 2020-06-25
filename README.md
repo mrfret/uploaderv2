@@ -5,7 +5,7 @@
 ## INITIAL SETUP
 
 ```
-mkdir -p /opt/uploader/{keys,plex}
+mkdir -p /opt/uploader/keys
 ```
 
 Copy your rclone file to ``/opt/uploader``
@@ -30,7 +30,7 @@ sed -i "s#${OLDPATH}#/config/keys/#g" /opt/uploader/rclone.conf
 ```
 UPLOADS = can be used from 1 - 20
 BWLIMITSET = 10 - 100
-GCE = true or false  for maxout  the upload speed 
+GCE = true or false for maxout the upload speed 
 PLEX = true or false
 TZ = for local timezone 
 DISCORD_WEBHOOK_URL = for using Discord to track the Uploads
@@ -89,7 +89,6 @@ BWLIMITSET / UPLOADS = UPLOADSPEED per file
 
 Folder for uploads              =  - /mnt/move:/move
 Folder for config               =  - /opt/uploader:/config
-Folder for the plex Preference  =  - /opt/uploader/plex:/app/plex
 Dolder for merged contest       =  - /mnt/<pathofmergerfsrootfolder>:/unionfs
 
 ```
@@ -171,6 +170,7 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 
 
 
+
 - NEW FEATURES COMING !! 
 
 -----
@@ -246,7 +246,6 @@ services:
     volumes:
       - "/mnt/move:/move"
       - "/opt/uploader:/config"
-      - "/opt/uploader/plexstreams:/app/plex"
       - "/mnt/unionfs:/unionfs:shared"
     ports:
       - "7777:8080"
