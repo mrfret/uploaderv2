@@ -18,42 +18,42 @@ FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
-# PLEX=${PLEX}
-# GCE=${GCE}
-# PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
-# PLEX_SERVER_IP=${PLEX_SERVER_IP}
-# PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
+PLEX=${PLEX}
+GCE=${GCE}
+PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
+PLEX_SERVER_IP=${PLEX_SERVER_IP}
+PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
 TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
-# BWLIMITSET=${BWLIMITSET}
-# UPLOADS=${UPLOADS}
+BWLIMITSET=${BWLIMITSET}
+UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
-# PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
-# PLEX_STREAMS="/config/json/${FILEBASE}.streams"
-# TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-# PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
-# PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-# PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
-# echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-# if [ "${PLEX}" == "true" ]; then
-  # if [[ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]]; then
-    # # shellcheck disable=SC2086
-	# if [[ ${PLEX_PLAYS} == "0" || ${UPLOADS} -le ${TRANSFERS} ]]; then
-     # bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    # elif [[ ${PLEX_PLAYS} -ge "0" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
-      # bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
-    # elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
-      # bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
-    # else
-      # bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    # fi
-  # else
-    # bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-  # fi
-# fi
+PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
+PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
+PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
+PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
+echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
+if [ "${PLEX}" == "true" ]; then
+  if [[ ${PLEX_SELFTEST} -ge "200" && ${PLEX_SELFTEST} -lt "299" ]]; then
+    # shellcheck disable=SC2086
+	if [[ ${PLEX_PLAYS} == "0" || ${UPLOADS} -le ${TRANSFERS} ]]; then
+     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    elif [[ ${PLEX_PLAYS} -ge "0" && ${PLEX_PLAYS} -le ${UPLOADS} ]]; then
+      bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
+    elif [ ${PLEX_PLAYS} -ge ${UPLOADS} ]; then
+      bc -l <<< "scale=2; ${BWLIMITSET}/${PLEX_PLAYS}" >${PLEX_JSON}
+    else
+      bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    fi
+  else
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+  fi
+fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
@@ -69,21 +69,19 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-# if [ ${PLEX} == 'true' ]; then
-    # BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    # BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-# elif [ ${GCE} == 'true' ]; then
-    # BWLIMIT=""
-# elif [ ${BWLIMITSET} != 'null' ]; then
-    # bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    # BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    # BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-# else
-    # BWLIMIT=""
-    # BWLIMITSPEED="no LIMIT was set"
-# fi
-bwlimitpart
-BWLIMIT=${BWLIMIT}
+if [ ${PLEX} == 'true' ]; then
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+elif [ ${GCE} == 'true' ]; then
+    BWLIMIT=""
+elif [ ${BWLIMITSET} != 'null' ]; then
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+else
+    BWLIMIT=""
+    BWLIMITSPEED="no LIMIT was set"
+fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI

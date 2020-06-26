@@ -97,9 +97,6 @@ while true; do
                            else
                               GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                            fi
-						   bwlimitpart "${i}" &
-                           FILEBASE=$(basename "${i}")
-						   sleep 1
                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                            PID=$!
                            FILEBASE=$(basename "${i}")
