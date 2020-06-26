@@ -16,3 +16,5 @@ else
    log "-> packages up2date <-"
 fi
 }
+
+update
