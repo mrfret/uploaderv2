@@ -120,7 +120,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
 	   "${VNSTAT_JSON}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
+ find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  rm -f "${JSONFILE}"
 else
  sleep 1
@@ -131,7 +131,7 @@ else
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
 	   "${VNSTAT_JSON}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
+ find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi

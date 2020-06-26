@@ -9,10 +9,12 @@ function vnstat_install() {
 if [ ! -f "/etc/vnstat.conf" ]; then
    log "-> install vnstat || start <-"
    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
-   apk add vnstat  -qq
+   apk add vnstat -qq
    rm -rf /var/cache/apk/*
    log "-> install vnstat || done <-"
 else
    log "-> package vnstat already installed <-"
 fi
 }
+
+vnstat_install
