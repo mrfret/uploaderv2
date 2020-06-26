@@ -246,3 +246,4 @@ else
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
+}
