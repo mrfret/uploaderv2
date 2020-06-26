@@ -97,10 +97,10 @@ while true; do
                            else
                               GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                            fi
-                           bwlimitpart "${i}" &
+						   bwlimitpart "${i}" &
                            FILEBASE=$(basename "${i}")
-                           sleep 1
-                           uploader "${i}" "${GDSA_TO_USE}" &
+						   sleep 1
+                           /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                            PID=$!
                            FILEBASE=$(basename "${i}")
                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
