@@ -61,7 +61,8 @@ RUN \
         libxml2-utils \
         tzdata \
         openntpd \
-        grep \
+        grep \ 
+        vnstat \
         tar && \
  echo "**** ${OVERLAY_VERSION} used ****" && \
   curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
