@@ -118,7 +118,8 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${PLEX_STREAMS}" \
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
-       "${DISCORD}"
+       "${DISCORD}" \
+	   "${VNSTAT_JSON}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
  rm -f "${JSONFILE}"
 else
@@ -128,7 +129,8 @@ else
        "${PLEX_STREAMS}" \
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
-       "${DISCORD}"
+       "${DISCORD}" \
+	   "${VNSTAT_JSON}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
