@@ -47,16 +47,16 @@ if [ ${PLEX} == "true" ]; then
    PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    vnstat -tr > ${VNSTAT_JSON}
-    # MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
-    # out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`
-    # used_upload_speed=$(($MAXUPLOADSPEED - `cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`))
-   outscaled=$(($(($((${BWLIMITSET} * 10)) - `cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`)) / 10))
+   MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
+   out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`
+   outx1=$(($MAXUPLOADSPEED - $out))
+   outscaled=$(($outx1 / 10))
    bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
    BWLIMITSPEED="$(cat ${PLEX_JSON})"
    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == 'true' ]; then
+elif [ ${GCE} == "true" ]; then
    BWLIMIT=""
-elif [ ${BWLIMITSET} != 'null' ]; then
+elif [ ${BWLIMITSET} != "null" ]; then
    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
    BWLIMITSPEED="$(cat ${PLEX_JSON})"
    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
