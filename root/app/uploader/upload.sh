@@ -42,7 +42,7 @@ echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 ##### First Test
 if [ ${PLEX} == 'true' ]; then
    vnstat -tr > ${VNSTAT_JSON}
-   out=`cat ${VNSTAT_JSON} | grep tx | grep -v MB/s  | awk '{print $2}' | cut  -d . -f1`
+   out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbits  | awk '{print $2}' | cut  -d . -f1`
    outx1=$((${BWLIMITSET} - $out))
    bc -l <<< "scale=2; ${outx1} - 2" >${PLEX_JSON}
    BWLIMITSPEED="$(cat ${PLEX_JSON})"
