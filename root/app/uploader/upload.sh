@@ -51,7 +51,7 @@ if [ ${PLEX} == "true" ]; then
    out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`
    outx1=$(($MAXUPLOADSPEED - $out))
    outscaled=$(($outx1 / 10))
-   bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
+   bc -l <<< "scale=2; ${outscaled}" >${PLEX_JSON}
    BWLIMITSPEED="$(cat ${PLEX_JSON})"
    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == "true" ]; then
