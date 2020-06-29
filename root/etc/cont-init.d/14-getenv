@@ -14,16 +14,20 @@ RC_ADDR=${RC_ADDR:-0.0.0.0:25975}
 RC_USER=${RC_USER:-user}
 RC_PASS=${RC_PASS:-xxx}
 POLL_INTERVAL=${POLL_INTERVAL:-5m}
-#######
-UPLOADS=${UPLOADS:-4}
-BWLIMITSET=${BWLIMITSET:-80}
-CHUNK=${CHUNK:-32}
-TZ=${TZ:-Europe/Berlin}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-RCLONE}
-DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Upload Completed}
-LOGHOLDUI=${LOGHOLDUI:-5m}
-PLEX=${PLEX:-false}
-GCE=${GCE:-false}
-PLEX_SERVER_IP=${PLEX_SERVER_IP:-plex}
-PLEX_SERVER_PORT=${PLEX_SERVER_PORT:-32400}
+
+# echo "
+# Rclone ENV vars
+# ------------------------------------------------
+# --dir-cache-time              ${DIR_CACHE_TIME}
+# --vfs-read-chunk-size         ${VFS_READ_CHUNK_SIZE}
+# --vfs-cache-max-age           ${VFS_CACHE_MAX_AGE}
+# --vfs-read-chunk-size-limit   ${VFS_READ_CHUNK_SIZE_LIMIT}
+# --vfs-cache-mode              ${VFS_CACHE_MODE}
+# --buffer-size                 ${BUFFER_SIZE}
+# --poll-interval               ${POLL_INTERVAL}
+# --rc                          ${RC_ENABLED}
+# --rc-addr                     ${RC_ADDR}
+# --rc-user                     ${RC_USER}
+# --rc-pass                     REDACTED
+# ------------------------------------------------
+# "

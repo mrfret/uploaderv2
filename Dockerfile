@@ -15,7 +15,19 @@ ARG OVERLAY_ARCH="amd64"
 ARG OVERLAY_VERSION="v2.0.0.1"
 
 ENV ADDITIONAL_IGNORES=null \
-    DISCORD_WEBHOOK_URL=null
+    UPLOADS="4" \
+    BWLIMITSET="80" \
+    CHUNK="32" \
+    PLEX="true" \
+    GCE="false" \
+    TZ="Europe/Berlin" \
+    DISCORD_WEBHOOK_URL=null \
+    DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
+    DISCORD_NAME_OVERRIDE="RCLONE" \
+    DISCORD_EMBED_TITEL="Upload Completed" \
+    LOGHOLDUI="5m" \
+    PLEX_SERVER_IP="plex" \
+    PLEX_SERVER_PORT="32400"
 
 RUN \
  echo "**** install build packages ****" && \
