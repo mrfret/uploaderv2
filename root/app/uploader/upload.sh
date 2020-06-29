@@ -40,22 +40,13 @@ PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/
 PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
 echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
 ##### First Test
-if [ ${PLEX} == 'true' ]; then
+if [ "${PLEX}" == "true" ]; then
    vnstat -tr > ${VNSTAT_JSON}
-   out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbits  | awk '{print $2}' | cut  -d . -f1`
-   outx1=$((${BWLIMITSET} - $out))
-   bc -l <<< "scale=2; ${outx1} - 2" >${PLEX_JSON}
-   BWLIMITSPEED="$(cat ${PLEX_JSON})"
-   BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == 'true' ]; then
-    BWLIMIT=""
-elif [ ${BWLIMITSET} != 'null' ]; then
-    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-else
-    BWLIMIT=""
-    BWLIMITSPEED="no LIMIT was set"
+   MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
+   out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`
+   outx1=$(($MAXUPLOADSPEED - $out))
+   outscaled=$(($outx1 / 10))
+   bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
@@ -71,6 +62,20 @@ HRFILESIZE=$(stat -c %s "${FILE}" | numfmt --to=iec-i --suffix=B --padding=7)
 REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
+##bwlimitpart
+if [ ${PLEX} == 'true' ]; then
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+elif [ ${GCE} == 'true' ]; then
+    BWLIMIT=""
+elif [ ${BWLIMITSET} != 'null' ]; then
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+else
+    BWLIMIT=""
+    BWLIMITSPEED="no LIMIT was set"
+fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
@@ -115,7 +120,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
        "${VNSTAT_JSON}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
+ find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
  rm -f "${JSONFILE}"
 else
  sleep 1
@@ -126,7 +131,7 @@ else
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
        "${VNSTAT_JSON}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
+ find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -delete 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
