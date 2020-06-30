@@ -63,12 +63,12 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-if [ ${PLEX} == 'true' ]; then
+if [ "${PLEX}" == 'true' ]; then
     BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == 'true' ]; then
+elif [ "${GCE}" == 'true' ]; then
     BWLIMIT=""
-elif [ ${BWLIMITSET} != 'null' ]; then
+elif [ "${BWLIMITSET}" != 'null' ]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
     BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
