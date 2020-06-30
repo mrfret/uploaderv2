@@ -19,11 +19,7 @@ ENV ADDITIONAL_IGNORES=null \
     BWLIMITSET="80" \
     CHUNK="32" \
     TZ="Europe/Berlin" \
-    DISCORD_WEBHOOK_URL=null \
-    DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
-    DISCORD_NAME_OVERRIDE="RCLONE" \
-    DISCORD_EMBED_TITEL="Upload Completed" \
-    LOGHOLDUI="5m"
+    DISCORD_WEBHOOK_URL=null
 
 RUN \
  echo "**** install build packages ****" && \
