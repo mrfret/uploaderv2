@@ -111,37 +111,38 @@ else
   log "Uploads is set to ${UPLOADS}"
 fi
 }
- function getenvs() {
- UPLOADS=${UPLOADS}
-if [ ${UPLOADS} == '' ]; then
+
+function getenvs() {
+UPLOADS=${UPLOADS}
+if [ "${UPLOADS}" == '' ]; then
    UPLOADS=${UPLOADS:-4}
 else
    UPLOADS=${UPLOADS}
 fi
 ###
 BWLIMITSET=${BWLIMITSET}
-if [ ${BWLIMITSET} == '' ]; then
+if [ "${BWLIMITSET}" == '' ]; then
    BWLIMITSET=${BWLIMITSET:-80}
 else
    BWLIMITSET=${BWLIMITSET}
 fi
 ###
 CHUNK=${CHUNK}
-if [ ${CHUNK} == '' ]; then
+if [ "${CHUNK}" == '' ]; then
    CHUNK=${CHUNK:-32}
 else
    CHUNK=${CHUNK}
 fi
 ###
 TZ=${TZ}
-if [ ${TZ} == '' ]; then
+if [ "${TZ}" == '' ]; then
    TZ=${TZ:-UTC}
 else
    TZ=${TZ}
 fi
 ###
 LOGHOLDUI=${LOGHOLDUI}
-if [ ${LOGHOLDUI} == '' ]; then
+if [ "${LOGHOLDUI}" == '' ]; then
    LOGHOLDUI=${LOGHOLDUI:-5m}
 else
    LOGHOLDUI=${LOGHOLDUI}
@@ -165,7 +166,7 @@ fi
 
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 
-if [ ${DISCORD_WEBHOOK_URL} == 'null' ]; then 
+if [ "${DISCORD_WEBHOOK_URL}" == 'null' ]; then 
   LOGHOLDUI=${LOGHOLDUI:-5m}
  else
   DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
