@@ -15,10 +15,6 @@ ARG OVERLAY_ARCH="amd64"
 ARG OVERLAY_VERSION="v2.0.0.1"
 
 ENV ADDITIONAL_IGNORES=null \
-    UPLOADS="4" \
-    BWLIMITSET="80" \
-    CHUNK="32" \
-    TZ="Europe/Berlin" \
     DISCORD_WEBHOOK_URL=null
 
 RUN \

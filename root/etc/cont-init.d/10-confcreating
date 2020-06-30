@@ -5,6 +5,7 @@
 function log() {
 echo "[Uploader] ${1}"
 }
+
 function rclone() {
 rclone=/config/rclone-docker.conf
 if [ ! -f ${rclone} ]; then
@@ -18,6 +19,7 @@ else
   log "-> rclone conf exist <-"
 fi
 }
+
 function rcloneinstall() {
 if [ ! -f "/usr/bin/rclone" ]; then
   log "-> install rclone || start <-"
