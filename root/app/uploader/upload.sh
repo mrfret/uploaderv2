@@ -39,15 +39,6 @@ PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' 
 PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
 PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
 echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-##### First Test
-if [ "${PLEX}" == "true" ]; then
-   vnstat -tr > ${VNSTAT_JSON}
-   MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
-   out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`
-   outx1=$(($MAXUPLOADSPEED - $out))
-   outscaled=$(($outx1 / 10))
-   bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
-fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
@@ -63,12 +54,18 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-if [ "${PLEX}" == 'true' ]; then
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ "${GCE}" == 'true' ]; then
+if [[ ${PLEX} == 'true' && ${GCE} != 'true' ]]; then
+   vnstat -tr > ${VNSTAT_JSON}
+   MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
+   out=`cat ${VNSTAT_JSON} | grep tx | grep -v kbit | awk '{print $2}' | cut  -d . -f1`
+   outx1=$(($MAXUPLOADSPEED - $out))
+   outscaled=$(($outx1 / 10))
+   bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
+   BWLIMITSPEED="$(cat ${PLEX_JSON})"
+   BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+elif [[ ${GCE} == 'true' && ${PLEX} != 'true' ]]; then
     BWLIMIT=""
-elif [ "${BWLIMITSET}" != 'null' ]; then
+elif [[ ${GCE} != 'true' && ${PLEX} != 'true' && ${BWLIMITSET} != 'null' ]]; then
     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
     BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
