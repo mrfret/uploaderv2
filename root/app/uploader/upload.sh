@@ -7,6 +7,13 @@
 function log() {
     echo "[Uploader] ${1}"
 }
+
+## getenvs recall
+source /app/functions/functions.sh
+getenvs
+
+## getenvs recall
+
 downloadpath=/move
 IFS=$'\n'
 FILE=$1

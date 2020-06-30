@@ -50,15 +50,13 @@ else
    LOGHOLDUI=${LOGHOLDUI}
 fi
 ###
-# PLEX=${PLEX:-false}
-# GCE=${GCE:-false}
 PLEX_FILE=/config/plex/docker-preferences.xml
 GCECHECK=$(dnsdomainname | tail -c 10)
 if [ -f ${PLEX_FILE} ]; then
   PLEX=${PLEX:-true}
   PLEX_SERVER_IP=${PLEX_SERVER_IP:-plex}
   PLEX_SERVER_PORT=${PLEX_SERVER_PORT:-32400}
-  GCE=false
+  GCE=${GCE:-false}
  elif [ "$gcheck" == ".internal" ]; then
   PLEX=${PLEX:-false}
   GCE=${GCE:-true}
@@ -70,7 +68,7 @@ fi
 
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 
-if [ ${DISCORD_WEBHOOK_URL} == 'null' ]; then 
+if [ "${DISCORD_WEBHOOK_URL}" == 'null' ]; then 
   LOGHOLDUI=${LOGHOLDUI:-5m}
  else
   DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
@@ -95,14 +93,29 @@ fi
 # ------------------------------------------------
 # "
 
+function envs() {
+echo "
+DOCKER ENV vars
+------------------------------------------------
+   UPLOADS                     ${UPLOADS}
+   BWLIMITSET                  ${BWLIMITSET}
+   CHUNK                       ${CHUNK}
+   TimeZone                    ${TZ}
 
-echo ${UPLOADS}
-echo ${BWLIMITSET}
-echo ${PLEX}
-echo ${GCE}
-echo ${CHUNK}
-echo ${TZ}
-echo ${PLEX_SERVER_IP}
-echo ${PLEX_SERVER_PORT}
-
-sleep 60
+   GCE                         ${GCE}
+   PLEX                        ${PLEX}
+   PLEX_SERVER_IP              ${PLEX_SERVER_IP}
+   PLEX_SERVER_PORT            ${PLEX_SERVER_PORT}
+   DISCORD_EMBED_TITEL         ${DISCORD_EMBED_TITEL}
+   DISCORD_NAME_OVERRIDE       ${DISCORD_NAME_OVERRIDE}
+------------------------------------------------
+"
+}
+DEBUG=${DEBUG:-false}
+if [ "${DEBUG}" == 'false' ]; then
+ envs
+ sleep 5
+else
+ envs
+ sleep 60
+fi

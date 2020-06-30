@@ -65,6 +65,9 @@ log "-> update packages || done <-"
 }
 
 function discord_start_send_gdrive() {
+
+getenvs
+
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -86,6 +89,9 @@ fi
 }
 
 function discord_start_send_tdrive() {
+
+getenvs
+
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
@@ -103,5 +109,67 @@ else
   log "Upload Docker is Starting"
   log "Started for the First Time - Cleaning up if from reboot"
   log "Uploads is set to ${UPLOADS}"
+fi
+}
+ function getenvs() {
+ UPLOADS=${UPLOADS}
+if [ ${UPLOADS} == '' ]; then
+   UPLOADS=${UPLOADS:-4}
+else
+   UPLOADS=${UPLOADS}
+fi
+###
+BWLIMITSET=${BWLIMITSET}
+if [ ${BWLIMITSET} == '' ]; then
+   BWLIMITSET=${BWLIMITSET:-80}
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
+###
+CHUNK=${CHUNK}
+if [ ${CHUNK} == '' ]; then
+   CHUNK=${CHUNK:-32}
+else
+   CHUNK=${CHUNK}
+fi
+###
+TZ=${TZ}
+if [ ${TZ} == '' ]; then
+   TZ=${TZ:-UTC}
+else
+   TZ=${TZ}
+fi
+###
+LOGHOLDUI=${LOGHOLDUI}
+if [ ${LOGHOLDUI} == '' ]; then
+   LOGHOLDUI=${LOGHOLDUI:-5m}
+else
+   LOGHOLDUI=${LOGHOLDUI}
+fi
+###
+PLEX_FILE=/config/plex/docker-preferences.xml
+GCECHECK=$(dnsdomainname | tail -c 10)
+if [ -f ${PLEX_FILE} ]; then
+  PLEX=${PLEX:-true}
+  PLEX_SERVER_IP=${PLEX_SERVER_IP:-plex}
+  PLEX_SERVER_PORT=${PLEX_SERVER_PORT:-32400}
+  GCE=${GCE:-false}
+ elif [ "$gcheck" == ".internal" ]; then
+  PLEX=${PLEX:-false}
+  GCE=${GCE:-true}
+ else
+  PLEX=${PLEX:-false}
+  GCE=${GCE:-false}
+  LOGHOLDUI=${LOGHOLDUI:-5m}
+fi
+
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+
+if [ ${DISCORD_WEBHOOK_URL} == 'null' ]; then 
+  LOGHOLDUI=${LOGHOLDUI:-5m}
+ else
+  DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
+  DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-RCLONE}
+  DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Upload_Completed}
 fi
 }
