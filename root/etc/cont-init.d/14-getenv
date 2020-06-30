@@ -15,38 +15,67 @@
 #RC_PASS=${RC_PASS:-xxx}
 #POLL_INTERVAL=${POLL_INTERVAL:-5m}
 ######################################
-UPLOADS=4
-BWLIMITSET=80
-CHUNK=32
-TZ=UTC
-LOGHOLDUI=5m
+UPLOADS=${UPLOADS}
+if [ "${UPLOADS}" == '' ]; then
+   UPLOADS=${UPLOADS:-4}
+else
+   UPLOADS=${UPLOADS}
+fi
+###
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == '' ]; then
+   BWLIMITSET=${BWLIMITSET:-80}
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
+###
+CHUNK=${CHUNK}
+if [ "${CHUNK}" == '' ]; then
+   CHUNK=${CHUNK:-32}
+else
+   CHUNK=${CHUNK}
+fi
+###
+TZ=${TZ}
+if [ "${TZ}" == '' ]; then
+   TZ=${TZ:-UTC}
+else
+   TZ=${TZ}
+fi
+###
+LOGHOLDUI=${LOGHOLDUI}
+if [ "${LOGHOLDUI}" == '' ]; then
+   LOGHOLDUI=${LOGHOLDUI:-5m}
+else
+   LOGHOLDUI=${LOGHOLDUI}
+fi
+###
 # PLEX=${PLEX:-false}
 # GCE=${GCE:-false}
 PLEX_FILE=/config/plex/docker-preferences.xml
 GCECHECK=$(dnsdomainname | tail -c 10)
 if [ -f ${PLEX_FILE} ]; then
-  PLEX=true
-  PLEX_SERVER_IP=plex
-  PLEX_SERVER_PORT=32400
+  PLEX=${PLEX:-true}
+  PLEX_SERVER_IP=${PLEX_SERVER_IP:-plex}
+  PLEX_SERVER_PORT=${PLEX_SERVER_PORT:-32400}
   GCE=false
  elif [ "$gcheck" == ".internal" ]; then
-  PLEX=false
-  GCE=true
+  PLEX=${PLEX:-false}
+  GCE=${GCE:-true}
  else
-  PLEX=false
-  GCE=false
-  LOGHOLDUI=5m
-
+  PLEX=${PLEX:-false}
+  GCE=${GCE:-false}
+  LOGHOLDUI=${LOGHOLDUI:-5m}
 fi
 
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 
-if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then 
-  DISCORD_ICON_OVERRIDE=https://i.imgur.com/MZYwA1I.png
-  DISCORD_NAME_OVERRIDE=RCLONE
-  DISCORD_EMBED_TITEL=Upload_Completed
-else
-  LOGHOLDUI=5m
+if [ ${DISCORD_WEBHOOK_URL} == 'null' ]; then 
+  LOGHOLDUI=${LOGHOLDUI:-5m}
+ else
+  DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
+  DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-RCLONE}
+  DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Upload_Completed}
 fi
 
 # echo "
@@ -65,3 +94,15 @@ fi
 # --rc-pass                     REDACTED
 # ------------------------------------------------
 # "
+
+
+echo ${UPLOADS}
+echo ${BWLIMITSET}
+echo ${PLEX}
+echo ${GCE}
+echo ${CHUNK}
+echo ${TZ}
+echo ${PLEX_SERVER_IP}
+echo ${PLEX_SERVER_PORT}
+
+sleep 60
