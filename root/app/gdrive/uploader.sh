@@ -39,6 +39,21 @@ if [ -e /config/vars/lastGDSA ]; then
 else
    GDSAAMOUNT=0
 fi
+# PLEX=${PLEX:-false}
+# GCE=${GCE:-false}
+# GCECHECK=$(dnsdomainname | tail -c 10)
+# if [[ "${PLEX}" == "false" && "${GCE}" == "false" ]]; then
+ # if [ -f /config/plex/docker-preferences.xml ]; then
+    # PLEX=true
+	# GCE=false
+ # elif [ "$gcheck" == ".internal" ]; then
+    # PLEX=false
+	# GCE=true
+ # else
+    # PLEX=false
+	# GCE=false
+ # fi
+# fi
 # Run Loop
 while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)

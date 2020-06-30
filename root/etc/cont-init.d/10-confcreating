@@ -1,0 +1,75 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+# Copyright (c) 2019, PhysK
+# All rights reserved.
+function log() {
+echo "[Uploader] ${1}"
+}
+function rclone() {
+rclone=/config/rclone-docker.conf
+if [ ! -f ${rclone} ]; then
+  log "-> Copying rclone conf <-"
+      cp /config/rclone.conf /config/rclone-docker.conf
+      sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone-docker.conf
+      sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone-docker.conf
+      sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone-docker.conf
+  log "-> Make needed edits to rclone conf <-"
+else
+  log "-> rclone conf exist <-"
+fi
+}
+function rcloneinstall() {
+if [ ! -f "/usr/bin/rclone" ]; then
+  log "-> install rclone || start <-"
+      wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
+      unzip -qq rclone.zip && rm rclone.zip && \
+      mv rclone*/rclone /usr/bin && rm -rf rclone* 
+  log "-> install rclone || done <-"
+else
+  log "-> rclone is current installed <-"
+fi
+}
+
+function plex_check_preference() {
+PLEX_FOLDER="/config/plex"
+PLEX_PRE="docker-preferences.xml"
+PLEX_OLD="/config/plexstreams"
+PLEX_FILE=/config/plex/docker-preferences.xml
+##########
+PLEXCHECK1=`find /config -name "Pre*.xml" -type f -print`
+PLEXCHECK2=`find /app -name "Pre*.xml" -type f -print`
+##########
+
+echo "-> Copying Plex Preference.xml if exists <-"
+if [[ "$PLEXCHECK1" != "" || "$PLEXCHECK2" != "" ]]; then
+  if [ ! -f ${PLEX_FILE} ]; then
+    if [ -d ${PLEX_OLD} ]; then
+      echo -e "-> existing ${PLEX_PRE} found ! <- \n-> symlink to new location ${PLEX_FOLDER} <-"
+      ln -s ${PLEX_OLD} ${PLEX_FOLDER}
+    fi
+    if [ ! -f ${PLEX_FILE} ]; then
+      echo "-> Creating ${PLEX_PRE} start <-"
+      mkdir -p ${PLEX_FOLDER}
+      find /config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      find /app -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      echo "-> Copying ${PLEX_PRE} done  <-"
+    fi
+   else
+     if [ ! -d ${PLEX_FOLDER} ]; then
+      mkdir -p ${PLEX_FOLDER}
+      echo "-> Creating folder for ${PLEX_PRE} done <-"
+      find /config -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      find /app -name "Pre*.xml" -type f -exec cp {} ${PLEX_FILE} \;
+      echo "-> Copying ${PLEX_PRE} done  <-"
+    fi
+   fi
+   chown -hR abc:abc ${PLEX_FOLDER} && chown -cR abc:abc ${PLEX_FILE}
+   echo "-> Permission done  <-"
+else
+   echo "-> No Plex Preference file found || so skipping  <-"
+fi
+}
+
+rclone
+rcloneinstall
+plex_check_preference
