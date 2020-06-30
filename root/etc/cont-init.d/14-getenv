@@ -15,35 +15,37 @@
 #RC_PASS=${RC_PASS:-xxx}
 #POLL_INTERVAL=${POLL_INTERVAL:-5m}
 ######################################
-UPLOADS=${UPLOADS:-4}
-BWLIMITSET=${BWLIMITSET:-80}
-CHUNK=${CHUNK:-32}
-TZ=${TZ:-UTC}
-LOGHOLDUI=${LOGHOLDUI:-5m}
+UPLOADS="4"
+BWLIMITSET="80"
+CHUNK="32"
+TZ="UTC"
+LOGHOLDUI="5m"
 # PLEX=${PLEX:-false}
 # GCE=${GCE:-false}
 PLEX_FILE=/config/plex/docker-preferences.xml
 GCECHECK=$(dnsdomainname | tail -c 10)
 if [ -f ${PLEX_FILE} ]; then
-  PLEX=${PLEX:-true}
-  PLEX_SERVER_IP=${PLEX_SERVER_IP:-plex}
-  PLEX_SERVER_PORT=${PLEX_SERVER_PORT:-32400}
-  GCE=${GCE:-false}
+  PLEX="true"
+  PLEX_SERVER_IP="plex"
+  PLEX_SERVER_PORT="32400"
+  GCE="false"
  elif [ "$gcheck" == ".internal" ]; then
-  PLEX=${PLEX:-false}
-  GCE=${GCE:-true}
+  PLEX="false"
+  GCE="true"
  else
-  PLEX=${PLEX:-false}
-  GCE=${GCE:-false}
-  LOGHOLDUI=${LOGHOLDUI:-5m}
+  PLEX="false"
+  GCE="false"
+  LOGHOLDUI="5m"
 fi
 
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then 
-  DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
-  DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-RCLONE}
-  DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Upload Completed}
+  DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png"
+  DISCORD_NAME_OVERRIDE="RCLONE"
+  DISCORD_EMBED_TITEL="Upload Completed"
 else
-  LOGHOLDUI=${LOGHOLDUI:5m}
+  LOGHOLDUI="5m"
 fi
 
 # echo "
