@@ -3,78 +3,17 @@
 # Copyright (c) 2019, PhysK
 # All rights reserved.
 
-#DIR_CACHE_TIME=${DIR_CACHE_TIME:-2m}
-#VFS_READ_CHUNK_SIZE=${VFS_READ_CHUNK_SIZE:-96M}
-#VFS_CACHE_MAX_AGE=${VFS_CACHE_MAX_AGE:-675h}
-#VFS_READ_CHUNK_SIZE_LIMIT=${VFS_READ_CHUNK_SIZE_LIMIT:-1G}
-#VFS_CACHE_MODE=${VFS_CACHE_MODE:-writes}
-#BUFFER_SIZE=${BUFFER_SIZE:-48M}
-#RC_ENABLED=${RC_ENABLED:-false}
-#RC_ADDR=${RC_ADDR:-0.0.0.0:25975}
-#RC_USER=${RC_USER:-user}
-#RC_PASS=${RC_PASS:-xxx}
-#POLL_INTERVAL=${POLL_INTERVAL:-5m}
-######################################
-UPLOADS=${UPLOADS}
-if [ "${UPLOADS}" == '' ]; then
-   UPLOADS=${UPLOADS:-4}
-else
-   UPLOADS=${UPLOADS}
-fi
-###
-BWLIMITSET=${BWLIMITSET}
-if [ "${BWLIMITSET}" == '' ]; then
-   BWLIMITSET=${BWLIMITSET:-80}
-else
-   BWLIMITSET=${BWLIMITSET}
-fi
-###
-CHUNK=${CHUNK}
-if [ "${CHUNK}" == '' ]; then
-   CHUNK=${CHUNK:-32}
-else
-   CHUNK=${CHUNK}
-fi
-###
-TZ=${TZ}
-if [ "${TZ}" == '' ]; then
-   TZ=${TZ:-UTC}
-else
-   TZ=${TZ}
-fi
-###
-LOGHOLDUI=${LOGHOLDUI}
-if [ "${LOGHOLDUI}" == '' ]; then
-   LOGHOLDUI=${LOGHOLDUI:-5m}
-else
-   LOGHOLDUI=${LOGHOLDUI}
-fi
-###
-PLEX_FILE=/config/plex/docker-preferences.xml
-GCECHECK=$(dnsdomainname | tail -c 10)
-if [ -f ${PLEX_FILE} ]; then
-  PLEX=${PLEX:-true}
-  PLEX_SERVER_IP=${PLEX_SERVER_IP:-plex}
-  PLEX_SERVER_PORT=${PLEX_SERVER_PORT:-32400}
-  GCE=${GCE:-false}
- elif [ "$gcheck" == ".internal" ]; then
-  PLEX=${PLEX:-false}
-  GCE=${GCE:-true}
- else
-  PLEX=${PLEX:-false}
-  GCE=${GCE:-false}
-  LOGHOLDUI=${LOGHOLDUI:-5m}
-fi
-
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-
-if [ "${DISCORD_WEBHOOK_URL}" == 'null' ]; then 
-  LOGHOLDUI=${LOGHOLDUI:-5m}
- else
-  DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
-  DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-RCLONE}
-  DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Upload_Completed}
-fi
+DIR_CACHE_TIME=${DIR_CACHE_TIME:-2m}
+VFS_READ_CHUNK_SIZE=${VFS_READ_CHUNK_SIZE:-96M}
+VFS_CACHE_MAX_AGE=${VFS_CACHE_MAX_AGE:-675h}
+VFS_READ_CHUNK_SIZE_LIMIT=${VFS_READ_CHUNK_SIZE_LIMIT:-1G}
+VFS_CACHE_MODE=${VFS_CACHE_MODE:-writes}
+BUFFER_SIZE=${BUFFER_SIZE:-48M}
+RC_ENABLED=${RC_ENABLED:-false}
+RC_ADDR=${RC_ADDR:-0.0.0.0:25975}
+RC_USER=${RC_USER:-user}
+RC_PASS=${RC_PASS:-xxx}
+POLL_INTERVAL=${POLL_INTERVAL:-5m}
 
 # echo "
 # Rclone ENV vars
@@ -92,30 +31,3 @@ fi
 # --rc-pass                     REDACTED
 # ------------------------------------------------
 # "
-
-function envs() {
-echo "
-DOCKER ENV vars
-------------------------------------------------
-   UPLOADS                     ${UPLOADS}
-   BWLIMITSET                  ${BWLIMITSET}
-   CHUNK                       ${CHUNK}
-   TimeZone                    ${TZ}
-
-   GCE                         ${GCE}
-   PLEX                        ${PLEX}
-   PLEX_SERVER_IP              ${PLEX_SERVER_IP}
-   PLEX_SERVER_PORT            ${PLEX_SERVER_PORT}
-   DISCORD_EMBED_TITEL         ${DISCORD_EMBED_TITEL}
-   DISCORD_NAME_OVERRIDE       ${DISCORD_NAME_OVERRIDE}
-------------------------------------------------
-"
-}
-DEBUG=${DEBUG:-false}
-if [ "${DEBUG}" == 'false' ]; then
- envs
- sleep 5
-else
- envs
- sleep 60
-fi

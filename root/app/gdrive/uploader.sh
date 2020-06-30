@@ -21,7 +21,14 @@ ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
-getenvs
+UPLOADS=${UPLOADS}
+if [ "${UPLOADS}" == 'null' ]; then
+   UPLOADS="8"
+elif [ "${UPLOADS}" -ge '20' ]; then
+   UPLOADS="8"
+else
+   UPLOADS=${UPLOADS}
+fi
 discord_start_send_gdrive
 remove_old_files_start_up
 cleanup_start
@@ -32,7 +39,6 @@ if [ -e /config/vars/lastGDSA ]; then
 else
    GDSAAMOUNT=0
 fi
-
 # Run Loop
 while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)

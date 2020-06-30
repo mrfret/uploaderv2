@@ -22,8 +22,14 @@ DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' 
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
-
-getenvs
+UPLOADS=${UPLOADS}
+if [ "${UPLOADS}" == 'null' ]; then
+   UPLOADS="8"
+elif [ "${UPLOADS}" -ge '20' ]; then
+   UPLOADS="8"
+else
+   UPLOADS=${UPLOADS}
+fi
 discord_start_send_tdrive
 remove_old_files_start_up
 cleanup_start
@@ -52,21 +58,6 @@ else
    GDSAUSE=0
    GDSAAMOUNT=0
 fi
-# PLEX=${PLEX:-false}
-# GCE=${GCE:-false}
-# GCECHECK=$(dnsdomainname | tail -c 10)
-# if [[ "${PLEX}" == "false" && "${GCE}" == "false" ]]; then
- # if [ -f /config/plex/docker-preferences.xml ]; then
-    # PLEX=true
-	# GCE=false
- # elif [ "$gcheck" == ".internal" ]; then
-    # PLEX=false
-	# GCE=true
- # else
-    # PLEX=false
-	# GCE=false
- # fi
-# fi
 # Run Loop
 while true; do
     #Find files to transfer
