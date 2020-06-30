@@ -15,37 +15,38 @@
 #RC_PASS=${RC_PASS:-xxx}
 #POLL_INTERVAL=${POLL_INTERVAL:-5m}
 ######################################
-UPLOADS="4"
-BWLIMITSET="80"
-CHUNK="32"
-TZ="UTC"
-LOGHOLDUI="5m"
+UPLOADS=4
+BWLIMITSET=80
+CHUNK=32
+TZ=UTC
+LOGHOLDUI=5m
 # PLEX=${PLEX:-false}
 # GCE=${GCE:-false}
 PLEX_FILE=/config/plex/docker-preferences.xml
 GCECHECK=$(dnsdomainname | tail -c 10)
 if [ -f ${PLEX_FILE} ]; then
-  PLEX="true"
-  PLEX_SERVER_IP="plex"
-  PLEX_SERVER_PORT="32400"
-  GCE="false"
+  PLEX=true
+  PLEX_SERVER_IP=plex
+  PLEX_SERVER_PORT=32400
+  GCE=false
  elif [ "$gcheck" == ".internal" ]; then
-  PLEX="false"
-  GCE="true"
+  PLEX=false
+  GCE=true
  else
-  PLEX="false"
-  GCE="false"
-  LOGHOLDUI="5m"
+  PLEX=false
+  GCE=false
+  LOGHOLDUI=5m
+
 fi
 
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then 
-  DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png"
-  DISCORD_NAME_OVERRIDE="RCLONE"
-  DISCORD_EMBED_TITEL="Upload Completed"
+  DISCORD_ICON_OVERRIDE=https://i.imgur.com/MZYwA1I.png
+  DISCORD_NAME_OVERRIDE=RCLONE
+  DISCORD_EMBED_TITEL=Upload_Completed
 else
-  LOGHOLDUI="5m"
+  LOGHOLDUI=5m
 fi
 
 # echo "
