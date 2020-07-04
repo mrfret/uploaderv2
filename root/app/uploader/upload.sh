@@ -33,7 +33,7 @@ else
    BWLIMITSET=${BWLIMITSET}
 fi
 GCE=${GCE:-false}
-if [[ "${GCE}" == "false" ]]; then
+if [ "${GCE}" == "false" ]; then
 gcheck=$(dnsdomainname | tail -c 10)
  if [ "$gcheck" == ".internal" ]; then
     GCE=true
