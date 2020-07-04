@@ -15,6 +15,27 @@ RC_USER=${RC_USER:-user}
 RC_PASS=${RC_PASS:-xxx}
 POLL_INTERVAL=${POLL_INTERVAL:-5m}
 
+PLEX=${PLEX:-false}
+test_2=$(ls -la /config  | grep -c xml)
+test_1=$(ls -la /app  | grep -c xml)
+if [ ${PLEX} == "false" ]; then
+  if [[ ${test_1} == "1"  || ${test_2} == "1" ]]; then
+    PLEX=true
+  fi
+fi
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
+GCE=${GCE:-false}
+if [[ "${GCE}" == "false" ]]; then
+gcheck=$(dnsdomainname | tail -c 10)
+ if [ "$gcheck" == ".internal" ]; then
+    GCE=true
+ fi
+fi
 # echo "
 # Rclone ENV vars
 # ------------------------------------------------
@@ -31,3 +52,27 @@ POLL_INTERVAL=${POLL_INTERVAL:-5m}
 # --rc-pass                     REDACTED
 # ------------------------------------------------
 # "
+
+function envs() {
+echo "
+   DOCKER ENV vars
+-------------------------------------------------------
+   BWLIMITSET                  ${BWLIMITSET}
+   CHUNK                       ${CHUNK}
+   TimeZone                    ${TZ}
+
+   GCE                         ${GCE}
+   PLEX                        ${PLEX}
+   DISCORD_EMBED_TITEL         ${DISCORD_EMBED_TITEL}
+   DISCORD_NAME_OVERRIDE       ${DISCORD_NAME_OVERRIDE}
+-------------------------------------------------------
+"
+}
+DEBUG=${DEBUG:-false}
+if [ "${DEBUG}" == 'false' ]; then
+ envs
+ sleep 5
+else
+ envs
+ sleep 60
+fi

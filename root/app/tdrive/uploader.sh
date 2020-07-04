@@ -22,14 +22,6 @@ DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' 
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
-UPLOADS=${UPLOADS}
-if [ "${UPLOADS}" == 'null' ]; then
-   UPLOADS="8"
-elif [ "${UPLOADS}" -ge '20' ]; then
-   UPLOADS="8"
-else
-   UPLOADS=${UPLOADS}
-fi
 discord_start_send_tdrive
 remove_old_files_start_up
 cleanup_start
@@ -58,6 +50,13 @@ else
    GDSAUSE=0
    GDSAAMOUNT=0
 fi
+
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
 # Run Loop
 while true; do
     #Find files to transfer
@@ -85,11 +84,12 @@ while true; do
                        continue
                     fi
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
-                       if [ -e "${i}" ]; then
-                          log "Starting upload of ${i}"
+                      if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le ${BWLIMITSET} ]; then
+                        log "Upload Bandwith is less then ${BWLIMITSET}M"
+                         if [ -e "${i}" ]; then
+                           log "Starting upload of ${i}"
                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                            # Set gdsa as crypt or not
                            if [ ${ENCRYPTED} == "true" ]; then
@@ -97,10 +97,10 @@ while true; do
                            else
                               GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                            fi
-                           /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                           PID=$!
-                           FILEBASE=$(basename "${i}")
-                           echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            PID=$!
+                            FILEBASE=$(basename "${i}")
+                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
                            # shellcheck disable=SC2086
                            if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
                               log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
@@ -117,14 +117,16 @@ while true; do
                            log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
                            # Record GDSA transfered in case of crash/reboot
                            echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                       else
-                          log "File ${i} seems to have dissapeared"
+                         else
+                            log "File ${i} seems to have dissapeared"
+                         fi
+                      else 
+                         log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                         log "Upload Bandwith is reached || wait for next loop"
+                         sleep 5
+                         break
                        fi
-                   else
-                      ##log "Already ${UPLOADS} transfers running, waiting for next loop" 
-					  break
-                   fi
-               else
+                 else
                   log "File not found: ${i}"
 				  continue
                fi
@@ -133,12 +135,12 @@ while true; do
               continue
            else
               log "Sleeping 5s before looking at next file"
-              sleep 10
+              sleep 5
            fi
        done
-       log "Finished looking for files, sleeping 10 secs"
+       log "Finished looking for files, sleeping 5 secs"
    else
-       log "Nothing to upload, sleeping 10 secs"
+       log "Nothing to upload, sleeping 5 secs"
    fi
-   sleep 10
+   sleep 5
 done

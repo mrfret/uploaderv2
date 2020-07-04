@@ -6,9 +6,18 @@ PLEX_FOLDER="/config/plex"
 PLEX_PRE="docker-preferences.xml"
 PLEX_OLD="/config/plexstreams"
 PLEX_FILE=/config/plex/docker-preferences.xml
-PLEX=${PLEX}
 echo "-> Copying Plex Preference.xml if exists <-"
-if [ "${PLEX}" == "true" ]; then
+PLEX=${PLEX:-false}
+test_2=$(ls -la /config  | grep -c xml)
+test_1=$(ls -la /app  | grep -c xml)
+
+if [ ${PLEX} == "false" ]; then
+  if [[ ${test_1} == "1"  || ${test_2} == "1" ]]; then
+    PLEX=true
+  fi
+fi
+
+if [ ${PLEX} == "true" ]; then
   if [ ! -f ${PLEX_FILE} ]; then
     if [ -d ${PLEX_OLD} ]; then
       echo -e "-> existing ${PLEX_PRE} found ! <- \n-> symlink to new location ${PLEX_FOLDER} <-"

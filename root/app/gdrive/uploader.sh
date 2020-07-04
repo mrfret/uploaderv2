@@ -15,19 +15,17 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
      ENCRYPTED=true
   fi
 fi
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
-fi
-UPLOADS=${UPLOADS}
-if [ "${UPLOADS}" == 'null' ]; then
-   UPLOADS="8"
-elif [ "${UPLOADS}" -ge '20' ]; then
-   UPLOADS="8"
-else
-   UPLOADS=${UPLOADS}
 fi
 discord_start_send_gdrive
 remove_old_files_start_up
@@ -81,9 +79,10 @@ while true; do
                   fi
                   # Check if we have any upload slots available
                   # shellcheck disable=SC2010
-                  TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                  # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                   # shellcheck disable=SC2086
-                  if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
+                    if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le ${BWLIMITSET} ]; then
+                       log "Upload Bandwith is less then ${BWLIMITSET}M"
                      if [ -e "${i}" ]; then
                         log "Starting upload of ${i}"
                         # Append filesize to GDSAAMOUNT
@@ -100,9 +99,7 @@ while true; do
                            log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
                            break
                         fi
-                        # Add filesize to file
-                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
-                        # Run plex & upload script demonised
+                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
                         /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                         PID=$!
                         FILEBASE=$(basename "${i}")
@@ -115,10 +112,11 @@ while true; do
                       else
                         log "File ${i} seems to have dissapeared"
                       fi
-                   else
-                      ##log "Already ${UPLOADS} transfers running, waiting for next loop"
-                      sleep 10       
-                      break
+                    else 
+                       log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                       log "bwlimit is reached || wait for next loop"
+                       sleep 5
+                       break
                     fi
                 else
                     log "File not found: ${i}"
