@@ -49,7 +49,7 @@ if [ ${PLEX} == "true" ]; then
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
    vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
-   bc -l <<< "scale=2; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
+   bc <<< "scale=0; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
@@ -67,7 +67,7 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [ ${PLEX} == "true" ]; then
-     BWLIMITSPEED="$(cat ${PLEX_JSON})"
+     BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
      BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == "true" ]; then
      BWLIMIT=""
