@@ -32,7 +32,6 @@ if [ "${BWLIMITSET}" == 'null' ]; then
 else
    BWLIMITSET=${BWLIMITSET}
 fi
-fi
 GCE=${GCE:-false}
 if [[ "${GCE}" == "false" ]]; then
 gcheck=$(dnsdomainname | tail -c 10)
