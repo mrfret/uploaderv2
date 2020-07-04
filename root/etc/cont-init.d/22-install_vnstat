@@ -16,6 +16,7 @@ if [ ! -f ${vnstat} ]; then
    sed -i 's/UnitMode 0/UnitMode 1/g' /etc/vnstat.conf
    sed -i 's/RateUnit 1/RateUnit 0/g' /etc/vnstat.conf
    sed -i 's/Locale "-"/Locale "LC_ALL=en_US.UTF-8"/g' /etc/vnstat.conf
+   vnstat --remove -i eth1 --force 1>/dev/null 2>&1
    vnstat -i eth0 1>/dev/null 2>&1
    log "-> create vnstat database || done <-"
    chown -R vnstat:vnstat /var/lib/vnstat/
@@ -25,6 +26,7 @@ else
    sed -i 's/UnitMode 0/UnitMode 1/g' /etc/vnstat.conf
    sed -i 's/RateUnit 1/RateUnit 0/g' /etc/vnstat.conf
    sed -i 's/Locale "-"/Locale "LC_ALL=en_US.UTF-8"/g' /etc/vnstat.conf
+   vnstat --remove -i eth1 --force 1>/dev/null 2>&1
    vnstat -i eth0 1>/dev/null 2>&1
    log "-> create vnstat database || done <-"
    chown -R vnstat:vnstat /var/lib/vnstat/
