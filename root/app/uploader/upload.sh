@@ -43,14 +43,14 @@ TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 ##### BWLIMIT-PART
 if [ ${PLEX} == "true" ]; then
    PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
+   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
    PLEX_SERVER_IP=${PLEX_SERVER_IP}
    PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
    PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
    PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
-   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   bc <<< "scale=0; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
+   bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
