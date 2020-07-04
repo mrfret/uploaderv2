@@ -35,11 +35,10 @@ fi
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 LOGHOLDUI=${LOGHOLDUI}
 BWLIMITSET=${BWLIMITSET}
-UPLOADS=${UPLOADS}
-CHECKERS="$((${UPLOADS}*2))"
+TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+CHECKERS="$((${TRANSFERS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 PLEX_STREAMS="/config/json/${FILEBASE}.streams"
-TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 ##### BWLIMIT-PART
 if [ ${PLEX} == "true" ]; then
    PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
@@ -126,7 +125,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
-	   "${VNSTAT_JSON}"
+       "${VNSTAT_JSON}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  rm -f "${JSONFILE}"
 else
@@ -137,7 +136,7 @@ else
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
-	   "${VNSTAT_JSON}"
+       "${VNSTAT_JSON}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
