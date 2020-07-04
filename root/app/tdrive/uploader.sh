@@ -20,22 +20,12 @@ PLEX=${PLEX:-false}
 if [[ "${PLEX}" == "false" ]]; then
  if [ -f /config/plex/docker-preferences.xml ]; then
     PLEX=true
-	GCE=false
- else 
-    PLEX=false
-	GCE=false
- fi
 fi
 GCE=${GCE:-false}
 if [[ "${GCE}" == "false" ]]; then
 gcheck=$(dnsdomainname | tail -c 10)
  if [ "$gcheck" == ".internal" ]; then
-    PLEX=false
     GCE=true
- else 
-    PLEX=false
-    GCE=false
- fi
 fi
 
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
@@ -109,7 +99,16 @@ while true; do
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
+					if [ ${PLEX} == "true" ]; then 
+                      VNSTAT_JSON="/config/json/bwlimit.monitor"
+                      BWLIMIT_JSON="/config/json/bwlimit.system"
+                      vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+                      bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
+					fi
+					if [ ${PLEX} == "true" && $(cat ${BWLIMIT_JSON}) != "0" ]; then
+                       sleep 5
+                       continue
+					  if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                        if [ -e "${i}" ]; then
                           log "Starting upload of ${i}"
                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
@@ -119,22 +118,10 @@ while true; do
                            else
                               GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                            fi
-						   if [ ${PLEX} == "true" ]; then
-                              VNSTAT_JSON="/config/json/bwlimit.monitor"
-                              BWLIMIT_JSON="/config/json/bwlimit.system"
-                              vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
-                              bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
-							  if [ $(cat ${BWLIMIT_JSON}) == "0" ]; then
-                                  log "bwlimit is reached || wait for next loop"
-                                  sleep 5
-                                  continue
-                              fi
-						   else
-                              /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                              PID=$!
-                              FILEBASE=$(basename "${i}")
-                              echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-						   fi
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            PID=$!
+                            FILEBASE=$(basename "${i}")
+                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
                            # shellcheck disable=SC2086
                            if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
                               log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
@@ -157,6 +144,11 @@ while true; do
                    else
                       ##log "Already ${UPLOADS} transfers running, waiting for next loop" 
 					  break
+                   fi
+                  else 					   
+                     log "bwlimit is reached || wait for next loop"
+                     sleep 5
+                     break
                    fi
                else
                   log "File not found: ${i}"

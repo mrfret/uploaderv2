@@ -22,22 +22,12 @@ PLEX=${PLEX:-false}
 if [[ "${PLEX}" == "false" ]]; then
  if [ -f /config/plex/docker-preferences.xml ]; then
     PLEX=true
-    GCE=false
- else 
-    PLEX=false
-    GCE=false
- fi
 fi
 GCE=${GCE:-false}
 if [[ "${GCE}" == "false" ]]; then
 gcheck=$(dnsdomainname | tail -c 10)
  if [ "$gcheck" == ".internal" ]; then
-    PLEX=false
     GCE=true
- else 
-    PLEX=false
-    GCE=false
- fi
 fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -58,17 +48,6 @@ if [ ${PLEX} == "true" ]; then
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
    vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
    bc -l <<< "scale=2; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
-   BWLIMITSPEED="$(cat ${PLEX_JSON})"
-   BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == 'true' ]; then
-    BWLIMIT=""
-elif [ ${BWLIMITSET} != 'null' ]; then
-    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-else
-    BWLIMIT=""
-    BWLIMITSPEED="no LIMIT was set"
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
@@ -85,19 +64,19 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-# if [ ${PLEX} == 'true' ]; then
-   # BWLIMITSPEED="$(cat ${PLEX_JSON})"
-   # BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-# elif [ ${GCE} == 'true' ]; then
-    # BWLIMIT=""
-# elif [ ${BWLIMITSET} != 'null' ]; then
-    # bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    # BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    # BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-# else
-    # BWLIMIT=""
-    # BWLIMITSPEED="no LIMIT was set"
-# fi
+if [ ${PLEX} == "true" ]; then
+     BWLIMITSPEED="$(cat ${PLEX_JSON})"
+     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+elif [ ${GCE} == "true" ]; then
+     BWLIMIT=""
+elif [ ${BWLIMITSET} != "null" ]; then
+     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+     BWLIMITSPEED="$(cat ${PLEX_JSON})"
+     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+else
+     BWLIMIT=""
+     BWLIMITSPEED="no LIMIT was set"
+fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
