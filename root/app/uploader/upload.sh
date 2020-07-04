@@ -47,8 +47,7 @@ if [ ${PLEX} == "true" ]; then
    PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
    PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+   VNSTAT_JSON="/config/json/bwlimit.monitor"
    bc <<< "scale=0; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}

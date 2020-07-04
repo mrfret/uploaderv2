@@ -90,15 +90,14 @@ while true; do
                   TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                   # shellcheck disable=SC2086
                   if [ ${PLEX} == "true" ]; then
-                     VNSTAT_JSON="/config/json/bwlimit.monitor"
-                     BWLIMIT_JSON="/config/json/bwlimit.system"
-                     vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
-                     bc <<< "scale=0; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
-                      if [ "$(cat /config/json/bwlimit.system | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" == "-10" ]; then
+                       VNSTAT_JSON="/config/json/bwlimit.monitor"
+                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+                     if [ ${BWLIMITSET} -le "$(cat /config/json/bwlimit.monitor | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
                         log "bwlimit is reached || wait for next loop"
                         sleep 5
+                        UPLOADS=0
                         break
-                   fi
+                      fi
                   fi
                   if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                      if [ -e "${i}" ]; then
