@@ -99,7 +99,7 @@ while true; do
                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
                       bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
 					fi
-                    if [[ ${PLEX} == "true" && $(cat /config/json/bwlimit.system) == "0" ]]; then
+                    if [[ ${PLEX} == "true" && $(cat /config/json/bwlimit.system) -gt "0" ]]; then
                       log "bwlimit is reached || wait for next loop"
                       sleep 5
                       break
