@@ -93,13 +93,13 @@ while true; do
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-					if [ ${PLEX} == "true" ]; then 
-                      VNSTAT_JSON="/config/json/bwlimit.monitor"
+					if [ ${PLEX} == "true" ]; then
+	                  VNSTAT_JSON="/config/json/bwlimit.monitor"
                       BWLIMIT_JSON="/config/json/bwlimit.system"
                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
                       bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
 					fi
-                    if [[ ${PLEX} == "true" && $(cat ${BWLIMIT_JSON}) == "0" ]]; then
+                    if [[ ${PLEX} == "true" && $(cat /config/json/bwlimit.system) == "0" ]]; then
                       log "bwlimit is reached || wait for next loop"
                       sleep 5
                       break

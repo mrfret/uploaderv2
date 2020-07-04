@@ -22,12 +22,14 @@ PLEX=${PLEX:-false}
 if [[ "${PLEX}" == "false" ]]; then
  if [ -f /config/plex/docker-preferences.xml ]; then
     PLEX=true
+ fi
 fi
 GCE=${GCE:-false}
 if [[ "${GCE}" == "false" ]]; then
 gcheck=$(dnsdomainname | tail -c 10)
  if [ "$gcheck" == ".internal" ]; then
     GCE=true
+ fi
 fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
