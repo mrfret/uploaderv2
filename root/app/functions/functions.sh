@@ -65,12 +65,18 @@ log "-> update packages || done <-"
 }
 
 function discord_start_send_gdrive() {
+BWLIMITSET=${BWLIMITSET:-80}
+if [[ ${BWLIMITSET} == "" ]]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
+  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is based of ${BWLIMITSET}M" >"${DISCORD}"
   msg_content=$(cat "${DISCORD}")
   if [[ "${ENCRYPTED}" == "false" ]]; then
     TITEL="Start of GDrive Uploader"
@@ -81,17 +87,23 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
 else
   log "Upload Docker is Starting"
   log "Started for the First Time - Cleaning up if from reboot"
-  log "Uploads is set to ${UPLOADS}"
+  log "Uploads is based of ${BWLIMITSET}"
 fi
 }
 
 function discord_start_send_tdrive() {
+BWLIMITSET=${BWLIMITSET:-80}
+if [[ ${BWLIMITSET} == "" ]]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
 DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 DISCORD="/config/discord/startup.discord"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is set to ${UPLOADS}" >"${DISCORD}"
+  echo "Upload Docker is Starting \nStarted for the First Time \nCleaning up if from reboot \nUploads is based of ${BWLIMITSET}M" >"${DISCORD}"
   msg_content=$(cat "${DISCORD}")
   if [[ "${ENCRYPTED}" == "false" ]]; then
     TITEL="Start of TDrive Uploader"
@@ -102,6 +114,6 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
 else
   log "Upload Docker is Starting"
   log "Started for the First Time - Cleaning up if from reboot"
-  log "Uploads is set to ${UPLOADS}"
+  log "Uploads is based of ${BWLIMITSET}"
 fi
 }

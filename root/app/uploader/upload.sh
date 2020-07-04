@@ -19,13 +19,21 @@ JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX:-false}
-if [[ "${PLEX}" == "false" ]]; then
- if [ -f /config/plex/docker-preferences.xml ]; then
+test_2=$(ls -la /config  | grep -c xml)
+test_1=$(ls -la /app  | grep -c xml)
+if [ ${PLEX} == "false" ]; then
+  if [[ ${test_1} == "1"  || ${test_2} == "1" ]]; then
     PLEX=true
- fi
+  fi
+fi
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
 fi
 GCE=${GCE:-false}
-if [[ "${GCE}" == "false" ]]; then
+if [ "${GCE}" == "false" ]; then
 gcheck=$(dnsdomainname | tail -c 10)
  if [ "$gcheck" == ".internal" ]; then
     GCE=true
@@ -34,21 +42,12 @@ fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 LOGHOLDUI=${LOGHOLDUI}
-BWLIMITSET=${BWLIMITSET}
-UPLOADS=${UPLOADS}
-CHECKERS="$((${UPLOADS}*2))"
-PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
-PLEX_STREAMS="/config/json/${FILEBASE}.streams"
 TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+CHECKERS="$((${TRANSFERS}*2))"
+PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 ##### BWLIMIT-PART
-if [ ${PLEX} == "true" ]; then
-   PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
+if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   PLEX_SERVER_IP=${PLEX_SERVER_IP}
-   PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
-   PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
-   PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-   echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
    bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
@@ -67,15 +66,11 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-if [ ${PLEX} == "true" ]; then
+if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
      BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
      BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == "true" ]; then
      BWLIMIT=""
-elif [ ${BWLIMITSET} != "null" ]; then
-     bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-     BWLIMITSPEED="$(cat ${PLEX_JSON})"
-     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 else
      BWLIMIT=""
      BWLIMITSPEED="no LIMIT was set"
@@ -105,13 +100,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  # shellcheck disable=SC2003
   TIME="$((count=${ENDTIME}-${STARTTIME}))"
   duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-if [ ${PLEX} == 'true' ]; then
-  echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS} \nActive Plex Streams : ${PLEX_PLAYS}" >"${DISCORD}"
-elif [ ${GCE} == 'true' ]; then
-  echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : GCE-MODE is running \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
-else
   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
-fi
   msg_content=$(cat "${DISCORD}")
   curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
@@ -126,7 +115,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
-	   "${VNSTAT_JSON}"
+       "${VNSTAT_JSON}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  rm -f "${JSONFILE}"
 else
@@ -137,7 +126,7 @@ else
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
-	   "${VNSTAT_JSON}"
+       "${VNSTAT_JSON}"
  find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"

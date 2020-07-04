@@ -16,25 +16,11 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
     ENCRYPTED=true
  fi
 fi
-PLEX=${PLEX:-false}
-if [[ "${PLEX}" == "false" ]]; then
- if [ -f /config/plex/docker-preferences.xml ]; then
-    PLEX=true
- fi
-fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
-fi
-UPLOADS=${UPLOADS}
-if [ "${UPLOADS}" == 'null' ]; then
-   UPLOADS="8"
-elif [ "${UPLOADS}" -ge '20' ]; then
-   UPLOADS="8"
-else
-   UPLOADS=${UPLOADS}
 fi
 discord_start_send_tdrive
 remove_old_files_start_up
@@ -64,6 +50,13 @@ else
    GDSAUSE=0
    GDSAAMOUNT=0
 fi
+
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
+    BWLIMITSET=100
+else
+   BWLIMITSET=${BWLIMITSET}
+fi
 # Run Loop
 while true; do
     #Find files to transfer
@@ -91,21 +84,12 @@ while true; do
                        continue
                     fi
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [ ${PLEX} == "true" ]; then
                       if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le ${BWLIMITSET} ]; then
                         log "Upload Bandwith is less then ${BWLIMITSET}M"
-                       else 
-                         log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
-                         log "Upload Bandwith is reached || wait for next loop"
-                         sleep 5
-                         break
-                      fi
-                    fi
-                     if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
-                       if [ -e "${i}" ]; then
-                          log "Starting upload of ${i}"
+                         if [ -e "${i}" ]; then
+                           log "Starting upload of ${i}"
                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                            # Set gdsa as crypt or not
                            if [ ${ENCRYPTED} == "true" ]; then
@@ -133,14 +117,16 @@ while true; do
                            log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
                            # Record GDSA transfered in case of crash/reboot
                            echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                       else
-                          log "File ${i} seems to have dissapeared"
+                         else
+                            log "File ${i} seems to have dissapeared"
+                         fi
+                      else 
+                         log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                         log "Upload Bandwith is reached || wait for next loop"
+                         sleep 5
+                         break
                        fi
-                   else
-                      ##log "Already ${UPLOADS} transfers running, waiting for next loop" 
-					  break
-                   fi
-               else
+                 else
                   log "File not found: ${i}"
 				  continue
                fi
