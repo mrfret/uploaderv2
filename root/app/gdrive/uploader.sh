@@ -19,12 +19,7 @@ PLEX=${PLEX:-false}
 if [[ "${PLEX}" == "false" ]]; then
  if [ -f /config/plex/docker-preferences.xml ]; then
     PLEX=true
-fi
-GCE=${GCE:-false}
-if [[ "${GCE}" == "false" ]]; then
-gcheck=$(dnsdomainname | tail -c 10)
- if [ "$gcheck" == ".internal" ]; then
-    GCE=true
+ fi
 fi
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
@@ -100,7 +95,7 @@ while true; do
                      vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
                      bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
 					fi
-                  if [ ${PLEX} == "true" && $(cat ${BWLIMIT_JSON}) != "0" ]; then
+                  if [[ ${PLEX} == "true" && $(cat ${BWLIMIT_JSON}) != "0" ]]; then
                      sleep 5
                      continue
                   if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
