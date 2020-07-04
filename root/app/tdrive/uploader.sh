@@ -16,6 +16,12 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
     ENCRYPTED=true
  fi
 fi
+PLEX=${PLEX:-false}
+if [[ "${PLEX}" == "false" ]]; then
+ if [ -f /config/plex/docker-preferences.xml ]; then
+    PLEX=true
+ fi
+fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
@@ -87,7 +93,17 @@ while true; do
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
+                    if [ ${PLEX} == "true" ]; then
+                       VNSTAT_JSON="/config/json/bwlimit.monitor"
+                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+                         if [ ${BWLIMITSET} -le "$(cat /config/json/bwlimit.monitor | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
+                            log "bwlimit is reached || wait for next loop"
+                            sleep 5
+                            UPLOADS=0
+                            break
+						 fi
+                     fi
+                     if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                        if [ -e "${i}" ]; then
                           log "Starting upload of ${i}"
                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
@@ -97,10 +113,10 @@ while true; do
                            else
                               GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                            fi
-                           /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                           PID=$!
-                           FILEBASE=$(basename "${i}")
-                           echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            PID=$!
+                            FILEBASE=$(basename "${i}")
+                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
                            # shellcheck disable=SC2086
                            if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
                               log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"

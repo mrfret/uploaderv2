@@ -31,3 +31,30 @@ POLL_INTERVAL=${POLL_INTERVAL:-5m}
 # --rc-pass                     REDACTED
 # ------------------------------------------------
 # "
+
+function envs() {
+echo "
+   DOCKER ENV vars
+-------------------------------------------------------
+   UPLOADS                     ${UPLOADS}
+   BWLIMITSET                  ${BWLIMITSET}
+   CHUNK                       ${CHUNK}
+   TimeZone                    ${TZ}
+
+   GCE                         ${GCE}
+   PLEX                        ${PLEX}
+   PLEX_SERVER_IP              ${PLEX_SERVER_IP}
+   PLEX_SERVER_PORT            ${PLEX_SERVER_PORT}
+   DISCORD_EMBED_TITEL         ${DISCORD_EMBED_TITEL}
+   DISCORD_NAME_OVERRIDE       ${DISCORD_NAME_OVERRIDE}
+-------------------------------------------------------
+"
+}
+DEBUG=${DEBUG:-false}
+if [ "${DEBUG}" == 'false' ]; then
+ envs
+ sleep 5
+else
+ envs
+ sleep 60
+fi

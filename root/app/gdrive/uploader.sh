@@ -15,6 +15,12 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
      ENCRYPTED=true
   fi
 fi
+PLEX=${PLEX:-false}
+if [[ "${PLEX}" == "false" ]]; then
+ if [ -f /config/plex/docker-preferences.xml ]; then
+    PLEX=true
+ fi
+fi
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
@@ -83,6 +89,16 @@ while true; do
                   # shellcheck disable=SC2010
                   TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                   # shellcheck disable=SC2086
+                  if [ ${PLEX} == "true" ]; then
+                       VNSTAT_JSON="/config/json/bwlimit.monitor"
+                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+                     if [ ${BWLIMITSET} -le "$(cat /config/json/bwlimit.monitor | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
+                        log "bwlimit is reached || wait for next loop"
+                        sleep 5
+                        UPLOADS=0
+                        break
+                      fi
+                  fi
                   if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                      if [ -e "${i}" ]; then
                         log "Starting upload of ${i}"
@@ -100,9 +116,7 @@ while true; do
                            log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
                            break
                         fi
-                        # Add filesize to file
-                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
-                        # Run plex & upload script demonised
+                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
                         /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                         PID=$!
                         FILEBASE=$(basename "${i}")
@@ -116,10 +130,9 @@ while true; do
                         log "File ${i} seems to have dissapeared"
                       fi
                    else
-                      ##log "Already ${UPLOADS} transfers running, waiting for next loop"
-                      sleep 10       
-                      break
-                    fi
+                      ##log "Already ${UPLOADS} transfers running, waiting for next loop" 
+					  break
+                   fi
                 else
                     log "File not found: ${i}"
                     continue
