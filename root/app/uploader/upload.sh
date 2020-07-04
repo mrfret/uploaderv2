@@ -39,6 +39,7 @@ UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 ##### BWLIMIT-PART
 if [ ${PLEX} == "true" ]; then
    PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
@@ -47,7 +48,8 @@ if [ ${PLEX} == "true" ]; then
    PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
    PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-   VNSTAT_JSON="/config/json/bwlimit.monitor"
+   vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
+   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
    bc <<< "scale=0; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
@@ -66,7 +68,7 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [ ${PLEX} == "true" ]; then
-     BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
+     BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
      BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == "true" ]; then
      BWLIMIT=""

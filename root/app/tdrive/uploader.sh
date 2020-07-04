@@ -94,15 +94,15 @@ while true; do
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
                     if [ ${PLEX} == "true" ]; then
-                       VNSTAT_JSON="/config/json/bwlimit.monitor"
-                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
-                         if [ ${BWLIMITSET} -le "$(cat /config/json/bwlimit.monitor | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
-                            log "bwlimit is reached || wait for next loop"
-                            sleep 5
-                            UPLOADS=0
-                            break
-						 fi
-                     fi
+                      if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le ${BWLIMITSET} ]; then
+                        log "Upload Bandwith is less then ${BWLIMITSET}M"
+                       else 
+                         log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                         log "Upload Bandwith is reached || wait for next loop"
+                         sleep 5
+                         break
+                      fi
+                    fi
                      if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                        if [ -e "${i}" ]; then
                           log "Starting upload of ${i}"
@@ -149,12 +149,12 @@ while true; do
               continue
            else
               log "Sleeping 5s before looking at next file"
-              sleep 10
+              sleep 5
            fi
        done
-       log "Finished looking for files, sleeping 10 secs"
+       log "Finished looking for files, sleeping 5 secs"
    else
-       log "Nothing to upload, sleeping 10 secs"
+       log "Nothing to upload, sleeping 5 secs"
    fi
-   sleep 10
+   sleep 5
 done
