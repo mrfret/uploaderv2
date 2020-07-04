@@ -38,16 +38,12 @@ if [ "${PLEX}" == "true" ]; then
    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
    PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
    PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-   #PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   vnstat_command=$(vnstat -i eth0 -tr | awk '$1 == "rx" {print $2}')
-   $vnstat_command > ${VNSTAT_JSON}
-   MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
-   out=`cat ${VNSTAT_JSON}`
-   outx1=$(($MAXUPLOADSPEED - $out)
-   outscaled=$(($outx1 / 10))
-   bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
+   vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+   #out=`cat ${VNSTAT_JSON}`
+   # outx1=$((${BWLIMITSET} - $out))
+   bc -l <<< "scale=2; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
@@ -65,8 +61,6 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [ ${PLEX} == 'true' ]; then
-    plex_streams
-    vnstat_command
     BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == 'true' ]; then
