@@ -18,32 +18,57 @@ FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
-PLEX=${PLEX}
-GCE=${GCE}
+PLEX=${PLEX:-false}
+if [[ "${PLEX}" == "false" ]]; then
+ if [ -f /config/plex/docker-preferences.xml ]; then
+    PLEX=true
+    GCE=false
+ else 
+    PLEX=false
+    GCE=false
+ fi
+fi
+GCE=${GCE:-false}
+if [[ "${GCE}" == "false" ]]; then
+gcheck=$(dnsdomainname | tail -c 10)
+ if [ "$gcheck" == ".internal" ]; then
+    PLEX=false
+    GCE=true
+ else 
+    PLEX=false
+    GCE=false
+ fi
+fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-# DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-# DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
 BWLIMITSET=${BWLIMITSET}
 UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 PLEX_STREAMS="/config/json/${FILEBASE}.streams"
-##### First Test
-if [ "${PLEX}" == "true" ]; then
+##### BWLIMIT-PART
+if [ ${PLEX} == "true" ]; then
    PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
    PLEX_SERVER_IP=${PLEX_SERVER_IP}
    PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
-   TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
    PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
    PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
    echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
    vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
-   #out=`cat ${VNSTAT_JSON}`
-   # outx1=$((${BWLIMITSET} - $out))
    bc -l <<< "scale=2; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
+   BWLIMITSPEED="$(cat ${PLEX_JSON})"
+   BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+elif [ ${GCE} == 'true' ]; then
+    BWLIMIT=""
+elif [ ${BWLIMITSET} != 'null' ]; then
+    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+else
+    BWLIMIT=""
+    BWLIMITSPEED="no LIMIT was set"
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
@@ -60,19 +85,19 @@ REMOTE=$GDSA
 log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
-if [ ${PLEX} == 'true' ]; then
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == 'true' ]; then
-    BWLIMIT=""
-elif [ ${BWLIMITSET} != 'null' ]; then
-    bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-else
-    BWLIMIT=""
-    BWLIMITSPEED="no LIMIT was set"
-fi
+# if [ ${PLEX} == 'true' ]; then
+   # BWLIMITSPEED="$(cat ${PLEX_JSON})"
+   # BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+# elif [ ${GCE} == 'true' ]; then
+    # BWLIMIT=""
+# elif [ ${BWLIMITSET} != 'null' ]; then
+    # bc -l <<< "scale=2; ${BWLIMITSET}/${TRANSFERS}" >${PLEX_JSON}
+    # BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    # BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+# else
+    # BWLIMIT=""
+    # BWLIMITSPEED="no LIMIT was set"
+# fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
@@ -92,9 +117,9 @@ fi
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-TITEL=${DISCORD_EMBED_TITEL}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+   TITEL=${DISCORD_EMBED_TITEL}
+   DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
+   DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
  # shellcheck disable=SC2003
   TIME="$((count=${ENDTIME}-${STARTTIME}))"
   duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
