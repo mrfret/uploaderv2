@@ -44,11 +44,6 @@ TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 if [ ${PLEX} == "true" ]; then
    PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   PLEX_SERVER_IP=${PLEX_SERVER_IP}
-   PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
-   PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
-   PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-   echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
    vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
    bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
@@ -105,9 +100,14 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
  # shellcheck disable=SC2003
   TIME="$((count=${ENDTIME}-${STARTTIME}))"
   duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-if [ ${PLEX} == 'true' ]; then
+if [ ${PLEX} == "true" ]; then
+   PLEX_SERVER_IP=${PLEX_SERVER_IP}
+   PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
+   PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
+   PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
+   echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS} \nActive Plex Streams : ${PLEX_PLAYS}" >"${DISCORD}"
-elif [ ${GCE} == 'true' ]; then
+elif [ ${GCE} == "true" ]; then
   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : GCE-MODE is running \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
 else
   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
