@@ -22,14 +22,6 @@ DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' 
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
 fi
-UPLOADS=${UPLOADS}
-if [ "${UPLOADS}" == 'null' ]; then
-   UPLOADS="8"
-elif [ "${UPLOADS}" -ge '20' ]; then
-   UPLOADS="8"
-else
-   UPLOADS=${UPLOADS}
-fi
 discord_start_send_tdrive
 remove_old_files_start_up
 cleanup_start
@@ -59,13 +51,12 @@ else
    GDSAAMOUNT=0
 fi
 
-BWLIMITSET=${BWLIMITSET:-80}
-if [[ ${BWLIMITSET} == "" ]]; then
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
     BWLIMITSET=100
 else
    BWLIMITSET=${BWLIMITSET}
 fi
-
 # Run Loop
 while true; do
     #Find files to transfer

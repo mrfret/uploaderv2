@@ -15,8 +15,8 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
      ENCRYPTED=true
   fi
 fi
-BWLIMITSET=${BWLIMITSET:-80}
-if [[ ${BWLIMITSET} == "" ]]; then
+BWLIMITSET=${BWLIMITSET}
+if [ "${BWLIMITSET}" == 'null' ]; then
     BWLIMITSET=100
 else
    BWLIMITSET=${BWLIMITSET}
@@ -26,14 +26,6 @@ DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' 
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
    ADDITIONAL_IGNORES=""
-fi
-UPLOADS=${UPLOADS}
-if [ "${UPLOADS}" == 'null' ]; then
-   UPLOADS="8"
-elif [ "${UPLOADS}" -ge '20' ]; then
-   UPLOADS="8"
-else
-   UPLOADS=${UPLOADS}
 fi
 discord_start_send_gdrive
 remove_old_files_start_up
