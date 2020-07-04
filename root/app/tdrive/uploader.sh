@@ -99,9 +99,11 @@ while true; do
                       vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
                       bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
 					fi
-					if [[ ${PLEX} == "true" && $(cat ${BWLIMIT_JSON}) != "0" ]]; then
-                       sleep 5
-                       continue
+                    if [[ ${PLEX} == "true" && $(cat ${BWLIMIT_JSON}) == "0" ]]; then
+                      log "bwlimit is reached || wait for next loop"
+                      sleep 5
+                      break
+                    fi
 					  if [ ! ${TRANSFERS} -ge ${UPLOADS} ]; then
                        if [ -e "${i}" ]; then
                           log "Starting upload of ${i}"
@@ -138,11 +140,6 @@ while true; do
                    else
                       ##log "Already ${UPLOADS} transfers running, waiting for next loop" 
 					  break
-                   fi
-                  else 					   
-                     log "bwlimit is reached || wait for next loop"
-                     sleep 5
-                     break
                    fi
                else
                   log "File not found: ${i}"
