@@ -15,6 +15,27 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
      ENCRYPTED=true
   fi
 fi
+PLEX=${PLEX:-false}
+if [[ "${PLEX}" == "false" ]]; then
+ if [ -f /config/plex/docker-preferences.xml ]; then
+    PLEX=true
+    GCE=false
+ else 
+    PLEX=false
+    GCE=false
+ fi
+fi
+GCE=${GCE:-false}
+if [[ "${GCE}" == "false" ]]; then
+gcheck=$(dnsdomainname | tail -c 10)
+ if [ "$gcheck" == ".internal" ]; then
+    PLEX=false
+    GCE=true
+ else 
+    PLEX=false
+    GCE=false
+ fi
+fi
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
@@ -100,14 +121,24 @@ while true; do
                            log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
                            break
                         fi
-                        # Add filesize to file
-                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"
-                        # Run plex & upload script demonised
-                        /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                        PID=$!
-                        FILEBASE=$(basename "${i}")
-                        # Add transfer to pid directory
-                        echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+						   if [ ${PLEX} == "true" ]; then
+                              VNSTAT_JSON="/config/json/bwlimit.monitor"
+                              BWLIMIT_JSON="/config/json/bwlimit.system"
+                              vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' > ${VNSTAT_JSON}
+                              bc -l <<< "scale=2; $(cat ${VNSTAT_JSON}) - ${BWLIMITSET}" >${BWLIMIT_JSON}
+							  if [ $(cat ${BWLIMIT_JSON}) == "0" ]; then
+                                  log "bwlimit is reached || wait for next loop"
+                                  sleep 5
+                                  continue
+                              fi
+						   else
+                              echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
+                              /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                              PID=$!
+                              FILEBASE=$(basename "${i}")
+                              # Add transfer to pid directory
+                              echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+						   fi
                         log "gdrive is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
                         # Record GDSA transfered in case of crash/reboot
                         echo "gdrive" >/config/vars/lastGDSA
