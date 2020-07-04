@@ -7,27 +7,6 @@
 function log() {
     echo "[Uploader] ${1}"
 }
-function vnstat_command() {
-VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-vnstat_command=$(vnstat -i eth0 -tr | awk '$1 == "rx" {print $2}')
-$vnstat_command > ${VNSTAT_JSON}
-out=`cat ${VNSTAT_JSON}`
-outx1=$(($((${BWLIMITSET} * 10)) - `cat ${VNSTAT_JSON}`))
-outscaled=$(($outx1 / 10))
-bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
-}
-
-function plex_streams() {
-FILE=$1
-FILEBASE=$(basename "${FILE}")
-PLEX_STREAMS="/config/json/${FILEBASE}.streams"
-TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
-PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
-PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
-echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
-}
-
 downloadpath=/move
 IFS=$'\n'
 FILE=$1
@@ -41,24 +20,35 @@ DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX}
 GCE=${GCE}
-PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
-PLEX_SERVER_IP=${PLEX_SERVER_IP}
-PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
-TITEL=${DISCORD_EMBED_TITEL}
+# TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+# DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
+# DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
 LOGHOLDUI=${LOGHOLDUI}
 BWLIMITSET=${BWLIMITSET}
 UPLOADS=${UPLOADS}
 CHECKERS="$((${UPLOADS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
-
-# ##### First Test
-# if [ "${PLEX}" == "true" ]; then
-# plex_streams
-# vnstat_command
-# fi
+PLEX_STREAMS="/config/json/${FILEBASE}.streams"
+##### First Test
+if [ "${PLEX}" == "true" ]; then
+   PLEX_PREFERENCE_FILE="/config/plex/docker-preferences.xml"
+   PLEX_SERVER_IP=${PLEX_SERVER_IP}
+   PLEX_SERVER_PORT=${PLEX_SERVER_PORT}
+   TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+   PLEX_TOKEN=$(cat "${PLEX_PREFERENCE_FILE}" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
+   PLEX_PLAYS=$(curl --silent "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/status/sessions" -H "X-Plex-Token: $PLEX_TOKEN" | xmllint --xpath 'string(//MediaContainer/@size)' -)
+   #PLEX_SELFTEST=$(curl -LI "http://${PLEX_SERVER_IP}:${PLEX_SERVER_PORT}/system?X-Plex-Token=${PLEX_TOKEN}" -o /dev/null -w '%{http_code}\n' -s)
+   echo "${PLEX_PLAYS}" >${PLEX_STREAMS}
+   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
+   vnstat_command=$(vnstat -i eth0 -tr | awk '$1 == "rx" {print $2}')
+   $vnstat_command > ${VNSTAT_JSON}
+   MAXUPLOADSPEED=$((${BWLIMITSET} * 10))
+   out=`cat ${VNSTAT_JSON}`
+   outx1=$(($MAXUPLOADSPEED - $out)
+   outscaled=$(($outx1 / 10))
+   bc -l <<< "scale=2; ${outscaled}/${TRANSFERS}" >${PLEX_JSON}
+fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
@@ -108,6 +98,9 @@ fi
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+TITEL=${DISCORD_EMBED_TITEL}
+DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
  # shellcheck disable=SC2003
   TIME="$((count=${ENDTIME}-${STARTTIME}))"
   duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
