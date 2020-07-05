@@ -37,6 +37,13 @@ if [ -e /config/vars/lastGDSA ]; then
 else
    GDSAAMOUNT=0
 fi
+##scaled_bandwith
+if [ "$(echo $(( (${BWLIMITSET})*10/11 | bc )))" -le "${BWLIMITSET}" ]; then
+    log "calculator for bandwidth working"
+else
+    log "calculator for bandwidth don't work"
+    exit 1
+fi
 # Run Loop
 while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
@@ -64,7 +71,7 @@ while true; do
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
                log "Lock File found for ${i}" 
-			   continue
+               continue
             else
                if [ -e "${i}" ]; then
                   sleep 5
@@ -74,16 +81,16 @@ while true; do
                   FILESIZE2=$(stat -c %s "${i}")
                   if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
                      ##log "File is still getting bigger ${i}" 
-					 sleep 5 
-					 continue
+                     sleep 5 
+                     continue
                   fi
                   # Check if we have any upload slots available
                   # shellcheck disable=SC2010
                   # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                   # shellcheck disable=SC2086
-                    if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le ${BWLIMITSET} ]; then
-                       log "Upload Bandwith is less then ${BWLIMITSET}M"
-                     if [ -e "${i}" ]; then
+                    if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET}-1)*10/11 | bc )))" ]; then
+                        log "Upload Bandwith is less then ${BWLIMITSET}M"
+                      if [ -e "${i}" ]; then
                         log "Starting upload of ${i}"
                         # Append filesize to GDSAAMOUNT
                         GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
