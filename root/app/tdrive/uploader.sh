@@ -50,12 +50,18 @@ else
    GDSAUSE=0
    GDSAAMOUNT=0
 fi
-
 BWLIMITSET=${BWLIMITSET}
 if [ "${BWLIMITSET}" == 'null' ]; then
     BWLIMITSET=100
 else
    BWLIMITSET=${BWLIMITSET}
+fi
+##scaled_bandwith
+if [ "$(echo $(( (${BWLIMITSET})*10/11 | bc )))" -le "${BWLIMITSET}" ]; then
+    log "calculator for bandwidth working"
+else
+    log "calculator for bandwidth don't work"
+    exit 1
 fi
 # Run Loop
 while true; do
@@ -86,7 +92,7 @@ while true; do
                     # shellcheck disable=SC2010
                     # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                      if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le ${BWLIMITSET} ]; then
+                      if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET}-1)*10/11 | bc )))" ]; then
                         log "Upload Bandwith is less then ${BWLIMITSET}M"
                          if [ -e "${i}" ]; then
                            log "Starting upload of ${i}"
