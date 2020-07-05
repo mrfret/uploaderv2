@@ -76,7 +76,7 @@ while true; do
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
                log "Lock File found for ${i}" 
-			   continue
+               continue
             else
                 if [ -e "${i}" ]; then
                     sleep 5
@@ -134,7 +134,7 @@ while true; do
                        fi
                  else
                   log "File not found: ${i}"
-				  continue
+                  continue
                fi
            fi
            if [[ -d "/mnt/tdrive1/${FILEDIR}" || -d "/mnt/tdrive2/${FILEDIR}" ]]; then
