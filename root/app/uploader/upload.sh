@@ -48,7 +48,7 @@ PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 ##### BWLIMIT-PART
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
    VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
+   vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
    bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
 fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
@@ -68,7 +68,7 @@ LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
      if [ ${TRANSFERS} -le "2" ]; then 
-         BWLIMITSPEED="$(echo $(( (${BWLIMITSET})-${TRANSFERS}/10*5 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
+         BWLIMITSPEED="$(echo $(( ((${BWLIMITSET}-${TRANSFERS}))/10*5 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
          ####BWLIMITSPEED="35"        
          BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
       else
