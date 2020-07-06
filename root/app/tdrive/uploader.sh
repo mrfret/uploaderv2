@@ -57,7 +57,7 @@ else
    BWLIMITSET=${BWLIMITSET}
 fi
 ##scaled_bandwith
-if [ "$(echo $(( (${BWLIMITSET})/10*9 | bc )))" -le "${BWLIMITSET}" ]; then
+if [ "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "${BWLIMITSET}" ]; then
     log "calculator for bandwidth working"
 else
     log "calculator for bandwidth don't work"
