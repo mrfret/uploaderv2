@@ -136,3 +136,5 @@ else
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
+
+find "${downloadpath}" -mindepth 1 -type d  "${DOWNLOADIGNORE}" "${ADDITIONAL_IGNORES}" -empty -delete
