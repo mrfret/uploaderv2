@@ -69,7 +69,7 @@ LOGFILE="/config/logs/${FILEBASE}.log"
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
      if [ ${TRANSFERS} -le "2" ]; then 
          BWLIMITSPEED="40"          
-         BWLIMIT="--bwlimit=${BWLIMITSPEED}M
+         BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
       else
          BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
          BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
