@@ -67,8 +67,13 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-     BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
-     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+     if [ ${TRANSFERS} -le "2" ]; then 
+         BWLIMITSPEED="40"          
+         BWLIMIT="--bwlimit=${BWLIMITSPEED}M
+      else
+         BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
+         BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+     fi
 elif [ ${GCE} == "true" ]; then
      BWLIMIT=""
 else
