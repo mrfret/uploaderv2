@@ -89,7 +89,7 @@ log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
        --config /config/rclone-docker.conf \
        --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-       --delete-empty-src-dirs --no-traverse \
+       --no-traverse \
        --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
