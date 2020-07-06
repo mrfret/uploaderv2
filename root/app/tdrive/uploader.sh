@@ -90,7 +90,11 @@ while true; do
                        continue
                     fi
                     # shellcheck disable=SC2010
-                    # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+					if [ ${TRANSFERS} -gt 5 ]; then
+					  log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running sleeping for 120second"
+					  sleep 120
+					fi
                     # shellcheck disable=SC2086
                       if [ "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
                         log "Upload Bandwith is less then ${BWLIMITSET}M"
