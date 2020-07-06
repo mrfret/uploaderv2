@@ -57,7 +57,7 @@ else
    BWLIMITSET=${BWLIMITSET}
 fi
 ##scaled_bandwith
-if [ "$(echo $(( (${BWLIMITSET})*10/11 | bc )))" -le "${BWLIMITSET}" ]; then
+if [ "$(echo $(( (${BWLIMITSET})/10*9 | bc )))" -le "${BWLIMITSET}" ]; then
     log "calculator for bandwidth working"
 else
     log "calculator for bandwidth don't work"
@@ -67,7 +67,7 @@ fi
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -type f -mmin +3 ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
@@ -92,7 +92,7 @@ while true; do
                     # shellcheck disable=SC2010
                     # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                      if [ "$(vnstat -i eth0 -tr | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET}-1)*10/11 | bc )))" ]; then
+                      if [ "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
                         log "Upload Bandwith is less then ${BWLIMITSET}M"
                          if [ -e "${i}" ]; then
                            log "Starting upload of ${i}"
