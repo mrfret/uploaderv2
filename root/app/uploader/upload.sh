@@ -68,7 +68,8 @@ LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
      if [ ${TRANSFERS} -le "2" ]; then 
-         BWLIMITSPEED="40"          
+         BWLIMITSPEED="$(echo $(( (${BWLIMITSET})-${TRANSFERS}/10*5 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
+         ####BWLIMITSPEED="35"        
          BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
       else
          BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
