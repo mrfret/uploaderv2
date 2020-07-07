@@ -91,12 +91,15 @@ while true; do
                     fi
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-                    if [ ${TRANSFERS} -le 5 ]; then
-                        log "attacke .....  ${TRANSFERS} are running"
-                        sleep 10
+                    #if [ ${TRANSFERS} -le 4 ]; then
+                        #log "attacke .....  ${TRANSFERS} are running"
+                        #sleep 10
                     # shellcheck disable=SC2086
-                      if [ "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
-                        log "Upload Bandwith is less then ${BWLIMITSET}M"
+                      if [[ ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
+                           log "attacke .....  ${TRANSFERS} are running"                       
+                           log "Upload Bandwith is less then ${BWLIMITSET}M"
+                           log "Upload Bandwith is calculated for ${i}"
+                           sleep 10
                          if [ -e "${i}" ]; then
                            log "Starting upload of ${i}"
                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
@@ -129,17 +132,22 @@ while true; do
                          else
                             log "File ${i} seems to have dissapeared"
                          fi
-                      else 
-                         log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
-                         log "Upload Bandwith is reached || wait for next loop"
+                      else
+                         if [ ${TRANSFERS} == 4 ]; then
+                            log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running
+                            log "wait for next free Upload slot"
+                         else 
+                            log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                            log "Upload Bandwith is reached || wait for next loop"
+                         fi
                          sleep 5
                          break
                        fi
-                     else
-                      log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
-                      sleep 5
-                      break
-                    fi
+                    # else
+                    #  log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
+                    #  sleep 5
+                    #  break
+                   # fi
                  else
                   log "File not found: ${i}"
                   continue
