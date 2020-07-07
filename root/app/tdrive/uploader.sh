@@ -92,59 +92,49 @@ while true; do
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                      if [[ -e "${i}" && ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
-                           log "attacke .....  ${TRANSFERS} are running"                       
-                           log "Upload Bandwith is less then ${BWLIMITSET}M"
-                           log "Upload Bandwith is calculated for ${i}"
-                       ####### sleep 10
-                       ####### if [ -e "${i}" ]; then
-                           log "Starting upload of ${i}"
-                           GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
-                           # Set gdsa as crypt or not
-                           if [ ${ENCRYPTED} == "true" ]; then
-                              GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
+                    if [[ -e "${i}" && ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
+                       log "attacke .....  ${TRANSFERS} are running"                       
+                       log "Upload Bandwith is less then ${BWLIMITSET}M"
+                       log "Upload Bandwith is calculated for ${i}"
+                       log "Starting upload of ${i}"
+                       GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
+                       # Set gdsa as crypt or not
+                       if [ ${ENCRYPTED} == "true" ]; then
+                           GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
+                        else
+                           GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
+                        fi
+                        /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                        PID=$!
+                        FILEBASE=$(basename "${i}")
+                        echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                        # shellcheck disable=SC2086
+                        if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
+                           log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
+                           if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
+                              GDSAUSE=0
+                              GDSAAMOUNT=0
                            else
-                              GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
+                              GDSAUSE=$(("${GDSAUSE}" + 1))
+                              GDSAAMOUNT=0
                            fi
-                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                            PID=$!
-                            FILEBASE=$(basename "${i}")
-                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-                           # shellcheck disable=SC2086
-                           if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                              log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
-                              if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
-                                 GDSAUSE=0
-                                 GDSAAMOUNT=0
-                              else
-                                 GDSAUSE=$(("${GDSAUSE}" + 1))
-                                 GDSAAMOUNT=0
-                              fi
-                              # Record next GDSA in case of crash/reboot
-                              echo "${GDSAUSE}" >/config/vars/lastGDSA
-                           fi
-                           log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                           # Record GDSA transfered in case of crash/reboot
-                           echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                        ####### else
-                           ####### log "File ${i} seems to have dissapeared"
-                         ####### fi
-                      else
-                         if [ ${TRANSFERS} == 4 ]; then
-                            log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
-                            log "wait for next free Upload slot"
-                         else 
-                            log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
-                            log "Upload Bandwith is reached || wait for next loop"
-                         fi
-                         sleep 5
-                         break
+                           # Record next GDSA in case of crash/reboot
+                           echo "${GDSAUSE}" >/config/vars/lastGDSA
+                        fi
+                        log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
+                        # Record GDSA transfered in case of crash/reboot
+                        echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
+                    else
+                       if [ ${TRANSFERS} == 4 ]; then
+                          log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
+                          log "wait for next free Upload slot"
+                       else 
+                          log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                          log "Upload Bandwith is reached || wait for next loop"
                        fi
-                    # else
-                    #  log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
-                    #  sleep 5
-                    #  break
-                   # fi
+                       sleep 5
+                       break
+                    fi
                  else
                   log "File not found: ${i}"
                   continue
