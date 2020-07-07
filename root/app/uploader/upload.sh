@@ -137,4 +137,4 @@ else
  rm -f "${JSONFILE}"
 fi
 
-rmdir "${downloadpath/${FILEDIR}" > /dev/null 2>&1
+rmdir "${downloadpath}/${FILEDIR}" > /dev/null 2>&1
