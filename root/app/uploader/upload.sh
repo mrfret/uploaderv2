@@ -137,4 +137,4 @@ else
  rm -f "${JSONFILE}"
 fi
 
-find "${downloadpath}" -mindepth 1 -type d  "${DOWNLOADIGNORE}" "${ADDITIONAL_IGNORES}" -empty -delete
+find ${downloadpath}/${FILEDIR}/ -type d -empty -delete
