@@ -134,7 +134,7 @@ while true; do
                          fi
                       else
                          if [ ${TRANSFERS} == 4 ]; then
-                            log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running
+                            log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
                             log "wait for next free Upload slot"
                          else 
                             log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
