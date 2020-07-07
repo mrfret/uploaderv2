@@ -123,7 +123,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
        "${VNSTAT_JSON}" \
-       "${JSONFILE}"
+       "${JSONFILE}"    
 else
  sleep 1
  rm -f "${FILE}.lck" \
@@ -137,8 +137,4 @@ else
  rm -f "${JSONFILE}"
 fi
 
-FIND=$(which find)
-TARGET_FOLDER=${downloadpath}
-FIND_ACTION='-delete > /dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER}/${FILEDIR} -mindepth 1 -type d -empty ${FIND_ACTION}"
-eval "${command}"
+rmdir "${downloadpath/${FILEDIR}" > /dev/null 2>&1
