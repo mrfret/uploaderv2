@@ -37,8 +37,7 @@ if [ -e /config/vars/lastGDSA ]; then
 else
    GDSAAMOUNT=0
 fi
-##scaled_bandwith
-if [ "$(echo $(( (${BWLIMITSET})*10/11 | bc )))" -le "${BWLIMITSET}" ]; then
+if [ "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "${BWLIMITSET}" ]; then
     log "calculator for bandwidth working"
 else
     log "calculator for bandwidth don't work"
@@ -84,47 +83,48 @@ while true; do
                      sleep 5 
                      continue
                   fi
-                  # Check if we have any upload slots available
-                  # shellcheck disable=SC2010
-                  # TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                  TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                   # shellcheck disable=SC2086
-                    if [ "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]; then
-                        log "Upload Bandwith is less then ${BWLIMITSET}M"
-                      if [ -e "${i}" ]; then
-                        log "Starting upload of ${i}"
-                        # Append filesize to GDSAAMOUNT
-                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
-                        # Set gdrive as crypt or not
-                        if [ ${ENCRYPTED} == "true" ]; then
-                           GDSA_TO_USE="gcrypt"
-                        else
+                  if [[ -e "${i}" && ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
+                       log "attacke .....  ${TRANSFERS} are running"                       
+                       log "Upload Bandwith is less then ${BWLIMITSET}M"
+                       log "Upload Bandwith is calculated for ${i}"
+                       log "Starting upload of ${i}"
+                       # Append filesize to GDSAAMOUNT
+                       GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
+                       # Set gdrive as crypt or not
+                       if [ ${ENCRYPTED} == "true" ]; then
+                          GDSA_TO_USE="gcrypt"
+                       else
                            GDSA_TO_USE="gdrive"
-                        fi
-                        # Increase or reset $GDSAUSE?
-                        # shellcheck disable=SC2086
-                        if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                           log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
-                           break
-                        fi
-                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
-                        /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                        PID=$!
-                        FILEBASE=$(basename "${i}")
-                        # Add transfer to pid directory
-                        echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-                        log "gdrive is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                        # Record GDSA transfered in case of crash/reboot
-                        echo "gdrive" >/config/vars/lastGDSA
-                        echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                      else
-                        log "File ${i} seems to have dissapeared"
-                      fi
+                       fi
+                       # Increase or reset $GDSAUSE?
+                       # shellcheck disable=SC2086
+                       if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
+                          log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
+                          break
+                       fi
+                       echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
+                       /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                       PID=$!
+                       FILEBASE=$(basename "${i}")
+                       # Add transfer to pid directory
+                       echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                       log "${GDSA_TO_USE} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
+                       # Record GDSA transfered in case of crash/reboot
+                       echo "gdrive" >/config/vars/lastGDSA
+                       echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
                     else 
-                       log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
-                       log "bwlimit is reached || wait for next loop"
-                       sleep 5
-                       break
-                    fi
+                       if [ ${TRANSFERS} == 4 ]; then
+                          log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
+                          log "wait for next free Upload slot"
+                       else 
+                          log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
+                          log "Upload Bandwith is reached || wait for next loop"
+                       fi
+                          sleep 5
+                          break
+                     fi
                 else
                     log "File not found: ${i}"
                     continue
