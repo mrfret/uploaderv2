@@ -89,6 +89,7 @@ log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
        --config /config/rclone-docker.conf \
        --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+       --no-traverse \
        --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
@@ -121,9 +122,8 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
-       "${VNSTAT_JSON}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
- rm -f "${JSONFILE}"
+       "${VNSTAT_JSON}" \
+       "${JSONFILE}"    
 else
  sleep 1
  rm -f "${FILE}.lck" \
@@ -133,7 +133,8 @@ else
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
        "${VNSTAT_JSON}"
- find "${downloadpath}" -mindepth 1 -type d ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty -exec rmdir \{} \; 1>/dev/null 2>&1
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
+
+rmdir "${downloadpath}/${FILEDIR}" > /dev/null 2>&1
