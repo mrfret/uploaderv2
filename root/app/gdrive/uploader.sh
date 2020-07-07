@@ -85,40 +85,35 @@ while true; do
                   fi
                   TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                   # shellcheck disable=SC2086
-                  if [[ ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
+                  if [[ -e "${i}" && ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
                        log "attacke .....  ${TRANSFERS} are running"                       
                        log "Upload Bandwith is less then ${BWLIMITSET}M"
                        log "Upload Bandwith is calculated for ${i}"
-                       sleep 10
-                    if [ -e "${i}" ]; then
-                        log "Starting upload of ${i}"
-                        # Append filesize to GDSAAMOUNT
-                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
-                        # Set gdrive as crypt or not
-                        if [ ${ENCRYPTED} == "true" ]; then
-                           GDSA_TO_USE="gcrypt"
-                        else
+                       log "Starting upload of ${i}"
+                       # Append filesize to GDSAAMOUNT
+                       GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
+                       # Set gdrive as crypt or not
+                       if [ ${ENCRYPTED} == "true" ]; then
+                          GDSA_TO_USE="gcrypt"
+                       else
                            GDSA_TO_USE="gdrive"
-                        fi
-                        # Increase or reset $GDSAUSE?
-                        # shellcheck disable=SC2086
-                        if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                           log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
-                           break
-                        fi
-                        echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
-                        /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                        PID=$!
-                        FILEBASE=$(basename "${i}")
-                        # Add transfer to pid directory
-                        echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-                        log "${GDSA_TO_USE} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                        # Record GDSA transfered in case of crash/reboot
-                        echo "gdrive" >/config/vars/lastGDSA
-                        echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                      else
-                        log "File ${i} seems to have dissapeared"
-                      fi
+                       fi
+                       # Increase or reset $GDSAUSE?
+                       # shellcheck disable=SC2086
+                       if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
+                          log "${GDSA_TO_USE} has hit 730GB uploads will resume when they can ( ︶︿︶)_╭∩╮" 
+                          break
+                       fi
+                       echo "${FILESIZE2}" > "/config/vars/gdrive/$(echo "$(date +%s) + 86400" | bc)"						   
+                       /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                       PID=$!
+                       FILEBASE=$(basename "${i}")
+                       # Add transfer to pid directory
+                       echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                       log "${GDSA_TO_USE} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
+                       # Record GDSA transfered in case of crash/reboot
+                       echo "gdrive" >/config/vars/lastGDSA
+                       echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
                     else 
                        if [ ${TRANSFERS} == 4 ]; then
                           log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
