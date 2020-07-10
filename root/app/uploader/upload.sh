@@ -46,11 +46,11 @@ TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
 CHECKERS="$((${TRANSFERS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 ##### BWLIMIT-PART
-if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
-   bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
-fi
+# if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
+   # VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
+   # vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
+   # bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
+# fi
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
@@ -67,14 +67,8 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-     if [ ${TRANSFERS} -le "2" ]; then 
-         BWLIMITSPEED="$(echo $(( ((${BWLIMITSET}-${TRANSFERS}))/10*5 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
-         ####BWLIMITSPEED="35"        
+         BWLIMITSPEED="$(cat ${PLEX_JSON})"
          BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-      else
-         BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
-         BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-     fi
 elif [ ${GCE} == "true" ]; then
      BWLIMIT=""
 else
