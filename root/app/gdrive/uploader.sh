@@ -91,8 +91,8 @@ while true; do
                     USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
-					if [[ -e "${i}" &&  ${TRANSFERS} -le 4 ]] && [[ ! ${UPLOADSPEED} -le ${BWLIMITSET} ]] && [[ ! ${UPLOADFILE} -gt 10 ]]; then                      
-					   log "attacke .....  ${TRANSFERS} are running"                       
+                    if [[ -e "${i}" && ${TRANSFERS} -le 4 && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                     
+                       log "attacke .....  ${TRANSFERS} are running"                       
                        log "Upload Bandwith is less then ${BWLIMITSET}M"
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
