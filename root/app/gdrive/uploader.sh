@@ -37,7 +37,9 @@ if [ -e /config/vars/lastGDSA ]; then
 else
    GDSAAMOUNT=0
 fi
-if [ "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "${BWLIMITSET}" ]; then
+##scaled_bandwith
+USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+if [ ${USEDUPLOADSPEED} -le ${BWLIMITSET} ]; then
     log "calculator for bandwidth working"
 else
     log "calculator for bandwidth don't work"
@@ -83,13 +85,24 @@ while true; do
                      sleep 5 
                      continue
                   fi
-                  TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-                  # shellcheck disable=SC2086
-                  if [[ -e "${i}" && ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
+                    # shellcheck disable=SC2010
+                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    UPLOADSPEED=$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    # shellcheck disable=SC2086
+                    if [[ -e "${i}" && ${TRANSFERS} -le 4 && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                     
                        log "attacke .....  ${TRANSFERS} are running"                       
                        log "Upload Bandwith is less then ${BWLIMITSET}M"
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
+                       if [ ${UPLOADFILE} -gt 40 ]; then
+                           UPLOADFILE=35
+                       else
+                           UPLOADFILE=${UPLOADFILE}
+                       fi
+                       FILEBASE=$(basename "${i}")
+                       echo ${UPLOADFILE} >> /config/json/${FILEBASE}.bwlimit
                        # Append filesize to GDSAAMOUNT
                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                        # Set gdrive as crypt or not
@@ -122,20 +135,16 @@ while true; do
                           log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
                           log "Upload Bandwith is reached || wait for next loop"
                        fi
-                          sleep 5
-                          break
+                       sleep 5
+                       break
                      fi
                 else
                     log "File not found: ${i}"
                     continue
                 fi
             fi
-            if [[ -d "/mnt/gdrive/${FILEDIR}" || -d "/mnt/gcrypt/${FILEDIR}" ]]; then
-                continue
-            else
-                log "Sleeping 5s before looking at next file"
-                sleep 10
-            fi
+            log "Sleeping 5s before looking at next file"
+            sleep 10
         done
         log "Finished looking for files, sleeping 10 secs"
     else

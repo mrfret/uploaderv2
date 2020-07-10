@@ -57,7 +57,8 @@ else
    BWLIMITSET=${BWLIMITSET}
 fi
 ##scaled_bandwith
-if [ "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "${BWLIMITSET}" ]; then
+USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+if [ ${USEDUPLOADSPEED} -le ${BWLIMITSET} ]; then
     log "calculator for bandwidth working"
 else
     log "calculator for bandwidth don't work"
@@ -90,16 +91,26 @@ while true; do
                        continue
                     fi
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    TRANSFERS=$(ls /config/pid/*.trans | wc -l )
+                    UPLOADSPEED=$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
-                    if [[ -e "${i}" && ${TRANSFERS} -le 4 && "$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" -le "$(echo $(( (${BWLIMITSET})/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')" ]]; then
+                    if [[ -e "${i}" && ${TRANSFERS} -le 4 && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                     
                        log "attacke .....  ${TRANSFERS} are running"                       
                        log "Upload Bandwith is less then ${BWLIMITSET}M"
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
+                       if [ ${UPLOADFILE} -gt 40 ]; then
+                           UPLOADFILE=35
+                       else
+                           UPLOADFILE=${UPLOADFILE}
+                       fi
+                       FILEBASE=$(basename "${i}")
+                       echo ${UPLOADFILE} >> /config/json/${FILEBASE}.bwlimit
                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                        # Set gdsa as crypt or not
-                       if [ ${ENCRYPTED} == "true" ]; then
+                        if [ ${ENCRYPTED} == "true" ]; then
                            GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
                         else
                            GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
@@ -124,7 +135,7 @@ while true; do
                         log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
                         # Record GDSA transfered in case of crash/reboot
                         echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                    else
+                    else 
                        if [ ${TRANSFERS} == 4 ]; then
                           log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
                           log "wait for next free Upload slot"
@@ -134,22 +145,18 @@ while true; do
                        fi
                        sleep 5
                        break
-                    fi
-                 else
-                  log "File not found: ${i}"
-                  continue
-               fi
-           fi
-           if [[ -d "/mnt/tdrive1/${FILEDIR}" || -d "/mnt/tdrive2/${FILEDIR}" ]]; then
-              continue
-           else
-              log "Sleeping 5s before looking at next file"
-              sleep 5
-           fi
-       done
-       log "Finished looking for files, sleeping 5 secs"
-   else
-       log "Nothing to upload, sleeping 5 secs"
-   fi
-   sleep 5
+                     fi
+                else
+                    log "File not found: ${i}"
+                    continue
+                fi
+            fi
+            log "Sleeping 5s before looking at next file"
+            sleep 10
+        done
+        log "Finished looking for files, sleeping 10 secs"
+    else
+        log "Nothing to upload, sleeping 10 secs"
+    fi
+    sleep 10
 done
