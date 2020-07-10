@@ -101,12 +101,13 @@ while true; do
                        log "Upload Bandwith is less then ${BWLIMITSET}M"
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
-					   if [ ${UPLOADFILE} -gt 40 ]; then
+                       if [ ${UPLOADFILE} -gt 40 ]; then
                            UPLOADFILE=35
                        else
-					       UPLOADFILE=${UPLOADFILE}
+                           UPLOADFILE=${UPLOADFILE}
                        fi
-                       echo ${UPLOADFILE} >> /config/json/$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g").bwlimit
+                       FILEBASE=$(basename "${i}")
+                       echo ${UPLOADFILE} >> /config/json/${FILEBASE}.bwlimit
                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                        # Set gdsa as crypt or not
                         if [ ${ENCRYPTED} == "true" ]; then
