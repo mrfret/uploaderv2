@@ -101,6 +101,7 @@ while true; do
                        else
 					       UPLOADFILE=${UPLOADFILE}
                        fi
+                       echo ${UPLOADFILE} >> /config/json/$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g").bwlimit
                        # Append filesize to GDSAAMOUNT
                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                        # Set gdrive as crypt or not
