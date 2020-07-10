@@ -91,7 +91,7 @@ while true; do
                        continue
                     fi
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    TRANSFERS=$(ls /config/pid/*.trans | wc -l )
                     UPLOADSPEED=$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
