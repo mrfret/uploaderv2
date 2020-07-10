@@ -19,21 +19,21 @@ JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
 PLEX=${PLEX:-false}
-test_2=$(ls -la /config  | grep -c xml)
-test_1=$(ls -la /app  | grep -c xml)
+test_2=$(ls /config | grep -c xml)
+test_1=$(ls /app | grep -c xml)
 if [ ${PLEX} == "false" ]; then
-  if [[ ${test_1} == "1"  || ${test_2} == "1" ]]; then
+  if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
     PLEX=true
   fi
 fi
 BWLIMITSET=${BWLIMITSET}
-if [ "${BWLIMITSET}" == 'null' ]; then
+if [ ${BWLIMITSET} == 'null' ]; then
     BWLIMITSET=100
 else
    BWLIMITSET=${BWLIMITSET}
 fi
 GCE=${GCE:-false}
-if [ "${GCE}" == "false" ]; then
+if [ ${GCE} == "false" ]; then
 gcheck=$(dnsdomainname | tail -c 10)
  if [ "$gcheck" == ".internal" ]; then
     GCE=true
@@ -42,21 +42,9 @@ fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 LOGHOLDUI=${LOGHOLDUI}
-TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+TRANSFERS=$(ls /config/pid/*.trans | wc -l )
 CHECKERS="$((${TRANSFERS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
-##### BWLIMIT-PART
-if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-   VNSTAT_JSON="/config/json/${FILEBASE}.monitor"
-   vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/' > ${VNSTAT_JSON}
-   bc <<< "scale=3; ${BWLIMITSET} - $(cat ${VNSTAT_JSON})" >${PLEX_JSON}
-fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '*.inProgress/*'"
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 echo "lock" >"${DISCORD}"
@@ -67,14 +55,8 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-     if [ ${TRANSFERS} -le "2" ]; then 
-         BWLIMITSPEED="$(echo $(( ((${BWLIMITSET}-${TRANSFERS}))/10*5 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')"
-         ####BWLIMITSPEED="35"        
+         BWLIMITSPEED="$(cat ${PLEX_JSON})"
          BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-      else
-         BWLIMITSPEED="$(cat /config/json/${FILEBASE}.bwlimit)"
-         BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-     fi
 elif [ ${GCE} == "true" ]; then
      BWLIMIT=""
 else
@@ -122,7 +104,6 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
        "${DISCORD}" \
-       "${VNSTAT_JSON}" \
        "${JSONFILE}"    
 else
  sleep 1
@@ -131,8 +112,7 @@ else
        "${PLEX_STREAMS}" \
        "${LOGFILE}" \
        "${PID}/${FILEBASE}.trans" \
-       "${DISCORD}" \
-       "${VNSTAT_JSON}"
+       "${DISCORD}"
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
