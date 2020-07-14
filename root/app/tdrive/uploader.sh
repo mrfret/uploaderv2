@@ -135,7 +135,7 @@ while true; do
                         log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
                         # Record GDSA transfered in case of crash/reboot
                         echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                    else 
+                    else
                        if [ ${TRANSFERS} == 4 ]; then
                           log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
                           log "wait for next free Upload slot"
@@ -157,6 +157,7 @@ while true; do
         log "Finished looking for files, sleeping 10 secs"
     else
         log "Nothing to upload, sleeping 10 secs"
+        empty_folder
     fi
     sleep 10
 done
