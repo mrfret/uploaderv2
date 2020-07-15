@@ -117,3 +117,7 @@ else
   log "Uploads is based of ${BWLIMITSET}"
 fi
 }
+
+function empty_folder() {
+find /move -mindepth 1 -type d -empty -delete 
+}

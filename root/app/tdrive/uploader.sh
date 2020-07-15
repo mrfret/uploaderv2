@@ -91,7 +91,7 @@ while true; do
                        continue
                     fi
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls /config/pid/*.trans | wc -l )
+                    TRANSFERS=$(ls /config/pid/ | egrep trans | wc -l )
                     UPLOADSPEED=$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
@@ -135,7 +135,7 @@ while true; do
                         log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
                         # Record GDSA transfered in case of crash/reboot
                         echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                    else 
+                    else
                        if [ ${TRANSFERS} == 4 ]; then
                           log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
                           log "wait for next free Upload slot"
@@ -157,6 +157,7 @@ while true; do
         log "Finished looking for files, sleeping 10 secs"
     else
         log "Nothing to upload, sleeping 10 secs"
+        empty_folder
     fi
     sleep 10
 done

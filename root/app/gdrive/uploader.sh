@@ -149,6 +149,7 @@ while true; do
         log "Finished looking for files, sleeping 10 secs"
     else
         log "Nothing to upload, sleeping 10 secs"
+        empty_folder
     fi
     sleep 10
 done
