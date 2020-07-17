@@ -47,26 +47,29 @@ if [[ "${SERVERSIDEDRIVE}" == "false" ]]; then
     exit 1
  fi
 fi
-sunday="$(date '+%A')"
-yanow="$(Sunday)"
+sunday="(date '+%A')"
+yanow="Sunday"
 
 #####
 ### SERVERSIDE
 #####
 # Run Loop
 while true; do
-  if [[ "$(yanow)" == "$(sunday)" ]]; then
-     if [ "${SERVERSIDE}" == "true" ]; then
-     log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-     rclone move --checkers 4 --transfers 2 \
-            --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
-            --no-traverse ${SERVERSIDEAGE} --fast-list \
-            "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-     log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+  if [[ ${sunday} == Sunday ]]; then
+     continue
+     if [ ${SERVERSIDE} == "true" ]; then
+         log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+         rclone move --checkers 4 --transfers 2 \
+                --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
+                --no-traverse ${SERVERSIDEAGE} --fast-list \
+                "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+         log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
      fi
   else
-     break
-     log "Next Start on ${yanow} \nServer-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-     sleep 24h
+     log "Next Start on ${yanow}"
+     log "Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+        if [[ ${sunday} != Sunday ]]; then
+            break
+        fi
   fi 
 done
