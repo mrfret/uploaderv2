@@ -4,9 +4,9 @@
 # All rights reserved.
 # SERVER SIDE ACTION 
 ####
+SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
-LOGFILE="/config/logs/${SERVERSIDE}.log"
-
+LOGFILE="/config/logs/${SVLOG}.log"
 
 SERVERSIDE=${SERVERSIDE:-false}
 if [[ "${SERVERSIDE}" == "false" ]]; then
@@ -24,10 +24,10 @@ else
    SERVERSIDEAGE=""
 fi
 
-REMOTE=${REMOTE:-false}
+REMOTEDRIVE=${REMOTEDRIVE:-false}
 if [[ "${REMOTE}" == "false" ]]; then
  if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
-    REMOTE=tdrive
+    REMOTEDRIVE=tdrive
  else 
     exit 1
  fi
