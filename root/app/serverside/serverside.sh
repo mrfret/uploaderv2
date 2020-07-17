@@ -4,6 +4,11 @@
 # All rights reserved.
 # SERVER SIDE ACTION 
 ##############################
+####
+function log() {
+    echo "[Server Side] ${1}"
+}
+
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/${SVLOG}.log"
@@ -22,13 +27,13 @@ if [ "${SERVERSIDEMINAGE}" != 'null' ]; then
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEAGE="--min-age=${SERVERSIDEMINAGE}"
 else
-   SERVERSIDEAGE=""
+   SERVERSIDEAGE="--min-age=48h"
 fi
 #####
 REMOTEDRIVE=${REMOTEDRIVE:-false}
 if [[ "${REMOTEDRIVE}" == "false" ]]; then
- if [[ "$(grep -r gdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
-    REMOTEDRIVE=gdrive
+ if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
+    REMOTEDRIVE=tdrive
  else 
     exit 1
  fi
@@ -36,20 +41,32 @@ fi
 #####
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-false}
 if [[ "${SERVERSIDEDRIVE}" == "false" ]]; then
- if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
-    SERVERSIDEDRIVE=tdrive
+ if [[ "$(grep -r gdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
+    SERVERSIDEDRIVE=gdrive
  else
     exit 1
  fi
 fi
+sunday="$(date '+%A')"
+yanow="$(Sunday)"
+
 #####
 ### SERVERSIDE
 #####
-if [ "${SERVERSIDE}" == "true" ]; then
-rclone move --checkers 4 --transfers 2 \
-       --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
-       --no-traverse ${SERVERSIDEAGE} --fast-list \
-        "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-else
-   exit 1
-fi
+# Run Loop
+while true; do
+  if [[ "$(yanow)" == "$(sunday)" ]]; then
+     if [ "${SERVERSIDE}" == "true" ]; then
+     log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+     rclone move --checkers 4 --transfers 2 \
+            --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
+            --no-traverse ${SERVERSIDEAGE} --fast-list \
+            "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+     log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+     fi
+  else
+     break
+     log "Next Start on ${yanow} \nServer-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+     sleep 24h
+  fi 
+done
