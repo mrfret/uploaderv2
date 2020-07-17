@@ -26,9 +26,9 @@ else
 fi
 #####
 REMOTEDRIVE=${REMOTEDRIVE:-false}
-if [[ "${REMOTE}" == "false" ]]; then
- if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
-    REMOTEDRIVE=tdrive
+if [[ "${REMOTEDRIVE}" == "false" ]]; then
+ if [[ "$(grep -r gdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
+    REMOTEDRIVE=gdrive
  else 
     exit 1
  fi
@@ -36,8 +36,8 @@ fi
 #####
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-false}
 if [[ "${SERVERSIDEDRIVE}" == "false" ]]; then
- if [[ "$(grep -r gdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
-    SERVERSIDEDRIVE=gdrive
+ if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
+    SERVERSIDEDRIVE=tdrive
  else
     exit 1
  fi
@@ -46,7 +46,7 @@ fi
 ### SERVERSIDE
 #####
 if [ "${SERVERSIDE}" == "true" ]; then
-rclone move --tpslimit 6 --checkers 4 --transfers 2 \
+rclone move --checkers 4 --transfers 2 \
        --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
        --no-traverse ${SERVERSIDEAGE} --fast-list \
         "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
