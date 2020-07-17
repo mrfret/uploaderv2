@@ -13,8 +13,15 @@ SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/${SVLOG}.log"
 truncate -s 0 /config/logs/${SVLOG}.log
+sunday="(date '+%A')"
+yanow="Sunday"
+
 #####
-SERVERSIDE=${SERVERSIDE:-false}
+SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
+SERVERSIDE=${SERVERSIDE:-null}
+REMOTEDRIVE=${REMOTEDRIVE:-null}
+SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
+#####
 if [[ "${SERVERSIDE}" == "false" ]]; then
  if grep -q server_side** ${RCLONEDOCKER} ; then
     SERVERSIDE=true
@@ -25,13 +32,12 @@ fi
 #####
 if [ "${SERVERSIDEMINAGE}" != 'null' ]; then
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
-   SERVERSIDEAGE="--min-age=${SERVERSIDEMINAGE}"
+   SERVERSIDEAGE="--min-age ${SERVERSIDEMINAGE}"
 else
-   SERVERSIDEAGE="--min-age=48h"
+   SERVERSIDEAGE="--min-age 48h"
 fi
 #####
-REMOTEDRIVE=${REMOTEDRIVE:-false}
-if [[ "${REMOTEDRIVE}" == "false" ]]; then
+if [[ "${REMOTEDRIVE}" == "null" ]]; then
  if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
     REMOTEDRIVE=tdrive
  else 
@@ -39,24 +45,20 @@ if [[ "${REMOTEDRIVE}" == "false" ]]; then
  fi
 fi
 #####
-SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-false}
-if [[ "${SERVERSIDEDRIVE}" == "false" ]]; then
+if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
  if [[ "$(grep -r gdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
     SERVERSIDEDRIVE=gdrive
  else
     exit 1
  fi
 fi
-sunday="(date '+%A')"
-yanow="Sunday"
-
 #####
 ### SERVERSIDE
 #####
 # Run Loop
 while true; do
   if [[ ${sunday} == Sunday ]]; then
-     continue
+     sleep 5
      if [ ${SERVERSIDE} == "true" ]; then
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
          rclone move --checkers 4 --transfers 2 \
@@ -69,7 +71,7 @@ while true; do
      log "Next Start on ${yanow}"
      log "Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
         if [[ ${sunday} != Sunday ]]; then
-            break
+            sleep 24h || break
         fi
   fi 
 done
