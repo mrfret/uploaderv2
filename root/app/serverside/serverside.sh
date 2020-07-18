@@ -59,11 +59,10 @@ fi
 # Run Loop
 
 while true; do
-
   if [[ ${sunday} != Sunday ]]; then
      sleep 10
   else
-     if [ "${SERVERSIDE}" == "true" ]; then
+     if [ ${SERVERSIDE} == true ]; then
          echo "lock" >"${DISCORD}"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
