@@ -28,57 +28,13 @@ sed -i "s#${OLDPATH}#/config/keys/#g" /opt/uploader/rclone.conf
 ## ENVS FOR THE SETUP
 
 ```
-UPLOADS = can be used from 1 - 20
 BWLIMITSET = 10 - 100
-GCE = true or false for maxout the upload speed 
-PLEX = true or false
 TZ = for local timezone 
 DISCORD_WEBHOOK_URL = for using Discord to track the Uploads
 DISCORD_ICON_OVERRIDE = Discord Avatar 
 DISCORD_NAME_OVERRIDE = Name for the Discord Webhook User
 LOGHOLDUI = When Diacord-Webhook is not used, the Complete Uploads will stay there for the minutes you setup
-PLEX_SERVER_IP="plex" = you can use IP and localhost and traefik_proxy part 
-PLEX_SERVER_PORT="32400" = the plex port (! local accesible !)
-
 ```
-
------
-
-## SAMPLE FOR BWLIMITSET AND UPLOADS
-
-```
-
-BWLIMITSET  is set to 100
-UPLOADS     is set to 10 
-
-BWLIMITSET  / UPLOADS  = REAL UPLOADSPEED PER FILE
-
-```
-
-## IF PLEX AND DOCKER UPLOADER ARE ON THE SAME HOST
-
-> **1. WHEN PLEX STREAMS ARE RUNNING :**
-
-```
-
-BWLIMITSET = see above 
-PLEX_PLAYS = inside running command
-
-BWLIMITSET / PLEX_PLAYS = UPLOADSPEED per file
-
-```
-
-> **2. NO PLEX STREAMS ARE RUNNING OR PLEX STREAMS < 2 :**
-
-```
-
-BWLIMITSET = see above
-UPLOADS = see above 
-
-BWLIMITSET / UPLOADS = UPLOADSPEED per file
-
-```
-
 -----
 
 
@@ -166,7 +122,7 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 > - Upload speed throtlling
 > - Preference.xml (used for bandwidth throtlling whilst a plex stream is running) is now automatically copied and named docker-preferences.xml
 > - 2 failsafe mods added reading/edit the docker-preferences.xml and /app/plex folder. 
-
+> - server-side included now
 
 
 
