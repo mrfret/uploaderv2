@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2019, PhysK
+# Copyright (c) 2020, MrDoob
 # All rights reserved.
 
 DIR_CACHE_TIME=${DIR_CACHE_TIME:-2m}
