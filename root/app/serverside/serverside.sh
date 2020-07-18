@@ -57,10 +57,13 @@ fi
 ### SERVERSIDE
 #####
 # Run Loop
+
 while true; do
-  if [[ ${sunday} == Sunday ]]; then
-     sleep 5
-     if [ ${SERVERSIDE} == "true" ]; then
+
+  if [[ ${sunday} != Sunday ]]; then
+     sleep 10
+  else
+     if [ "${SERVERSIDE}" == "true" ]; then
          echo "lock" >"${DISCORD}"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
@@ -82,12 +85,6 @@ while true; do
           else
              log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
           fi
-    else
-     log "Next Start on ${yanow}"
-     log "Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-        if [[ ${sunday} != Sunday ]]; then
-            sleep 24h || break
-        fi
-    fi
+      fi
   fi
 done
