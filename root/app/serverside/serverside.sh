@@ -82,7 +82,7 @@ while true; do
              DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
              DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
              # shellcheck disable=SC2006 
-             echo "log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nStarted : ${STARTTIME} \nFinished : ${ENDTIME}" >"${DISCORD}"
+             echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nStarted : ${STARTTIME} \nFinished : ${ENDTIME}" >"${DISCORD}"
              msg_content=$(cat "${DISCORD}")
              curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
           else
