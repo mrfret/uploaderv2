@@ -2,16 +2,9 @@
 # shellcheck shell=bash
 # Copyright (c) 2019, PhysK
 # All rights reserved.
-RCLONEDOCKER="/config/rclone-docker.conf
 
 if grep -q GDSA01 /config/rclone-docker.conf && grep -q GDSA02 /config/rclone-docker.conf; then
     touch /etc/services.d/uploader-gdrive/down
 else
     touch /etc/services.d/uploader-tdrive/down
-fi
-
-if grep -q server_side** ${RCLONEDOCKER} ; then
-   log "-> Server_side works  <-"
-else 
-   touch /etc/services.d/serverside/down
 fi
