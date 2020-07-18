@@ -9,10 +9,6 @@ function log() {
     echo "[Server Side] ${1}"
 }
 
-if pidof -o %PPID -x "$0"; then
-    exit 1
-fi
-
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/${SVLOG}.log"
