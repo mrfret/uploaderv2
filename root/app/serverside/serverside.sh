@@ -39,7 +39,7 @@ else
 fi
 #####
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
- if [[ "$(grep -r tdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
+ if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
     REMOTEDRIVE=tdrive
  else 
     exit 1
@@ -47,7 +47,7 @@ if [[ "${REMOTEDRIVE}" == "null" ]]; then
 fi
 #####
 if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
- if [[ "$(grep -r gdrive ${RCLONEDOCKER} | wc -l )" -gt 1 ]]; then
+ if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
     SERVERSIDEDRIVE=gdrive
  else
     exit 1
@@ -58,7 +58,6 @@ fi
 #####
 # Run Loop
 while true; do
-
   if [[ ${sunday} == Sunday ]]; then
      sleep 5
      if [ ${SERVERSIDE} == "true" ]; then
@@ -91,5 +90,4 @@ while true; do
         fi
     fi
   fi
-
 done
