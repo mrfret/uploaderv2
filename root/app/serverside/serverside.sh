@@ -15,7 +15,6 @@ LOGFILE="/config/logs/${SVLOG}.log"
 truncate -s 0 /config/logs/${SVLOG}.log
 sunday="(date '+%A')"
 yanow="Sunday"
-PID="/config/pid"
 echo "lock" >"${DISCORD}"
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -63,8 +62,6 @@ while true; do
   if [[ ${sunday} == Sunday ]]; then
      sleep 5
      if [ ${SERVERSIDE} == "true" ]; then
-         echo "${SVLOG}" > "/config/pid/${SVLOG}.serverside" 
-         echo "${SVLOG}" > "/config/pid/${SVLOG}.lck"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
          rclone move --checkers 4 --transfers 2 \
@@ -81,6 +78,7 @@ while true; do
              echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nStarted : ${STARTTIME} \nFinished : ${ENDTIME}" >"${DISCORD}"
              msg_content=$(cat "${DISCORD}")
              curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+             rm -f ${DISCORD}
           else
              log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
           fi
@@ -91,8 +89,4 @@ while true; do
             sleep 24h || break
         fi
   fi
-  rm -f "${PID}/${SVLOG}.lck" \
-       "${LOGFILE}" \
-       "${PID}/${SVLOG}.serverside" \
-       "${DISCORD}"
 done
