@@ -15,7 +15,6 @@ LOGFILE="/config/logs/${SVLOG}.log"
 truncate -s 0 /config/logs/${SVLOG}.log
 sunday="(date '+%A')"
 yanow="Sunday"
-echo "lock" >"${DISCORD}"
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 #####
@@ -59,9 +58,11 @@ fi
 #####
 # Run Loop
 while true; do
+
   if [[ ${sunday} == Sunday ]]; then
      sleep 5
      if [ ${SERVERSIDE} == "true" ]; then
+         echo "lock" >"${DISCORD}"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
          rclone move --checkers 4 --transfers 2 \
@@ -88,5 +89,7 @@ while true; do
         if [[ ${sunday} != Sunday ]]; then
             sleep 24h || break
         fi
+    fi
   fi
+
 done
