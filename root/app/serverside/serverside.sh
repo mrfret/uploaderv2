@@ -13,7 +13,7 @@ SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/${SVLOG}.log"
 truncate -s 0 /config/logs/${SVLOG}.log
-sunday="(date '+%A')"
+sunday=$(date '+%A')
 yanow="Sunday"
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
