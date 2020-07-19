@@ -23,7 +23,7 @@ if grep -q server_side** ${RCLONEDOCKER}; then
       echo " --->> Server_side can be used <<-- "
       echo " --->> TCrypt and GCrypt used the same password <<-- "
    else
-      exit
+      exit 1
       echo " -->> Server_side can't be used <<-- "
       echo " -->> TCrypt and GCrypt dont used the same password <<-- "
    fi
@@ -31,7 +31,7 @@ if grep -q server_side** ${RCLONEDOCKER}; then
 else
    echo "-->> Server_side is not included <<--"
    echo "-->> skipping <<--"
-   exit
+   exit 1
 fi
 
 
@@ -83,9 +83,6 @@ fi
 #####
 ### SERVERSIDE
 #####
-# Run Loop
-
-while true; do
   if [[ ${sunday} != Sunday ]]; then
      sleep 10
   else
@@ -93,7 +90,7 @@ while true; do
          echo "lock" >"${DISCORD}"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-         rclone move --checkers 4 --transfers 2 \
+         rclone move -vv --checkers 4 --transfers 2 \
                 --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
                 --no-traverse ${SERVERSIDEAGE} --fast-list --delete-empty-src-dirs \
                 "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
@@ -113,4 +110,3 @@ while true; do
           fi
       fi
   fi
-done
