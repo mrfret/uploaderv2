@@ -127,10 +127,8 @@ sunday=$(date '+%A')
 ###lock="/config/json/serverside.lck"
     if [[ ${sunday} == Sunday ]]; then
        if [[ ! -e /config/json/serverside.lck ]]; then
-           echo "lock" >/config/json/serverside.lck
            /app/serverside/serverside.sh &
            sleep 30
-           rm -rf /config/json/serverside.lck
        else 
            exit 1
        fi
