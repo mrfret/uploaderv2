@@ -124,7 +124,10 @@ find /move -mindepth 1 -type d -empty -delete
 
 function serverside() {
 sunday=$(date '+%A')
-    if [[ ${sunday} == Sunday ]]; then
-    /app/serverside/serverside.sh &
+lock="/config/json/serverside.lck"
+    if [[ ${sunday} == Sunday && ! -e "${lock}" ]]; then
+        echo "lock" >${lock}
+        /app/serverside/serverside.sh &
+        rm -rf ${lock}
     fi
 }
