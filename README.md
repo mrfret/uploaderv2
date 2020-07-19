@@ -121,13 +121,11 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 > - alpine-docker-image:latest version
 > - Additional ENV variables added
 > - WEB-UI is optimized for Cellphones 
-> - Automatic Bandwidth Throttling whilst two or more than two Plex streams are running
 > - Upload speed throtlling
 > - Preference.xml (used for bandwidth throtlling whilst a plex stream is running) is now automatically copied and named docker-preferences.xml
-> - 2 failsafe mods added reading/edit the docker-preferences.xml and /app/plex folder. 
-> - server-side included now
-
-
+> - 2 failsafe mods added reading/edit the docker-preferences.xml
+> - server-side included now ( starts each Sunday in the background ) / from tdrive to gdrive /
+> - TCrypt and GCrypt password/salt passwords checks for server-side included
 
 
 - NEW FEATURES COMING !! 
