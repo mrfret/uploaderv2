@@ -158,6 +158,7 @@ while true; do
     else
         log "Nothing to upload, sleeping 10 secs"
         empty_folder
+        serverside
     fi
     sleep 10
 done
