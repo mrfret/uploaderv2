@@ -72,6 +72,7 @@ fi
      sleep 10
   else
      if [ ${SERVERSIDE} == true ]; then
+         echo "lock" >/config/json/serverside.lck
          echo "lock" >"${DISCORD}"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
@@ -90,8 +91,10 @@ fi
              msg_content=$(cat "${DISCORD}")
              curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
              rm -f ${DISCORD}
+             rm -f /config/json/serverside.lck
           else
              log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+             rm -f /config/json/serverside.lck
           fi
       fi
   fi
