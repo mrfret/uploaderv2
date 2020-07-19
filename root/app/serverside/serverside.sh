@@ -92,7 +92,7 @@ fi
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
          rclone move -vv --checkers 4 --transfers 2 \
                 --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
-                --no-traverse ${SERVERSIDEAGE} --fast-list --delete-empty-src-dirs \
+                --no-traverse ${SERVERSIDEAGE} --fast-list \
                 "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
           sleep 5
           ENDTIME=$(date +now)
