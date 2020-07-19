@@ -158,7 +158,7 @@ while true; do
     else
         log "Nothing to upload, sleeping 10 secs"
         empty_folder
-        serverside
+        /app/serverside/serverside.sh & 
     fi
     sleep 10
 done
