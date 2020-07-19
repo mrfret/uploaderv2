@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2019, PhysK
+# Copyright (c) 2020, MrDoob
 # All rights reserved.
 # Logging Functio
 ####
@@ -42,7 +42,7 @@ fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 LOGHOLDUI=${LOGHOLDUI}
-TRANSFERS=$(ls /config/pid/*.trans | wc -l )
+TRANSFERS=$(ls /config/pid/ | wc -l)
 CHECKERS="$((${TRANSFERS}*2))"
 PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
 # add to file lock to stop another process being spawned while file is moving

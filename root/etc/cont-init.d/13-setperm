@@ -1,17 +1,17 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2019, PhysK
+# Copyright (c) 2020, MrDoob
 # All rights reserved.
 ## function source
 function log() {
 echo "[Uploader] ${1}"
 }
 DISABLE_UNIONFS_CHOWN=${DISABLE_UNIONFS_CHOWN:-false}
-log "-> Making sure we have the correct Directorys <-"
-mkdir -p /mnt/tdrive1 \
-         /mnt/tdrive2 \
-         /mnt/gdrive \
-         /mnt/gcrypt
+#log "-> Making sure we have the correct Directorys <-"
+#mkdir -p /mnt/tdrive1 \
+#         /mnt/tdrive2 \
+#         /mnt/gdrive \
+#         /mnt/gcrypt
 log "-> Setting Permissions || start <-"
 chown -hR abc:abc  \
          /config \
@@ -20,6 +20,7 @@ chown -hR abc:abc  \
 chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
+         /app/serverside/serverside.sh \
          /app/functions/functions.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
@@ -27,6 +28,7 @@ chown -hR abc:abc /app/uploader/upload.sh \
          /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/functions/functions.sh \
+         /app/serverside/serverside.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
 chown -R abc:abc /run \
