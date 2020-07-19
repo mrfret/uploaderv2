@@ -34,6 +34,9 @@ DISCORD_WEBHOOK_URL = for using Discord to track the Uploads
 DISCORD_ICON_OVERRIDE = Discord Avatar 
 DISCORD_NAME_OVERRIDE = Name for the Discord Webhook User
 LOGHOLDUI = When Diacord-Webhook is not used, the Complete Uploads will stay there for the minutes you setup
+
+SERVERSIDEMINAGE = only valid  parts check rclone.org for more infos about --min-age  ||>> 1d - 30d || 1h - 24h || 1m - 12m 
+[[ basic is 48h ]] 
 ```
 -----
 
@@ -118,13 +121,11 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 > - alpine-docker-image:latest version
 > - Additional ENV variables added
 > - WEB-UI is optimized for Cellphones 
-> - Automatic Bandwidth Throttling whilst two or more than two Plex streams are running
 > - Upload speed throtlling
 > - Preference.xml (used for bandwidth throtlling whilst a plex stream is running) is now automatically copied and named docker-preferences.xml
-> - 2 failsafe mods added reading/edit the docker-preferences.xml and /app/plex folder. 
-> - server-side included now
-
-
+> - 2 failsafe mods added reading/edit the docker-preferences.xml
+> - server-side included now ( starts each Sunday in the background ) / from tdrive to gdrive /
+> - TCrypt and GCrypt password/salt passwords checks for server-side included
 
 
 - NEW FEATURES COMING !! 
@@ -187,11 +188,9 @@ services:
       - "apparmor:unconfined"
     environment:
       - "ADDITIONAL_IGNORES=null'
-      - "UPLOADS=4"
+      - 'SERVERSIDEMINAGE=null'
       - "BWLIMITSET=80"
       - "CHUNK=32"
-      - "PLEX=false"
-      - "GCE=false"
       - "TZ=Europe/Berlin"
       - "DISCORD_WEBHOOK_URL=null"
       - "DISCORD_ICON_OVERRIDE=https://i.imgur.com/MZYwA1I.png"

@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2019, PhysK
+# Copyright (c) 2020, MrDoob
 # All rights reserved.
 ## function source
 source /app/functions/functions.sh
@@ -158,6 +158,7 @@ while true; do
     else
         log "Nothing to upload, sleeping 10 secs"
         empty_folder
+        serverside
     fi
     sleep 10
 done
