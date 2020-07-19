@@ -126,13 +126,13 @@ function serverside() {
 sunday=$(date '+%A')
 ###lock="/config/json/serverside.lck"
     if [[ ${sunday} == Sunday ]]; then
-       if [[ ! -e /config/json/serverside.lck ]]; then
-           /app/serverside/serverside.sh &
+       if [[ -e "/config/json/serverside.lck" ]]; then
            sleep 30
        else 
-           exit 1
+           /app/serverside/serverside.sh &
+           sleep 30
        fi
     else 
-        exit 1
+        sleep 30
     fi
 }
