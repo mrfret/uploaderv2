@@ -22,6 +22,7 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png" \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     DISCORD_EMBED_TITEL="Upload Completed" \
+    BWLIMITSET=null \
     LOGHOLDUI="5m" 
 
 RUN \
