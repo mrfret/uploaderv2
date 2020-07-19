@@ -27,11 +27,6 @@ if [ ${PLEX} == "false" ]; then
   fi
 fi
 BWLIMITSET=${BWLIMITSET}
-if [ ${BWLIMITSET} == 'null' ]; then
-    BWLIMITSET=100
-else
-   BWLIMITSET=${BWLIMITSET}
-fi
 GCE=${GCE:-false}
 if [ ${GCE} == "false" ]; then
 gcheck=$(dnsdomainname | tail -c 10)
