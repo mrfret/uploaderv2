@@ -160,8 +160,4 @@ while true; do
         empty_folder
     fi
     sleep 10
-    sunday="(date '+%A')"
-    if [[ ${sunday} == Sunday ]]; then
-    /app/serverside/serverside.sh
-    fi
 done
