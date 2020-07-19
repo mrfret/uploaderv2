@@ -121,3 +121,10 @@ fi
 function empty_folder() {
 find /move -mindepth 1 -type d -empty -delete 
 }
+
+function serverside() {
+sunday=$(date '+%A')
+    if [[ ${sunday} == Sunday ]]; then
+    /app/serverside/serverside.sh
+    fi
+}
