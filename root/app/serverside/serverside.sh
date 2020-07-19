@@ -90,7 +90,7 @@ fi
          echo "lock" >"${DISCORD}"
          STARTTIME=$(date +now)
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-         rclone move -vv --checkers 4 --transfers 2 \
+         rclone move --checkers 4 --transfers 2 \
                 --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
                 --no-traverse ${SERVERSIDEAGE} --fast-list \
                 "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
