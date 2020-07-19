@@ -50,9 +50,14 @@ else
    GDSAUSE=0
    GDSAAMOUNT=0
 fi
-BWLIMITSET=${BWLIMITSET}
-if [ "${BWLIMITSET}" == 'null' ]; then
-    BWLIMITSET=100
+test_2=$(ls /config | grep -c xml)
+test_1=$(ls /app | grep -c xml)
+if [ ${BWLIMITSET} == 'null' ]; then
+   if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
+      BWLIMITSET=80
+   else
+      BWLIMITSET=100
+   fi
 else
    BWLIMITSET=${BWLIMITSET}
 fi
