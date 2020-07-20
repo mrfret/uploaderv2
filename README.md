@@ -36,7 +36,12 @@ DISCORD_NAME_OVERRIDE = Name for the Discord Webhook User
 LOGHOLDUI = When Diacord-Webhook is not used, the Complete Uploads will stay there for the minutes you setup
 
 SERVERSIDEMINAGE = only valid  parts check rclone.org for more infos about --min-age  ||>> 1d - 30d || 1h - 24h || 1m - 12m 
-[[ basic is 48h ]] 
+[[ basic is 48h ]]
+SERVERSIDE = true or false
+This means if you want to move one folder to another then rclone won't download all the files and re-upload them; 
+it will instruct the server to move them in place.
+
+
 ```
 -----
 
