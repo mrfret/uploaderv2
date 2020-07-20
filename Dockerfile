@@ -16,6 +16,7 @@ ARG OVERLAY_VERSION="v2.0.0.1"
 
 ENV ADDITIONAL_IGNORES=null \
     SERVERSIDEMINAGE=null \
+    SERVERSIDE=false \
     CHUNK="32" \
     TZ="Europe/Berlin" \
     DISCORD_WEBHOOK_URL=null \
