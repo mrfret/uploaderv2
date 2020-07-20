@@ -13,7 +13,9 @@ Use the following to fix the service file paths
 ```
 (( RUNNING PLEX SERVER SAME HOST ))
 ```
-Copy your PLEX - Preference.xml file to ```/opt/uploader/plex```
+Copy your PLEX - Preference.xml file to ```/opt/uploader/```
+
+The Uploader will find it ;)
 ```sh
 (( RUNNING PLEX SERVER SAME HOST ))
 ```
@@ -192,8 +194,9 @@ services:
     security_opt:
       - "apparmor:unconfined"
     environment:
-      - "ADDITIONAL_IGNORES=null'
-      - 'SERVERSIDEMINAGE=null'
+      - "ADDITIONAL_IGNORES=null"
+      - "SERVERSIDEMINAGE=null"
+      - "SERVERSIDE=false"
       - "BWLIMITSET=80"
       - "CHUNK=32"
       - "TZ=Europe/Berlin"
