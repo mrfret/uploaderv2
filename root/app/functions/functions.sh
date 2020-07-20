@@ -125,18 +125,9 @@ find /move -mindepth 1 -type d -empty -delete
 function serverside() {
 sunday=$(date '+%A')
 SERVERSIDE=${SERVERSIDE}
-if [[ "${SERVERSIDE}" == "true" ]]; then
-   if [[ ${sunday} == Sunday ]]; then
-      if [[ -e "/config/json/serverside.lck" ]]; then
-         sleep 1
-      else 
-         /app/serverside/serverside.sh &
-         sleep 5
-      fi
-   else 
-      sleep 1
+if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
+   if [[ ! -e "/config/json/serverside.lck" ]]; then 
+      /app/serverside/serverside.sh &
    fi
-else
-   sleep 1
 fi
 }
