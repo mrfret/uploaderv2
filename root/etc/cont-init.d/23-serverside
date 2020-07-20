@@ -29,6 +29,11 @@ if [[ "${SERVERSIDECHECK}" -gt "1" ]]; then
   fi
 else
    log " --->> Server_side is not included <<--- "
-   log " --->> skipping <<--- "
+   log " --->> https://rclone.org/docs/#server-side-copy <<---"
+   log " --->> add under [gdrive] and [tdrive] <<---"
+   echo ""
+   log " --->> server_side_across_configs = true << ---"
+   echo ""
+   sleep 30
 fi
-sleep 10
+sleep 1
