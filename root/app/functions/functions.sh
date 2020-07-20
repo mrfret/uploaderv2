@@ -128,6 +128,10 @@ SERVERSIDE=${SERVERSIDE}
 if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
    if [[ ! -e "/config/json/serverside.lck" ]]; then 
       /app/serverside/serverside.sh &
+   else 
+     sleep 0.5
    fi
+else
+   sleep 0.5
 fi
 }
