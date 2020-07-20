@@ -18,7 +18,7 @@ if [[ "${SERVERSIDECHECK}" -gt "1" ]]; then
    if [[ "${rccommand1}" == "${rccommand2}" && "${rccommand3}" == "${rccommand4}" ]]; then
       log "   --->> Server_side can be used <<--- "
       if [[ "${SERVERSIDE} != "true" ]]; then
-         log "   --->> SET DOCKER Env SERVERSIDE to true <<--- <<
+         log "   --->> SET DOCKER Env SERVERSIDE to true <<--- "
          sleep 10
       fi
       log "   --->> TCrypt and GCrypt used the same password <<--- "
