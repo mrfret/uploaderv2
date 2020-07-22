@@ -5,7 +5,7 @@
 # mod from MrDoob                                    #
 # es wird keinem erlaubt                             #
 # es in seinem Projekt einzubauen                    #
-# ohne meine Erlaubnis / Anfange oder aonstiges      # 
+# ohne meine Erlaubnis / Anfange oder sonstiges      # 
 ######################################################
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
