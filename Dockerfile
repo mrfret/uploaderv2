@@ -3,10 +3,11 @@
 # Original coder PhysK                               #
 # All rights reserved.                               #
 # mod from MrDoob                                    #
-# plex stream checker is owned by my self            #
-# no one is allowed to modifie or use for his projekt#
+# es wird keinem erlaubt                             #
+# es in seinem Projekt einzubauen                    #
+# ohne meine Erlaubnis / Anfange oder aonstiges      # 
 ######################################################
-########## fuck of the hater bitches ! ###############
+########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
 FROM alpine:latest
 LABEL maintainer="MrDoob made my day"
