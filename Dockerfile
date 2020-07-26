@@ -25,6 +25,7 @@ ENV ADDITIONAL_IGNORES=null \
     DISCORD_NAME_OVERRIDE="RCLONE" \
     DISCORD_EMBED_TITEL="Upload Completed" \
     BWLIMITSET=null \
+    MINAGEHOLD=null \
     LOGHOLDUI="5m" 
 
 RUN \
