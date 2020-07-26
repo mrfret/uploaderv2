@@ -50,6 +50,12 @@ else
     log "calculator for bandwidth don't work"
     exit 1
 fi
+MINAGE=${MINAGE}
+if [[ "${MINAGE}" != 'null' ]]; then
+   MINAGEHOLD="-mmin +${MINAGE}"
+else
+   MINAGEHOLD=""
+fi
 # Run Loop
 while true; do
     mapfile -t timestamps < <(eval find /config/vars/gdrive -type f)
@@ -68,7 +74,7 @@ while true; do
     done
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -mmin +3 -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} ${MINAGEHOLD} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
