@@ -1,0 +1,8 @@
+#!/bin/bash
+# $IMAGE_NAME var is injected into the build so the tag is correct.
+echo "Build hook running"
+BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+COMMIT_AUTHOR=`git log -1 --pretty=format:'%ae'`
+docker build --build-arg BUILD_DATE=$BUILD_DATE \
+             --build-arg COMMIT_AUTHOR=$COMMIT_AUTHOR \
+             -t $IMAGE_NAME .
