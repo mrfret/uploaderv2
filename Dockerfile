@@ -14,6 +14,11 @@ LABEL maintainer="MrDoob made my day"
 
 ARG OVERLAY_ARCH="amd64"
 ARG OVERLAY_VERSION="v2.0.0.1"
+ARG BUILD_DATE="unknown"
+ARG COMMIT_AUTHOR="unknown"
+
+LABEL maintainer=${COMMIT_AUTHOR} \
+    org.label-schema.build-date=${BUILD_DATE}
 
 ENV ADDITIONAL_IGNORES=null \
     SERVERSIDEMINAGE=null \
