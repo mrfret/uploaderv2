@@ -119,7 +119,12 @@ fi
 }
 
 function empty_folder() {
-find /move -mindepth 1 -type d -empty -delete 
+TARGET_FOLDER="/move"
+FIND=$(which find)
+FIND_BASE='-type d'
+FIND_ACTION='-exec rmdir \{\} \; > /dev/null 2>&1'
+command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} -empty ${FIND_ACTION}"
+eval "${command}"
 }
 
 function serverside() {
