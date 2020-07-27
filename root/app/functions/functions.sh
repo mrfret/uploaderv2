@@ -119,11 +119,15 @@ fi
 }
 
 function empty_folder() {
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+   ADDITIONAL_IGNORES=""
+fi
 TARGET_FOLDER="/move"
 FIND=$(which find)
 FIND_BASE='-type d'
 FIND_ACTION='-exec rmdir \{\} \; > /dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} -empty ${FIND_ACTION}"
+command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty ${FIND_ACTION}"
 eval "${command}"
 }
 
