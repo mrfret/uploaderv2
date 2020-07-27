@@ -117,8 +117,8 @@ fi
 TARGET_FOLDER="/move"
 FIND=$(which find)
 FIND_BASE='-type d'
-FIND_ACTION='-delete > /dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty ${FIND_ACTION}"
+FIND_ACTION='-delete'
+command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty ${FIND_ACTION} 1>/dev/null 2>&1"
 eval "${command}"
 }
 function serverside() {
