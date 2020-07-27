@@ -3,11 +3,9 @@
 # Copyright (c) 2020, MrDoob || tHaTer || buGGprint
 # All rights reserved.
 ## function source
-
 function log() {
     echo "[Uploader] ${1}"
 }
-
 function base_folder_gdrive() {
 mkdir -p /config/pid/ \
          /config/json/ \
@@ -16,7 +14,6 @@ mkdir -p /config/pid/ \
          /config/discord/ \
          /config/vars/gdrive/
 }
-
 function base_folder_tdrive() {
 mkdir -p /config/pid/ \
          /config/json/ \
@@ -24,7 +21,6 @@ mkdir -p /config/pid/ \
          /config/vars/ \
          /config/discord/
 }
-
 function remove_old_files_start_up() {
 # Remove left over webui and transfer files
 rm -f /config/pid/* \
@@ -32,14 +28,12 @@ rm -f /config/pid/* \
       /config/logs/* \
       /config/discord/*
 }
-
 function cleanup_start() {
 # delete any lock files for files that failed to upload
-find ${downloadpath} -type f -name '*.lck' -delete
+find /move -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
 }
-
 function bc_start_up_test() {
 # Check if BC is installed
 if [ "$(echo "10 + 10" | bc)" == "20" ]; then
@@ -63,7 +57,6 @@ log "-> update packages || start <-"
       rm -rf /var/cache/apk/*
 log "-> update packages || done <-"
 }
-
 function discord_start_send_gdrive() {
 BWLIMITSET=${BWLIMITSET:-80}
 if [[ ${BWLIMITSET} == "" ]]; then
@@ -90,7 +83,6 @@ else
   log "Uploads is based of ${BWLIMITSET}"
 fi
 }
-
 function discord_start_send_tdrive() {
 BWLIMITSET=${BWLIMITSET:-80}
 if [[ ${BWLIMITSET} == "" ]]; then
@@ -117,16 +109,18 @@ else
   log "Uploads is based of ${BWLIMITSET}"
 fi
 }
-
 function empty_folder() {
+DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
+if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+   ADDITIONAL_IGNORES=""
+fi
 TARGET_FOLDER="/move"
 FIND=$(which find)
 FIND_BASE='-type d'
-FIND_ACTION='-exec rmdir \{\} \; > /dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} -empty ${FIND_ACTION}"
+FIND_ACTION='-delete'
+command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty ${FIND_ACTION} 1>/dev/null 2>&1"
 eval "${command}"
 }
-
 function serverside() {
 sunday=$(date '+%A')
 SERVERSIDE=${SERVERSIDE}
