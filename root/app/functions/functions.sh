@@ -110,16 +110,14 @@ else
 fi
 }
 function empty_folder() {
-DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
-fi
-TARGET_FOLDER="/move"
+TARGET_FOLDER='/move'
 FIND=$(which find)
 FIND_BASE='-type d'
-FIND_ACTION='-delete'
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES} -empty ${FIND_ACTION} 1>/dev/null 2>&1"
-eval "${command}"
+FIND_EMPTY='-empty'
+FIND_MINDEPTH='-mindepth 2'
+FIND_ACTION='-delete 1>/dev/null 2>&1'
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_EMPTY} ${FIND_ACTION}"
+eval ${command}
 }
 function serverside() {
 sunday=$(date '+%A')
