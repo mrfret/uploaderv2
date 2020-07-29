@@ -16,8 +16,6 @@ if [ ! -f ${rclone} ]; then
       sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" ${rclone_docker}
       sed -i "s#/opt/uploader/keys/#/config/keys/#g" ${rclone_docker}
   log "-> Make needed edits to rclone conf <-"
-else
-  log "-> rclone.conf exist <-"
 fi
 }
 function rcloneinstall() {
@@ -27,15 +25,9 @@ if [ ! -f ${rclone_bin} ]; then
       wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
       unzip -qq rclone.zip && rm rclone.zip && \
       mv rclone*/rclone /usr/bin && rm -rf rclone* 
-      rcstored=$(rclone --version | awk '{print $2}' | head -n 1)
   log "-> install rclone || done <-"
-  log "-> installed rclone version ${rcstored}"
-else
-  rcstored=$(rclone --version | awk '{print $2}' | head -n 1)
-  log "-> rclone is current installed <-"
-  log "-> currently installed rclone version ${rcstored}"
 fi
 }
-
+###
 rclone
 rcloneinstall
