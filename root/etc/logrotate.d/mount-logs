@@ -1,6 +1,6 @@
 /tmp/mount-*.log {
-    size 50M
-    rotate 2
+    size 10M
+    rotate 1
     noolddir
 	missingok
 	sharedscripts

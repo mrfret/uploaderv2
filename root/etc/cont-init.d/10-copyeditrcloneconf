@@ -6,29 +6,28 @@ function log() {
 echo "[Uploader] ${1}"
 }
 function rclone() {
-rclone=/config/rclone-docker.conf
+rclone_docker=/config/rclone-docker.conf
+rclone=/config/rclone.conf
 if [ ! -f ${rclone} ]; then
-  log "-> Copying rclone conf <-"
-      cp /config/rclone.conf /config/rclone-docker.conf
-      sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone-docker.conf
-      sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone-docker.conf
-      sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone-docker.conf
+  log "-> Copying rclone.conf <-"
+      cp ${rclone} ${rclone_docker}
+      sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" ${rclone_docker}
+      sed -i "s#/opt/appdata/uploader/#/config/keys/#g" ${rclone_docker}
+      sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" ${rclone_docker}
+      sed -i "s#/opt/uploader/keys/#/config/keys/#g" ${rclone_docker}
   log "-> Make needed edits to rclone conf <-"
-else
-  log "-> rclone conf exist <-"
 fi
 }
 function rcloneinstall() {
-if [ ! -f "/usr/bin/rclone" ]; then
+rclone_bin=/usr/bin/rclone
+if [ ! -f ${rclone_bin} ]; then
   log "-> install rclone || start <-"
       wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
       unzip -qq rclone.zip && rm rclone.zip && \
       mv rclone*/rclone /usr/bin && rm -rf rclone* 
   log "-> install rclone || done <-"
-else
-  log "-> rclone is current installed <-"
 fi
 }
-
+###
 rclone
 rcloneinstall
