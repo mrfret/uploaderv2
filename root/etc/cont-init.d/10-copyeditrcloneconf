@@ -24,9 +24,13 @@ if [ ! -f "/usr/bin/rclone" ]; then
       wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
       unzip -qq rclone.zip && rm rclone.zip && \
       mv rclone*/rclone /usr/bin && rm -rf rclone* 
+      rcstored=$(rclone --version | awk '{print $2}' | head -n 1)
   log "-> install rclone || done <-"
+  log "-> installed rclone version ${rcstored}"
 else
+  rcstored=$(rclone --version | awk '{print $2}' | head -n 1)
   log "-> rclone is current installed <-"
+  log "-> currently installed rclone version ${rcstored}"
 fi
 }
 
