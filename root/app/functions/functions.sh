@@ -7,7 +7,8 @@ function log() {
     echo "[Uploader] ${1}"
 }
 function base_folder_gdrive() {
-mkdir -p /config/pid/ \
+mkdir -p -m=777 \
+         /config/pid/ \
          /config/json/ \
          /config/logs/ \
          /config/vars/ \
@@ -15,7 +16,8 @@ mkdir -p /config/pid/ \
          /config/vars/gdrive/
 }
 function base_folder_tdrive() {
-mkdir -p /config/pid/ \
+mkdir -p -m=777 \
+         /config/pid/ \
          /config/json/ \
          /config/logs/ \
          /config/vars/ \
@@ -23,10 +25,10 @@ mkdir -p /config/pid/ \
 }
 function remove_old_files_start_up() {
 # Remove left over webui and transfer files
-rm -f /config/pid/* \
-      /config/json/* \
-      /config/logs/* \
-      /config/discord/*
+rm -rf /config/pid/* \
+       /config/json/* \
+       /config/logs/* \
+       /config/discord/*
 }
 function cleanup_start() {
 # delete any lock files for files that failed to upload
@@ -36,12 +38,19 @@ sleep 10
 }
 function bc_start_up_test() {
 # Check if BC is installed
-if [ "$(echo "10 + 10" | bc)" == "20" ]; then
-    log "BC Found! All good :)"
-else
-    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && apk add bc -qq
+bc=/usr/bin/bc
+if [ ! -f ${bc} ]; then
+    apk --no-cache update -qq
+    apk --no-cache upgrade -qq
+    apk --no-cache fix -qq 
+    apk add bc -qq
     rm -rf /var/cache/apk/*
-    log "BC reinstalled, Exit"
+    log "BC reinstalled"
+    if [ "$(echo "10 + 10" | bc)" != "20" ]; then
+       log " -> [ WARNING ] BC install  failed [ WARNING ] <-"
+       sleep 30
+       exit 1
+    fi
 fi
 }
 function rclone() {
@@ -114,7 +123,7 @@ TARGET_FOLDER='/move'
 FIND=$(which find)
 FIND_BASE='-type d'
 FIND_EMPTY='-empty'
-FIND_MINDEPTH='-mindepth 2'
+FIND_MINDEPTH='-mindepth 1'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}
