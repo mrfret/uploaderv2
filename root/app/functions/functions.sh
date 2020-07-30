@@ -7,26 +7,14 @@ function log() {
     echo "[Uploader] ${1}"
 }
 function base_folder_gdrive() {
-mkdir -p /config/pid/ \
-         /config/json/ \
-         /config/logs/ \
-         /config/vars/ \
-         /config/discord/ \
-         /config/vars/gdrive/
+mkdir -p /config/{pid,json,logs,vars,vars/gdrive,discord}
 }
 function base_folder_tdrive() {
-mkdir -p /config/pid/ \
-         /config/json/ \
-         /config/logs/ \
-         /config/vars/ \
-         /config/discord/
+mkdir -p /config/{pid,json,logs,vars,discord}
 }
 function remove_old_files_start_up() {
 # Remove left over webui and transfer files
-rm -f /config/pid/* \
-      /config/json/* \
-      /config/logs/* \
-      /config/discord/*
+rm -rf /config/{pid,json,logs,discord}
 }
 function cleanup_start() {
 # delete any lock files for files that failed to upload
@@ -36,12 +24,17 @@ sleep 10
 }
 function bc_start_up_test() {
 # Check if BC is installed
-if [ "$(echo "10 + 10" | bc)" == "20" ]; then
-    log "BC Found! All good :)"
-else
-    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && apk add bc -qq
-    rm -rf /var/cache/apk/*
-    log "BC reinstalled, Exit"
+bc=/usr/bin/bc
+if [ ! -f ${bc} ]; then
+   apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
+   apk add bc -qq
+   rm -rf /var/cache/apk/*
+   log "BC reinstalled"
+   if [ "$(echo "10 + 10" | bc)" != "20" ]; then
+      log " -> [ WARNING ] BC install  failed [ WARNING ] <-"
+      sleep 30
+      exit 1
+   fi
 fi
 }
 function rclone() {
@@ -114,7 +107,7 @@ TARGET_FOLDER='/move'
 FIND=$(which find)
 FIND_BASE='-type d'
 FIND_EMPTY='-empty'
-FIND_MINDEPTH='-mindepth 2'
+FIND_MINDEPTH='-mindepth 1'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}
@@ -122,8 +115,9 @@ eval ${command}
 function serverside() {
 sunday=$(date '+%A')
 SERVERSIDE=${SERVERSIDE}
+lock=/config/json/serverside.lck
 if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
-   if [[ ! -e "/config/json/serverside.lck" ]]; then 
+   if [[ ! -f ${lock} ]]; then 
       /app/serverside/serverside.sh &
    else 
      sleep 0.5
