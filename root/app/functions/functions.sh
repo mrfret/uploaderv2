@@ -7,14 +7,26 @@ function log() {
     echo "[Uploader] ${1}"
 }
 function base_folder_gdrive() {
-mkdir -p /config/{pid,json,logs,vars,vars/gdrive,discord}
+mkdir -p /config/pid/ \
+         /config/json/ \
+         /config/logs/ \
+         /config/vars/ \
+         /config/discord/ \
+         /config/vars/gdrive/
 }
 function base_folder_tdrive() {
-mkdir -p /config/{pid,json,logs,vars,discord}
+mkdir -p /config/pid/ \
+         /config/json/ \
+         /config/logs/ \
+         /config/vars/ \
+         /config/discord/
 }
 function remove_old_files_start_up() {
 # Remove left over webui and transfer files
-rm -rf /config/{pid,json,logs,discord}
+rm -f /config/pid/* \
+      /config/json/* \
+      /config/logs/* \
+      /config/discord/*
 }
 function cleanup_start() {
 # delete any lock files for files that failed to upload
@@ -24,7 +36,8 @@ sleep 10
 }
 function bc_start_up_test() {
 # Check if BC is installed
-if [ "$(echo "10 + 10" | bc)" != "20" ]; then
+BCTEST=/usr/bin/bc
+if [ ! -f ${BCTEST} ]; then
    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
    apk add bc -qq
    rm -rf /var/cache/apk/*
