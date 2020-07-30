@@ -7,15 +7,14 @@ function log() {
     echo "[Uploader] ${1}"
 }
 function base_folder_gdrive() {
-mkdir -p /config/{pid,json,logs,vars,discord}/
-mkdir -p /config/vars/gdrive/
+mkdir -p /config/{pid,json,logs,vars,vars/gdrive,discord}
 }
 function base_folder_tdrive() {
-mkdir -p /config/{pid,json,logs,vars,discord}/ 
+mkdir -p /config/{pid,json,logs,vars,discord}
 }
 function remove_old_files_start_up() {
 # Remove left over webui and transfer files
-rm -rf /config/{pid,json,logs,discord}/*
+rm -rf /config/{pid,json,logs,discord}
 }
 function cleanup_start() {
 # delete any lock files for files that failed to upload
@@ -27,17 +26,15 @@ function bc_start_up_test() {
 # Check if BC is installed
 bc=/usr/bin/bc
 if [ ! -f ${bc} ]; then
-    apk --no-cache update -qq
-    apk --no-cache upgrade -qq
-    apk --no-cache fix -qq 
-    apk add bc -qq
-    rm -rf /var/cache/apk/*
-    log "BC reinstalled"
-    if [ "$(echo "10 + 10" | bc)" != "20" ]; then
-       log " -> [ WARNING ] BC install  failed [ WARNING ] <-"
-       sleep 30
-       exit 1
-    fi
+   apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
+   apk add bc -qq
+   rm -rf /var/cache/apk/*
+   log "BC reinstalled"
+   if [ "$(echo "10 + 10" | bc)" != "20" ]; then
+      log " -> [ WARNING ] BC install  failed [ WARNING ] <-"
+      sleep 30
+      exit 1
+   fi
 fi
 }
 function rclone() {
