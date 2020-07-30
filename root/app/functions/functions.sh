@@ -7,28 +7,15 @@ function log() {
     echo "[Uploader] ${1}"
 }
 function base_folder_gdrive() {
-mkdir -p -m=777 \
-         /config/pid/ \
-         /config/json/ \
-         /config/logs/ \
-         /config/vars/ \
-         /config/discord/ \
-         /config/vars/gdrive/
+mkdir -p /config/{pid,json,logs,vars,discord}/
+mkdir -p /config/vars/gdrive/
 }
 function base_folder_tdrive() {
-mkdir -p -m=777 \
-         /config/pid/ \
-         /config/json/ \
-         /config/logs/ \
-         /config/vars/ \
-         /config/discord/
+mkdir -p /config/{pid,json,logs,vars,discord}/ 
 }
 function remove_old_files_start_up() {
 # Remove left over webui and transfer files
-rm -rf /config/pid/* \
-       /config/json/* \
-       /config/logs/* \
-       /config/discord/*
+rm -rf /config/{pid,json,logs,discord}/*
 }
 function cleanup_start() {
 # delete any lock files for files that failed to upload
@@ -131,8 +118,9 @@ eval ${command}
 function serverside() {
 sunday=$(date '+%A')
 SERVERSIDE=${SERVERSIDE}
+lock=/config/json/serverside.lck
 if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
-   if [[ ! -e "/config/json/serverside.lck" ]]; then 
+   if [[ ! -f ${lock} ]]; then 
       /app/serverside/serverside.sh &
    else 
      sleep 0.5
