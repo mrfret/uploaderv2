@@ -24,8 +24,7 @@ sleep 10
 }
 function bc_start_up_test() {
 # Check if BC is installed
-bc=/usr/bin/bc
-if [ ! -f ${bc} ]; then
+if [ "$(echo "10 + 10" | bc)" != "20" ]; then
    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
    apk add bc -qq
    rm -rf /var/cache/apk/*
