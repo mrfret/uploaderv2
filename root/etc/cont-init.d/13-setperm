@@ -20,6 +20,7 @@ chown -hR abc:abc  \
 chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
+         /app/cleanup/cleanup.sh \
          /app/serverside/serverside.sh \
          /app/functions/functions.sh \
          /app/update-alpine/update-alpine.sh \
@@ -27,6 +28,7 @@ chmod a+x /app/gdrive/uploader.sh \
 chown -hR abc:abc /app/uploader/upload.sh \
          /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
+         /app/cleanup/cleanup.sh \
          /app/functions/functions.sh \
          /app/serverside/serverside.sh \
          /app/update-alpine/update-alpine.sh \

@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+# Copyright (c) 2020, MrDoob
+# All rights reserved.
+
+pids="$(ps -ef | grep 'cleanup.sh' | head -n 1 | grep -v grep | awk '{print $1}')"
+if [ "$pids" != "" ]; then
+  kill -15 $pids
+  sleep 2
+fi
