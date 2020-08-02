@@ -119,7 +119,7 @@ TARGET_FOLDER='/move'
 FIND=$(which find)
 FIND_BASE='-type d'
 FIND_EMPTY='-empty'
-FIND_MINDEPTH='-mindepth 1'
+FIND_MINDEPTH='-mindepth 2'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}

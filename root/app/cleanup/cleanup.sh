@@ -5,11 +5,6 @@
 # fuck of all haters
 # GNU:        General Public License v3.0
 ################################################################################
-#pids="$(ps -ef | grep 'cleanup.sh' | head -n 1 | grep -v grep | awk '{print $1}')"
-#if [ "$pids" == "" ]; then
-#  cleaning
-#  sleep 2
-#fi
 ##### FUNCTIONS #####
 downloadpath=/move
 CLEANUPDOWN=${CLEANUPDOWN}
@@ -23,8 +18,6 @@ fi
 cleaning() {
  while true; do
     cleanup_start
-    #find ${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2} -mindepth 1 -type d -ctime +${CLEANUPDOWN} -exec rm -rf {} +
-    #/app/cleanup/backpacker.sh
     garbage
     sleep 30
  done
