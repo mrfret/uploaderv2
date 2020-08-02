@@ -1,15 +1,10 @@
-#!/bin/bash
-#
-# Title:      remove the old garbage files
-# MOD from MrDoobPG
-# fuck of all haters
-# GNU:        General Public License v3.0
-################################################################################
-##### FUNCTIONS #####
-source /app/functions/functions.sh
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+# Copyright (c) 2020, MrDoob
+# All rights reserved.
+######## FUNCTIONS ##########
 downloadpath=/move
 CLEANUPDOWN=${CLEANUPDOWN}
-
 if [[ "${CLEANUPDOWN}" == 'null' ]]; then
    CLEANUPDOWN=7
 else 
@@ -19,16 +14,28 @@ fi
 cleaning() {
  while true; do
     cleanup_start
+    sleep 10
     garbage
+    sleep 10
     empty_folder
-    sleep 30
+    sleep 10
  done
 }
 
+function empty_folder() {
+TARGET_FOLDER='/move'
+FIND=$(which find)
+FIND_BASE='-type d'
+FIND_EMPTY='-empty'
+FIND_MINDEPTH='-mindepth 2'
+FIND_ACTION='-delete 1>/dev/null 2>&1'
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_EMPTY} ${FIND_ACTION}"
+eval ${command}
+}
 function cleanup_start() {
 TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 FIND=$(which find)
-FIND_BASE='-mindepth 1 -type d'
+FIND_BASE='-mindepth 2 -type d'
 FIND_TIME='-ctime +${CLEANUPDOWN}'
 FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_TIME} ${FIND_ACTION}"
@@ -36,23 +43,23 @@ eval "${command}"
 }
 
 function garbage() {
-#####################################################
-# script by pho
-#####################################################
+#################
+# script by pho #
+#################
 # basic settings
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 # find files in this folders
-FIND_SAMPLE_SIZE='188M' # files smaller then this are seen as samples and get deleted
-
+FIND_SAMPLE_SIZE='-size -188M'
 # advanced settings
 FIND=$(which find)
 FIND_BASE_CONDITION_WANTED='-type f -amin +600'
 FIND_BASE_CONDITION_UNWANTED='-type f'
+FIND_MINDEPTH='-mindepth 2'
 FIND_ADD_NAME='-o -iname'
 FIND_DEL_NAME='! -iname'
 FIND_ACTION='-not -path "**_UNPACK_**" -delete > /dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE_CONDITION_WANTED} -size -${FIND_SAMPLE_SIZE} ${FIND_ACTION}"
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_WANTED} ${FIND_SAMPLE_SIZE} ${FIND_ACTION}"
 eval "${command}"
 
 WANTED_FILES=(
@@ -111,18 +118,18 @@ UNWANTED_FILES=(
 condition="-iname '${UNWANTED_FILES[0]}'"
 for ((i = 1; i < ${#UNWANTED_FILES[@]}; i++))
 do
-    condition="${condition} ${FIND_ADD_NAME} '${UNWANTED_FILES[i]}'"
+  condition="${condition} ${FIND_ADD_NAME} '${UNWANTED_FILES[i]}'"
 done
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE_CONDITION_UNWANTED} \( ${condition} \) ${FIND_ACTION}"
-#echo "Executing ${command}"
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_UNWANTED} \( ${condition} \) ${FIND_ACTION}"
+
 eval "${command}"
 
 for ((i = 0; i < ${#WANTED_FILES[@]}-1; i++))
 do
-    condition2="${condition2} ${FIND_DEL_NAME} '${WANTED_FILES[i]}'"
+  condition2="${condition2} ${FIND_DEL_NAME} '${WANTED_FILES[i]}'"
 done
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE_CONDITION_WANTED} \( ${condition2} \) ${FIND_ACTION}"
-#echo "Executing ${command}"
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_WANTED} \( ${condition2} \) ${FIND_ACTION}"
+
 eval "${command}"
 }
 
