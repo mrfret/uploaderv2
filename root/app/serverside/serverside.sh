@@ -111,7 +111,7 @@ if [[ ! -e ${lock} ]]; then
       rm -rf "${lock}"
       fi
 else
-  sleep 1
+  sleep 24h
 fi
 }
 
