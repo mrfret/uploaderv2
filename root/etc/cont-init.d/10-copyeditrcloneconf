@@ -5,6 +5,14 @@
 function log() {
 echo "[Uploader] ${1}"
 }
+function rclonetest() {
+rclone_base=/config/rclone.conf
+if [ ! -f ${rclone_base} ]; then
+   log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
+   sleep 60
+   exit 1
+fi
+}
 function rclonestart() {
 rclone_docker=/config/rclone-docker.conf
 rclone_base=/config/rclone.conf
@@ -29,5 +37,6 @@ if [ ! -f ${rclone_bin} ]; then
 fi
 }
 ###
+rclonetest
 rclonestart
 rcloneinstall
