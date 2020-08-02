@@ -8,18 +8,15 @@
 function log() {
     echo "[Server Side] ${1}"
 }
-function serverside() {
 sunday=$(date '+%A')
 SERVERSIDE=${SERVERSIDE}
 lock=/config/json/serverside.lck
 if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
    if [[ ! -f ${lock} ]]; then 
       serverside_command
-   else 
-      sleep 10
    fi
 fi
-}
+
 function serverside_command() {
 ###execute part 
 SVLOG="serverside"
