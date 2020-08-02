@@ -111,9 +111,9 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 ! -path '**qbittorrent/**')
 
 ```
-----------
+-----
 
-CloneClean automatically  remove 
+## CloneClean automatically  remove 
 
 ```
 WANTED_FILES=(
@@ -168,7 +168,7 @@ UNWANTED_FILES=(
 )
 ```
 
-----------
+-----
 
 > **SIMILARLY ADDITIONAL IGNORES CAN BE SET USING ENV ``ADDITIONAL_IGNORES`` EXAMPLE:**
 
@@ -193,6 +193,7 @@ UNWANTED_FILES=(
 > - server-side included now ( starts each Sunday in the background ) / from tdrive to gdrive /
 > - TCrypt and GCrypt password/salt passwords checks for server-side included
 > - CloneClean included now 
+
 
 - NEW FEATURES COMING !! 
 
@@ -266,7 +267,7 @@ services:
       - "PUID=${PUID}"
       - "PGID=${PUID}"
     volumes:
-      - "/mnt/move:/move"
+      - "/mnt/downloads:/move"
       - "/opt/uploader:/config"
       - "/mnt/unionfs:/unionfs:shared"
     ports:
