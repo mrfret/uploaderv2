@@ -66,8 +66,10 @@ WANTED_FILES=(
     '*.srt'
     '*.idx'
     '*.sub'
+    '*.mp4'
 )
 UNWANTED_FILES=(
+    '*.m2ts'
     'abc.xyz.*'
     '*.m3u'
     'Top Usenet Provider*'
