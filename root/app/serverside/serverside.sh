@@ -8,6 +8,19 @@
 function log() {
     echo "[Server Side] ${1}"
 }
+function serverside() {
+sunday=$(date '+%A')
+SERVERSIDE=${SERVERSIDE}
+lock=/config/json/serverside.lck
+if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
+   if [[ ! -f ${lock} ]]; then 
+      serverside_command
+   else 
+      sleep 10
+   fi
+fi
+}
+function serverside_command() {
 ###execute part 
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
@@ -69,31 +82,37 @@ fi
 #####
 ### SERVERSIDE
 #####
-if [[ ! -e "/config/json/serverside.lck" ]]; then
-   echo "lock" >/config/json/serverside.lck
+lock=/config/json/serverside.lck
+if [[ ! -e ${lock} ]]; then
+   echo "lock" >${lock}
    echo "lock" >"${DISCORD}"
-   STARTTIME=$(date +now)
+   STARTTIME=$(date +%s)
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
    rclone move --checkers 4 --transfers 2 \
           --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
           --no-traverse ${SERVERSIDEAGE} --fast-list \
           "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
    sleep 5
-   ENDTIME=$(date +now)
+   ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
       DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
       DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+      TIME="$((count=${ENDTIME}-${STARTTIME}))"
+      duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
       # shellcheck disable=SC2006 
-      echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nStarted : ${STARTTIME} \nFinished : ${ENDTIME}" >"${DISCORD}"
+      echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nTime : ${duration}" >"${DISCORD}"
       msg_content=$(cat "${DISCORD}")
       curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-      rm -f ${DISCORD}
-      rm -f /config/json/serverside.lck
+      rm -rf "${DISCORD}" /
+            "${lock}"
    else
       log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-      rm -f /config/json/serverside.lck
+      rm -rf "${lock}"
       fi
 else
   sleep 1
 fi
+}
+
+serverside

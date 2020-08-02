@@ -114,17 +114,3 @@ else
   log "Uploads is based of ${BWLIMITSET}"
 fi
 }
-function serverside() {
-sunday=$(date '+%A')
-SERVERSIDE=${SERVERSIDE}
-lock=/config/json/serverside.lck
-if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
-   if [[ ! -f ${lock} ]]; then 
-      /app/serverside/serverside.sh &
-   else 
-     sleep 0.5
-   fi
-else
-   sleep 0.5
-fi
-}
