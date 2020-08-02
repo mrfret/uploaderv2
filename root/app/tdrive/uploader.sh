@@ -169,7 +169,7 @@ while true; do
         done
         log "Finished looking for files, sleeping 10 secs"
     else
-        serverside
+      log "Nothing to upload, sleeping 10 secs"
     fi
     sleep 10
 done
