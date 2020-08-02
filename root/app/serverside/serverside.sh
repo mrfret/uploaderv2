@@ -8,6 +8,7 @@
 function log() {
     echo "[Server Side] ${1}"
 }
+
 sunday=$(date '+%A')
 SERVERSIDE=${SERVERSIDE}
 lock=/config/json/serverside.lck
@@ -111,5 +112,3 @@ else
   sleep 24h
 fi
 }
-
-serverside
