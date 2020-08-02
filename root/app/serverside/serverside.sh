@@ -86,24 +86,24 @@ while true; do
           sleep 5
           ENDTIME=$(date +%s)
           if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-          TITEL="Server-Side Move"
-          DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
-          DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-          TIME="$((count=${ENDTIME}-${STARTTIME}))"
-          duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-          # shellcheck disable=SC2006 
-          echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nTime : ${duration}" >"${DISCORD}"
-          msg_content=$(cat "${DISCORD}")
-          curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-          rm -rf "${DISCORD}"
-          rm -rf "${lock}"
-       else
-          log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-          rm -rf "${lock}"
+             TITEL="Server-Side Move"
+             DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
+             DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+             TIME="$((count=${ENDTIME}-${STARTTIME}))"
+             duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+             # shellcheck disable=SC2006 
+             echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nTime : ${duration}" >"${DISCORD}"
+             msg_content=$(cat "${DISCORD}")
+             curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+             rm -rf "${DISCORD}"
+             rm -rf "${lock}"
+          else
+             log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+             rm -rf "${lock}"
+          fi
+        else
+          sleep 24h
         fi
-      else
-         sleep 24h
-       fi
        else
          log "Server-side is already is running"
          sleep 12h
