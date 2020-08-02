@@ -122,5 +122,3 @@ else
  sleep "${LOGHOLDUI}"
  rm -f "${JSONFILE}"
 fi
-
-rmdir "${downloadpath}/${FILEDIR}" > /dev/null 2>&1
