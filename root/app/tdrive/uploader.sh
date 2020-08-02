@@ -169,8 +169,6 @@ while true; do
         done
         log "Finished looking for files, sleeping 10 secs"
     else
-        log "Nothing to upload, sleeping 10 secs"
-        empty_folder
         serverside
     fi
     sleep 10

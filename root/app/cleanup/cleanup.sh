@@ -6,6 +6,7 @@
 # GNU:        General Public License v3.0
 ################################################################################
 ##### FUNCTIONS #####
+source /app/functions/functions.sh
 downloadpath=/move
 CLEANUPDOWN=${CLEANUPDOWN}
 
@@ -19,19 +20,19 @@ cleaning() {
  while true; do
     cleanup_start
     garbage
+    empty_folder
     sleep 30
  done
 }
 
 function cleanup_start() {
-TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}" 
+TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 FIND=$(which find)
 FIND_BASE='-mindepth 1 -type d'
 FIND_TIME='-ctime +${CLEANUPDOWN}'
 FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_TIME} ${FIND_ACTION}"
 eval "${command}"
-###find ${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2} -mindepth 1 -type d -ctime +${CLEANUPDOWN} -exec rm -rf {} +
 }
 
 function garbage() {
@@ -40,7 +41,7 @@ function garbage() {
 #####################################################
 # basic settings
 downloadpath=/move
-TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}" 
+TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 # find files in this folders
 FIND_SAMPLE_SIZE='188M' # files smaller then this are seen as samples and get deleted
 
