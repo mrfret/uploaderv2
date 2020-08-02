@@ -8,3 +8,9 @@ if grep -q GDSA01 /config/rclone-docker.conf && grep -q GDSA02 /config/rclone-do
 else
     touch /etc/services.d/uploader-tdrive/down
 fi
+
+RCLONEDOCKER=/config/rclone-docker.conf
+SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
+if [[ "${SERVERSIDECHECK}" -le "1" ]]; then 
+    touch /etc/services.d/serverside/down
+fi
