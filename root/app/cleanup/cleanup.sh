@@ -128,10 +128,6 @@ done
 command="${FIND} ${TARGET_FOLDER} -mindepth 1 ${FIND_BASE_CONDITION_WANTED} \( ${condition2} \) ${FIND_ACTION}"
 #echo "Executing ${command}"
 eval "${command}"
-
-command="${FIND} ${TARGET_FOLDER} -mindepth 1 -type d -empty ${FIND_ACTION}"
-#echo "Executing ${command}"
-eval "${command}"
 }
 
 # keeps the function in a loop

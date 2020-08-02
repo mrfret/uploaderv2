@@ -43,6 +43,7 @@ SERVERSIDE = true or false
 This means if you want to move one folder to another then rclone won't download all the files and re-upload them; 
 it will instruct the server to move them in place.
 
+CLEANUPDOWN = basic is 7 DAYS 
 
 ```
 -----
@@ -53,7 +54,7 @@ it will instruct the server to move them in place.
 
 ```
 
-Folder for uploads              =  - /mnt/move:/move
+Folder for uploads              =  - /mnt/downloads:/move
 Folder for config               =  - /opt/uploader:/config
 Dolder for merged contest       =  - /mnt/<pathofmergerfsrootfolder>:/unionfs
 
@@ -110,6 +111,64 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 ! -path '**qbittorrent/**')
 
 ```
+----------
+
+CloneClean automatically  remove 
+
+```
+WANTED_FILES=(
+    '*.mkv'
+    '*.mpg'
+    '*.mpeg'
+    '*.avi'
+    '*.mp4'
+    '*.mp3'
+    '*.flac'
+    '*.srt'
+    '*.idx'
+    '*.sub'
+)
+UNWANTED_FILES=(
+    'abc.xyz.*'
+    '*.m3u'
+    'Top Usenet Provider*'
+    'house-of-usenet.info'
+    '*.html~'
+    '*KLICK IT*'
+    'Click.rar'
+    '*.1'
+    '*.2'
+    '*.3'
+    '*.4'
+    '*.5'
+    '*.6'
+    '*.7'
+    '*.8'
+    '*.9'
+    '*.0'
+    '*.10'
+    '*.11'
+    '*.12'
+    '*.13'
+    '*.14'
+    '*.15'
+    '*.gif'
+    '*sample.*'
+    '*.sh'
+    '*.pdf'
+    '*.doc'
+    '*.docx'
+    '*.xls'
+    '*.xlsx'
+    '*.xml'
+    '*.html'
+    '*.htm'
+    '*.exe'
+    '*.nzb'
+)
+```
+
+----------
 
 > **SIMILARLY ADDITIONAL IGNORES CAN BE SET USING ENV ``ADDITIONAL_IGNORES`` EXAMPLE:**
 
@@ -133,7 +192,7 @@ starting with ``PG``, ``GD``, ``GS`` to upload with
 > - 2 failsafe mods added reading/edit the docker-preferences.xml
 > - server-side included now ( starts each Sunday in the background ) / from tdrive to gdrive /
 > - TCrypt and GCrypt password/salt passwords checks for server-side included
-
+> - CloneClean included now 
 
 - NEW FEATURES COMING !! 
 
