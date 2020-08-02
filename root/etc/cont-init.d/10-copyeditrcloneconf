@@ -7,10 +7,10 @@ echo "[Uploader] ${1}"
 }
 function rclone() {
 rclone_docker=/config/rclone-docker.conf
-rclone=/config/rclone.conf
-if [ ! -f ${rclone} ]; then
+rclone_base=/config/rclone.conf
+if [ ! -f ${rclone_base} ]; then
   log "-> Copying rclone.conf <-"
-      cp ${rclone} ${rclone_docker}
+      cp ${rclone_base} ${rclone_docker}
       sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" ${rclone_docker}
       sed -i "s#/opt/appdata/uploader/#/config/keys/#g" ${rclone_docker}
       sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" ${rclone_docker}
