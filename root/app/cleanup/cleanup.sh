@@ -11,14 +11,16 @@ else
    CLEANUPDOWN=${CLEANUPDOWN}
 fi
 
-while true; do
-  cleanup_start
-  sleep 10
-  garbage
-  sleep 10
-  empty_folder
-  sleep 10
-done
+cleaning() {
+ while true; do
+    cleanup_start
+    sleep 10
+    garbage
+    sleep 10
+    empty_folder
+    sleep 10
+ done
+}
 
 function empty_folder() {
 TARGET_FOLDER='/move'
@@ -130,3 +132,7 @@ command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_WANTED}
 
 eval "${command}"
 }
+
+# keeps the function in a loop
+cheeseballs=0
+while [[ "$cheeseballs" == "0" ]]; do cleaning; done
