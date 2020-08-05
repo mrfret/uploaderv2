@@ -62,6 +62,12 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
       sleep 10 && touch /etc/services.d/serverside/down && exit 1
    fi
 fi
+USERAGENT=${USERAGENT:-null}
+if [[ "$USERAGENT}" == "null" ]]; then
+    USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+else
+   USERAGENT=${USERAGENT}
+fi
 ################
 ## SERVERSIDE ##
 ################
@@ -84,6 +90,7 @@ while true; do
            rclone move --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
                  --no-traverse ${SERVERSIDEAGE} --fast-list \
+                 --user-agent=${USERAGENT} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
            sleep 5
            ENDTIME=$(date +%s)
