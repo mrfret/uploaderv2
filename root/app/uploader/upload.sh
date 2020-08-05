@@ -97,7 +97,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
    echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
    msg_content=$(cat "${DISCORD}")
-   curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+   curl -sH "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
    log "[Upload] Upload complete for $FILE, Cleaning up"
 fi
