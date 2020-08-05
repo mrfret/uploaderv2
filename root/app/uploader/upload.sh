@@ -70,12 +70,6 @@ else
     BWLIMIT=""
     BWLIMITSPEED="no LIMIT was set"
 fi
-USERAGENT=${USERAGENT:-null}
-if [[ ${USERAGENT} == "null" ]]; then
-    USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-else
-    USERAGENT=${USERAGENT}
-fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
@@ -84,7 +78,7 @@ log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
        --config=${RCLONEDOCKER} \
        --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-       --no-traverse --user-agent=${USERAGENT} \
+       --no-traverse \
        --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
