@@ -4,7 +4,7 @@
 # All rights reserved.
 ######## FUNCTIONS ##########
 downloadpath=/move
-CLEANUPDOWN=${CLEANUPDOWN}
+CLEANUPDOWN=${CLEANUPDOWN:-null}
 if [[ "${CLEANUPDOWN}" == 'null' ]]; then
    CLEANUPDOWN=7
 else 
@@ -61,7 +61,6 @@ FIND_DEL_NAME='! -iname'
 FIND_ACTION='-not -path "**_UNPACK_**" -delete > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_WANTED} ${FIND_SAMPLE_SIZE} ${FIND_ACTION}"
 eval "${command}"
-
 WANTED_FILES=(
     '*.mkv'
     '*.mpg'
@@ -121,18 +120,15 @@ do
   condition="${condition} ${FIND_ADD_NAME} '${UNWANTED_FILES[i]}'"
 done
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_UNWANTED} \( ${condition} \) ${FIND_ACTION}"
-
 eval "${command}"
-
 for ((i = 0; i < ${#WANTED_FILES[@]}-1; i++))
 do
   condition2="${condition2} ${FIND_DEL_NAME} '${WANTED_FILES[i]}'"
 done
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_WANTED} \( ${condition2} \) ${FIND_ACTION}"
-
 eval "${command}"
 }
-
 # keeps the function in a loop
 cheeseballs=0
 while [[ "$cheeseballs" == "0" ]]; do cleaning; done
+#EOF
