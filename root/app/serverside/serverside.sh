@@ -63,7 +63,7 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
    fi
 fi
 USERAGENT=${USERAGENT:-null}
-if [[ "$USERAGENT}" == "null" ]]; then
+if [[ ${USERAGENT} == "null" ]]; then
     USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 else
    USERAGENT=${USERAGENT}
