@@ -17,14 +17,15 @@ FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
+RCLONEDOCKER="/config/rclone-docker.conf
 PID="/config/pid"
 PLEX=${PLEX:-false}
 test_2=$(ls /config | grep -c xml)
 test_1=$(ls /app | grep -c xml)
 if [ ${PLEX} == "false" ]; then
-  if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
-    PLEX=true
-  fi
+   if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
+      PLEX=true
+   fi
 fi
 BWLIMITSET=${BWLIMITSET}
 test_2=$(ls /config | grep -c xml)
@@ -40,10 +41,10 @@ else
 fi
 GCE=${GCE:-false}
 if [ ${GCE} == "false" ]; then
-gcheck=$(dnsdomainname | tail -c 10)
- if [ "$gcheck" == ".internal" ]; then
-    GCE=true
- fi
+   gcheck=$(dnsdomainname | tail -c 10)
+   if [ "$gcheck" == ".internal" ]; then
+      GCE=true
+   fi
 fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -61,13 +62,19 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-         BWLIMITSPEED="$(cat ${PLEX_JSON})"
-         BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+    BWLIMITSPEED="$(cat ${PLEX_JSON})"
+    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
 elif [ ${GCE} == "true" ]; then
-     BWLIMIT=""
+    BWLIMIT=""
 else
-     BWLIMIT=""
-     BWLIMITSPEED="no LIMIT was set"
+    BWLIMIT=""
+    BWLIMITSPEED="no LIMIT was set"
+fi
+USERAGENT=${USERAGENT:-null}
+if [[ ${USERAGENT} == "null" ]]; then
+    USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+else
+   USERAGENT=${USERAGENT}
 fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
@@ -75,9 +82,9 @@ chmod 777 "${LOGFILE}"
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
-       --config /config/rclone-docker.conf \
+       --config=${RCLONEDOCKER} \
        --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-       --no-traverse \
+       --no-traverse --user-agent=${USERAGENT} \
        --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
@@ -93,13 +100,13 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
    DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
  # shellcheck disable=SC2003
-  TIME="$((count=${ENDTIME}-${STARTTIME}))"
-  duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-  echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
-  msg_content=$(cat "${DISCORD}")
-  curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+   TIME="$((count=${ENDTIME}-${STARTTIME}))"
+   duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
+   msg_content=$(cat "${DISCORD}")
+   curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
- log "[Upload] Upload complete for $FILE, Cleaning up"
+  log "[Upload] Upload complete for $FILE, Cleaning up"
 fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
