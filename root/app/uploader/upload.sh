@@ -5,7 +5,7 @@
 # Logging Functio
 ####
 function log() {
-    echo "[Uploader] ${1}"
+   echo "[Uploader] ${1}"
 }
 downloadpath=/move
 IFS=$'\n'
@@ -74,7 +74,7 @@ USERAGENT=${USERAGENT:-null}
 if [[ ${USERAGENT} == "null" ]]; then
     USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 else
-   USERAGENT=${USERAGENT}
+    USERAGENT=${USERAGENT}
 fi
 touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
@@ -89,8 +89,7 @@ rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
-    sleep 10s
-    rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
+    sleep 10s && rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
 fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
@@ -99,33 +98,34 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    TITEL=${DISCORD_EMBED_TITEL}
    DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
    DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
- # shellcheck disable=SC2003
+   # shellcheck disable=SC2003
    TIME="$((count=${ENDTIME}-${STARTTIME}))"
    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
    echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
    msg_content=$(cat "${DISCORD}")
    curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
-  log "[Upload] Upload complete for $FILE, Cleaning up"
+   log "[Upload] Upload complete for $FILE, Cleaning up"
 fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
- sleep 1
- rm -f "${FILE}.lck" \
-       "${PLEX_JSON}" \
-       "${PLEX_STREAMS}" \
-       "${LOGFILE}" \
-       "${PID}/${FILEBASE}.trans" \
-       "${DISCORD}" \
-       "${JSONFILE}"    
+   sleep 1
+   rm -f "${FILE}.lck" \
+         "${PLEX_JSON}" \
+         "${PLEX_STREAMS}" \
+         "${LOGFILE}" \
+         "${PID}/${FILEBASE}.trans" \
+         "${DISCORD}" \
+         "${JSONFILE}"    
 else
- sleep 1
- rm -f "${FILE}.lck" \
-       "${PLEX_JSON}" \
-       "${PLEX_STREAMS}" \
-       "${LOGFILE}" \
-       "${PID}/${FILEBASE}.trans" \
-       "${DISCORD}"
- sleep "${LOGHOLDUI}"
- rm -f "${JSONFILE}"
+   sleep 1
+   rm -f "${FILE}.lck" \
+         "${PLEX_JSON}" \
+         "${PLEX_STREAMS}" \
+         "${LOGFILE}" \
+         "${PID}/${FILEBASE}.trans" \
+         "${DISCORD}"
+   sleep "${LOGHOLDUI}"
+   rm -f "${JSONFILE}"
 fi
+##EOF
