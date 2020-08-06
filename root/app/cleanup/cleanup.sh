@@ -21,7 +21,6 @@ cleaning() {
     sleep 10
  done
 }
-
 function empty_folder() {
 TARGET_FOLDER='/move'
 FIND=$(which find)
@@ -58,7 +57,7 @@ FIND_BASE_CONDITION_UNWANTED='-type f'
 FIND_MINDEPTH='-mindepth 2'
 FIND_ADD_NAME='-o -iname'
 FIND_DEL_NAME='! -iname'
-FIND_ACTION='-not -path "**_UNPACK_**" -delete > /dev/null 2>&1'
+FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE_CONDITION_WANTED} ${FIND_SAMPLE_SIZE} ${FIND_ACTION}"
 eval "${command}"
 WANTED_FILES=(
@@ -75,6 +74,11 @@ WANTED_FILES=(
     '*.mp4'
 )
 UNWANTED_FILES=(
+    '*.bat'
+    'MUST_READ*'
+    'win_click2rename*'
+    'Thats_the_Board*'
+    'What.rar'
     '*.m2ts'
     'abc.xyz.*'
     '*.m3u'
