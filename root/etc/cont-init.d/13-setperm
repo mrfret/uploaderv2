@@ -36,6 +36,7 @@ chown -hR abc:abc /app/uploader/upload.sh \
 GTEST="/var/www/error"
 if [ ! -d ${GTEST} ]; then
     apk add git -qq
+    rm -rf /var/www/localhost
     git clone -q https://github.com/alexphelps/server-error-pages.git /var/www/error
     apk del git -qq
 fi
