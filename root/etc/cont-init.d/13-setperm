@@ -12,13 +12,11 @@ DISABLE_UNIONFS_CHOWN=${DISABLE_UNIONFS_CHOWN:-false}
 #         /mnt/tdrive2 \
 #         /mnt/gdrive \
 #         /mnt/gcrypt
-
 log "-> Setting Permissions || start <-"
 chown -hR abc:abc  \
          /config \
          /mnt \
          /move
-
 chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
@@ -27,7 +25,6 @@ chmod a+x /app/gdrive/uploader.sh \
          /app/functions/functions.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
-
 chown -hR abc:abc /app/uploader/upload.sh \
          /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
@@ -36,11 +33,12 @@ chown -hR abc:abc /app/uploader/upload.sh \
          /app/serverside/serverside.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
-
-## RUN GITADD
-gitadd
-## EXIT GITADD
-
+GTEST="/var/www/error"
+if [ ! -d ${GTEST} ]; then
+    apk add git -qq
+    git clone -q https://github.com/alexphelps/server-error-pages.git /var/www/error
+    apk del git -qq
+fi
 chown -R abc:abc /run \
          /var/lib/nginx \
          /var/log/nginx \
@@ -51,12 +49,4 @@ if [ "${DISABLE_UNIONFS_CHOWN}" == "false" ]; then
 else
     log "-> Unionfs Chown disabled <-"
 fi
-
-function gitadd() {
-GTEST=/usr/bin/git
-if [ ! -f ${GTEST} ]; then
-    apk add git -qq
-    git clone -q https://github.com/alexphelps/server-error-pages.git /var/www/error
-    apk del git -qq
-fi
-}
+#EOF
