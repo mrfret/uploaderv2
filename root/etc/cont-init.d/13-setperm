@@ -38,6 +38,7 @@ if [ ! -f ${GTEST} ]; then
     apk add --quiet --no-cache git
     git clone -q https://github.com/alexphelps/server-error-pages.git /var/www/error \
     apk del --quiet git
+fi
 chown -R abc:abc /run \
          /var/lib/nginx \
          /var/log/nginx \
