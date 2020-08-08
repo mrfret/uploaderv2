@@ -23,9 +23,9 @@ cleaning() {
 }
 function empty_folder() {
 downloadpath=/move
-TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/'
+TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/"
 FIND=$(which find)
-FIND_BASE='-type d'
+FIND_BASE='-type d -amin +600'
 FIND_EMPTY='-empty'
 FIND_MINDEPTH='-mindepth 2'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
