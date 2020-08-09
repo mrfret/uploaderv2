@@ -72,51 +72,43 @@ sleep $time
 while true; do
    sunday=$(date '+%A')
    SERVERSIDE=${SERVERSIDE}
-   lock=/config/json/serverside.lck
+   lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
    REMOTEDRIVE=${REMOTEDRIVE:-null}
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
-      if [[ ! -f ${lock} ]]; then 
-         lock=/config/json/serverside.lck
-         if [[ ! -e ${lock} ]]; then
-           echo "lock" >${lock}
-           echo "lock" >"${DISCORD}"
-           STARTTIME=$(date +%s)
-           log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-           rclone move --checkers 4 --transfers 2 \
-                 --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
-                 --no-traverse ${SERVERSIDEAGE} --fast-list \
-                 "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-           sleep 5
-           ENDTIME=$(date +%s)
-           if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-              TITEL="Server-Side Move"
-              DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
-              DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-              TIME="$((count=${ENDTIME}-${STARTTIME}))"
-              duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-              # shellcheck disable=SC2006 
-              echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nTime : ${duration}" >"${DISCORD}"
-              msg_content=$(cat "${DISCORD}")
-              curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
-              rm -rf "${DISCORD}"
-              rm -rf "${lock}"
-              sleeptime
+      if [[ ! -e "${lock}" ]]; then 
+         echo "lock" > "${lock}"
+         echo "lock" > "${DISCORD}"
+         STARTTIME=$(date +%s)
+         log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+         rclone move --checkers 4 --transfers 2 \
+             --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
+             --no-traverse ${SERVERSIDEAGE} --fast-list \
+             "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+         sleep 1
+         ENDTIME=$(date +%s)
+         if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+            TITEL="Server-Side Move"
+            DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
+            DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+            TIME="$((count=${ENDTIME}-${STARTTIME}))"
+            duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+            # shellcheck disable=SC2006 
+            echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nTime : ${duration}" >"${DISCORD}"
+            msg_content=$(cat "${DISCORD}")
+            curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+            rm -rf "${DISCORD}"
+            rm -rf "${lock}"
            else
-              log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-              rm -rf "${lock}"
-              sleeptime
-           fi
-         else
-           sleep 12h
+            log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
+            rm -rf "${lock}"
          fi
       else
-         log "Server-side is already is running"
-         sleep 12h
+         sleeptime
       fi
    else 
-      sleep 24h
+      sleeptime
    fi
 done
