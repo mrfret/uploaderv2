@@ -62,6 +62,10 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
       sleep 10 && touch /etc/services.d/serverside/down && exit 1
    fi
 fi
+function sleeptime() {
+let time=`date -d "next sunday" +%s`-`date +%s`
+sleep $time
+}
 ################
 ## SERVERSIDE ##
 ################
@@ -99,12 +103,14 @@ while true; do
               curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
               rm -rf "${DISCORD}"
               rm -rf "${lock}"
+              sleeptime
            else
               log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
               rm -rf "${lock}"
+              sleeptime
            fi
          else
-           sleep 24h
+           sleep 12h
          fi
       else
          log "Server-side is already is running"
