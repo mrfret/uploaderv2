@@ -13,7 +13,6 @@ SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/${SVLOG}.log"
 truncate -s 0 /config/logs/${SVLOG}.log
-sunday=$(date '+%A')
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
@@ -21,6 +20,7 @@ SERVERSIDE=${SERVERSIDE}
 REMOTEDRIVE=${REMOTEDRIVE:-null}
 SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
+rm -rf /config/json/serverside.lck
 #####
 if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
    log ">>>> [ WARNING ] Server-Side failed [ WARNING ] <<<<<"
@@ -77,16 +77,21 @@ while true; do
    REMOTEDRIVE=${REMOTEDRIVE:-null}
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
+   LOGFILE="/config/logs/${SVLOG}.log"
    if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
-      if [[ ! -e "${lock}" ]]; then 
+      if [ -e "${lock}" ]; then
+         sleeptime
+      else
          echo "lock" > "${lock}"
          echo "lock" > "${DISCORD}"
          STARTTIME=$(date +%s)
+         touch "${LOGFILE}"
          log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
          rclone move --checkers 4 --transfers 2 \
-             --config=${RCLONEDOCKER} --log-file="${LOGFILE}" --log-level INFO --stats 5s \
-             --no-traverse ${SERVERSIDEAGE} --fast-list \
-             "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+                     --config=${RCLONEDOCKER} \
+                     --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+                     --no-traverse ${SERVERSIDEAGE} \
+                     "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
          sleep 1
          ENDTIME=$(date +%s)
          if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
@@ -105,10 +110,8 @@ while true; do
             log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
             rm -rf "${lock}"
          fi
-      else
-         sleeptime
       fi
-   else 
-      sleeptime
+   else
+      sleeptime 
    fi
 done
