@@ -79,9 +79,7 @@ while true; do
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    LOGFILE="/config/logs/${SVLOG}.log"
    if [[ "${SERVERSIDE}" != "false" && ${sunday} == Sunday ]]; then
-      if [ -e "${lock}" ]; then
-         sleeptime
-      else
+      if [ ! -e "${lock}" ]; then
          echo "lock" > "${lock}"
          echo "lock" > "${DISCORD}"
          STARTTIME=$(date +%s)
@@ -110,6 +108,9 @@ while true; do
             log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
             rm -rf "${lock}"
          fi
+         sleeptime
+      else
+         sleeptime
       fi
    else
       sleeptime 
