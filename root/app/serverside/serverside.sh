@@ -83,7 +83,7 @@ while true; do
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
    rclone move --checkers 4 --transfers 2 \
-               --config=${RCLONEDOCKER} \
+               --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                --log-file="${LOGFILE}" --log-level INFO --stats 2s \
                --no-traverse ${SERVERSIDEAGE} \
                "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
