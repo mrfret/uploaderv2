@@ -78,7 +78,7 @@ log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
        --config=${RCLONEDOCKER} \
        --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-       --no-traverse \
+       --no-traverse --user-agent="SomeLegitUserAgent" \
        --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
        "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
