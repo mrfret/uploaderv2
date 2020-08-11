@@ -21,6 +21,7 @@ REMOTEDRIVE=${REMOTEDRIVE:-null}
 SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
 rm -rf /config/json/serverside.lck
+sunday=$(date '+%A')
 #####
 if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
    log ">>>> [ WARNING ] Server-Side failed [ WARNING ] <<<<<"
@@ -70,6 +71,7 @@ sleep $time
 ## SERVERSIDE ##
 ################
 while true; do
+   if [[ ${sunday} == Sunday ]]; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
@@ -77,8 +79,8 @@ while true; do
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    LOGFILE="/config/logs/${SVLOG}.log"
-   echo "lock" > "${lock}"
-   echo "lock" > "${DISCORD}"
+   echo "lock" >"${lock}"
+   echo "lock" >"${DISCORD}"
    STARTTIME=$(date +%s)
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
@@ -104,5 +106,9 @@ while true; do
       log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
       rm -rf "${lock}"
    fi
-   sleeptime
+   ##
+   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   else
+     sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   fi
 done
