@@ -67,11 +67,6 @@ function sleeptime() {
 let time=`date -d "next sunday" +%s`-`date +%s`
 sleep $time
 }
-function sleeptimer() {
-let time=`date -d "next monday" +%s`-`date +%s`
-sleep $time
-}
-
 ################
 ## SERVERSIDE ##
 ################
@@ -84,8 +79,8 @@ while true; do
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    LOGFILE="/config/logs/${SVLOG}.log"
-   echo "lock" > "${lock}"
-   echo "lock" > "${DISCORD}"
+   echo "lock" >"${lock}"
+   echo "lock" >"${DISCORD}"
    STARTTIME=$(date +%s)
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
@@ -112,8 +107,8 @@ while true; do
       rm -rf "${lock}"
    fi
    ##
-   sleeptimer
+   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    else
-     sleeptime
+     sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    fi
 done
