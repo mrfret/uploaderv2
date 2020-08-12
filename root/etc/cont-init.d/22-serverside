@@ -7,33 +7,37 @@ function log() {
 }
 RCLONEDOCKER=/config/rclone-docker.conf
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
+SERVERSIDE=${SERVERSIDE}
+
+if [[ "${SERVERSIDECHECK}" -le "1" ]]; then
+   if [[ "${SERVERSIDE}" != 'false' ]]; then
+      sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
+   fi
+fi
+
 if [[ "${SERVERSIDECHECK}" -gt "1" ]]; then 
    log "-->> Server_side is added <<-- "
- if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
-     log " -->> Check for booth salt passwords <<--"
-     rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
-     rccommand2=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 2 | tail -n 1))
-     rccommand3=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password2" {print $3}' | head -n 1 | tail -n 1))
-     rccommand4=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password2" {print $3}' | head -n 2 | tail -n 1))
-   if [[ "${rccommand1}" == "${rccommand2}" && "${rccommand3}" == "${rccommand4}" ]]; then
-      log "   --->> Server_side can be used <<--- "
-      if [[ "${SERVERSIDE}" != "true" ]]; then
-         log "   --->> SET DOCKER Env SERVERSIDE to true <<--- "
-         sleep 10
+   if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
+      log " -->> Check for booth salt passwords <<--"
+      rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
+      rccommand2=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 2 | tail -n 1))
+      rccommand3=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password2" {print $3}' | head -n 1 | tail -n 1))
+      rccommand4=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password2" {print $3}' | head -n 2 | tail -n 1))
+      if [[ "${rccommand1}" == "${rccommand2}" && "${rccommand3}" == "${rccommand4}" ]]; then
+         log "   --->> Server_side can be used <<--- "
+         if [[ "${SERVERSIDE}" != "true" ]]; then
+            log "   --->> SET DOCKER Env SERVERSIDE to true <<--- "
+            sleep 10
+         fi
+         log "   --->> TCrypt and GCrypt used the same password <<--- "
+      else
+         log "   --->> Server_side can't be used <<--- "
+         log "   --->> TCrypt and GCrypt dont used the same password <<--- "
       fi
-      log "   --->> TCrypt and GCrypt used the same password <<--- "
-   else
-      log "   --->> Server_side can't be used <<--- "
-      log "   --->> TCrypt and GCrypt dont used the same password <<--- "
    fi
-  fi
-else
-   log " --->> Server_side is not included <<--- "
-   log " --->> https://rclone.org/docs/#server-side-copy <<---"
-   log " --->> add under [gdrive] and [tdrive] <<---"
-   echo ""
-   log " --->> server_side_across_configs = true << ---"
-   echo ""
-   sleep 30
 fi
-sleep 1
+RCLONEDOCKER=/config/rclone-docker.conf
+SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
+if [[ "${SERVERSIDECHECK}" -le "1" ]]; then 
+    touch /etc/services.d/serverside/down
+fi
