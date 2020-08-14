@@ -27,7 +27,8 @@ if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
    log ">>>> [ WARNING ] Server-Side failed [ WARNING ] <<<<<"
    log ">>>> [ WARNING ] check your rclone-docker.conf [ WARNING ] <<<<<"
    sleep 10
-   touch /etc/services.d/serverside/down && exit 1
+   touch /etc/services.d/serverside/down 
+   exit 0
 fi
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
    rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
@@ -37,7 +38,9 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
    if [[ "${rccommand1}" != "${rccommand2}" && "${rccommand3}" != "${rccommand4}" ]]; then
       log ">>>>> [ WARNING ] Server_side can't be used <<<<< [ WARNING ]"
       log ">>>>> [ WARNING ] TCrypt and GCrypt dont used the same password <<<<< [ WARNING ]"
-      sleep 10 && touch /etc/services.d/serverside/down && exit 1
+      sleep 10
+      touch /etc/services.d/serverside/down
+      exit 0
    fi
 fi
 #####
@@ -52,7 +55,9 @@ if [[ "${REMOTEDRIVE}" == "null" ]]; then
    if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
       REMOTEDRIVE=tdrive
    else 
-      sleep 10 && touch /etc/services.d/serverside/down && exit 1
+      sleep 10
+      touch /etc/services.d/serverside/down
+      exit 0
    fi
 fi
 #####
@@ -60,18 +65,16 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
    if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
       SERVERSIDEDRIVE=gdrive
    else
-      sleep 10 && touch /etc/services.d/serverside/down && exit 1
+      sleep 10
+      touch /etc/services.d/serverside/down
+      exit 0
    fi
 fi
-function sleeptime() {
-let time=`date -d "next sunday" +%s`-`date +%s`
-sleep $time
-}
 ################
 ## SERVERSIDE ##
 ################
 while true; do
-   if [[ ${sunday} == Sunday ]]; then
+   if [[ "$(date '+%A')" == Sunday ]]; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
@@ -106,8 +109,6 @@ while true; do
       log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
       rm -rf "${lock}"
    fi
-   ##
-   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    else
      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    fi
