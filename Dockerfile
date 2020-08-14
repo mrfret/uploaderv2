@@ -29,6 +29,7 @@ ENV ADDITIONAL_IGNORES=null \
     BWLIMITSET=null \
     CLEANUPDOWN=null \
     MINAGE=null \
+    SERVERSIDEDAY=null \
     LOGHOLDUI="5m" 
 
 RUN \
