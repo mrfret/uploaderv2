@@ -21,7 +21,6 @@ REMOTEDRIVE=${REMOTEDRIVE:-null}
 SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
 rm -rf /config/json/serverside.lck
-sunday=$(date '+%A')
 #####
 if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
    log ">>>> [ WARNING ] Server-Side failed [ WARNING ] <<<<<"
@@ -70,11 +69,16 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
       exit 0
    fi
 fi
+if [[ "${SERVERSIDEDAY}" == 'null' ]]; then
+   SERVERSIDEDAY=Sunday
+else 
+   SERVERSIDEDAY=${SERVERSIDEDAY}
+fi
 ################
 ## SERVERSIDE ##
 ################
 while true; do
-   if [[ "$(date '+%A')" == Sunday ]]; then
+   if [[ $(date '+%A') == "${SERVERSIDEDAY}" ]]; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
