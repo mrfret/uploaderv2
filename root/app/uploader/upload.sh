@@ -96,11 +96,12 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    # shellcheck disable=SC2003
    TIME="$((count=${ENDTIME}-${STARTTIME}))"
    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nUpload queue : ${LEFTTOUPLOAD} \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
+   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nUpload queue : ${LEFTTOUPLOAD}Bytes \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
    msg_content=$(cat "${DISCORD}")
    curl -sH "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
-   log "[Upload] Upload complete for $FILE, Cleaning up"
+   LEFTTOUPLOAD=$(du -sh ${downloadpath}/ --exclude={torrent,nzb,filezilla,backup,nzbget,jdownloader2,sabnzbd,rutorrent,deluge,qbittorrent} | awk '$2 == "/move/" {print $1}')
+   log "[Upload] Upload complete for $FILE, Upload queue : ${LEFTTOUPLOAD}Bytes ,Cleaning up"
 fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
