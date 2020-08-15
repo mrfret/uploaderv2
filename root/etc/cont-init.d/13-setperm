@@ -33,13 +33,6 @@ chown -hR abc:abc /app/uploader/upload.sh \
          /app/serverside/serverside.sh \
          /app/update-alpine/update-alpine.sh \
          /app/mergerfs.sh
-GTEST="/var/www/error"
-if [ ! -d ${GTEST} ]; then
-    apk add git -qq
-    rm -rf /var/www/localhost
-    git clone -q https://github.com/alexphelps/server-error-pages.git /var/www/error
-    apk del git -qq
-fi
 chown -R abc:abc /run \
          /var/lib/nginx \
          /var/log/nginx \
