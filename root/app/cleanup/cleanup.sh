@@ -49,7 +49,7 @@ function garbage() {
 #################
 # basic settings
 downloadpath=/move
-TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
+TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget,jdownloader2}/" 
 # find files in this folders
 FIND_SAMPLE_SIZE='-size -188M'
 # advanced settings
