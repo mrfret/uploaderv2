@@ -43,7 +43,7 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
    fi
 fi
 #####
-if [ "${SERVERSIDEMINAGE}" != 'null' ]; then
+if [ "${SERVERSIDEMINAGE}" != 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEAGE="--min-age ${SERVERSIDEMINAGE}"
 else
