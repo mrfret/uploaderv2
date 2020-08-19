@@ -5,7 +5,7 @@
 ######## FUNCTIONS ##########
 downloadpath=/move
 CLEANUPDOWN=${CLEANUPDOWN:-null}
-if [[ "${CLEANUPDOWN}" == 'null' ]]; then
+if [ "${CLEANUPDOWN}" == 'null' ] || [ "${CLEANUPDOWN}" == 'false' ]; then
    CLEANUPDOWN=7
 else 
    CLEANUPDOWN=${CLEANUPDOWN}
@@ -28,8 +28,9 @@ FIND=$(which find)
 FIND_BASE='-type d'
 FIND_EMPTY='-empty'
 FIND_MINDEPTH='-mindepth 2'
+FIND_TIME='-ctime +${CLEANUPDOWN}'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_EMPTY} ${FIND_ACTION}"
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_TIME} ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}
 }
 function cleanup_start() {
@@ -37,7 +38,7 @@ downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 FIND=$(which find)
 FIND_BASE='-mindepth 2 -type d'
-FIND_TIME='-ctime +${CLEANUPDOWN}'
+FIND_TIME='-amin +60'
 FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_TIME} ${FIND_ACTION}"
 eval "${command}"
@@ -55,7 +56,7 @@ FIND_SAMPLE_SIZE='-size -188M'
 # advanced settings
 FIND=$(which find)
 FIND_BASE_CONDITION_WANTED='-type f -amin +600'
-FIND_BASE_CONDITION_UNWANTED='-type f'
+FIND_BASE_CONDITION_UNWANTED='-type f -amin +600'
 FIND_MINDEPTH='-mindepth 1'
 FIND_ADD_NAME='-o -iname'
 FIND_DEL_NAME='! -iname'
