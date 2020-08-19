@@ -38,7 +38,7 @@ downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 FIND=$(which find)
 FIND_BASE='-mindepth 2 -type d'
-FIND_TIME='-amin +60'
+FIND_TIME='-amin +600'
 FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_TIME} ${FIND_ACTION}"
 eval "${command}"
@@ -50,7 +50,7 @@ function garbage() {
 #################
 # basic settings
 downloadpath=/move
-TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget,jdownloader2}/" 
+TARGET_FOLDER="${downloadpath}/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}/" 
 # find files in this folders
 FIND_SAMPLE_SIZE='-size -188M'
 # advanced settings
