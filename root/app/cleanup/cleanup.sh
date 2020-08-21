@@ -46,7 +46,7 @@ for ((i = 1; i < ${#WANTED_FOLDERS[@]}; i++))
 do
   condition="${condition} ${FIND_ADD_NAME} '${WANTED_FOLDERS[i]}'"
 done
-command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_TIME} ${FIND_EMPTY} ${FIND_ACTION}"
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}
 }
 function cleanup_start() {
