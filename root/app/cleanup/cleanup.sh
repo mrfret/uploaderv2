@@ -35,7 +35,7 @@ WANTED_FOLDERS=(
     '**nzb/**'
     '**sabnzbd/**'
     '**filezilla/**'
-    '**nzbget/**
+    '**nzbget/**'
     '**rutorrent/**'
     '**qbittorrent/**'
     '**jdownloader2/**'
