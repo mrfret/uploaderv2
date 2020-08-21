@@ -28,9 +28,25 @@ FIND=$(which find)
 FIND_BASE='-type d'
 FIND_EMPTY='-empty'
 FIND_MINDEPTH='-mindepth 2'
-FIND_TIME='-ctime +${CLEANUPDOWN}'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} ${FIND_TIME} ${FIND_EMPTY} ${FIND_ACTION}"
+FIND_ADD_NAME='-o -path'
+WANTED_FOLDERS=(
+    '**torrent/**'
+    '**nzb/**'
+    '**sabnzbd/**'
+    '**filezilla/**'
+    '**nzbget/**
+    '**rutorrent/**'
+    '**qbittorrent/**'
+    '**jdownloader2/**'
+    '**deluge/**'
+)
+condition="-not -path '${WANTED_FOLDERS[0]}'"
+for ((i = 1; i < ${#WANTED_FOLDERS[@]}; i++))
+do
+  condition="${condition} ${FIND_ADD_NAME} '${WANTED_FOLDERS[i]}'"
+done
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_TIME} ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}
 }
 function cleanup_start() {
