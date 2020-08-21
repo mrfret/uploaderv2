@@ -3,7 +3,7 @@
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
 
-TARGET_FOLDER='/etc/services.d/{uploader-gdrive,uploader-tdrive,serverside}'
+TARGET_FOLDER='/etc/services.d/{uploader-gdrive,uploader-tdrive,serverside,cleaning}'
 FIND=$(which find)
 FIND_BASE='-type f'
 FIND_FILE='"down"'
@@ -17,4 +17,19 @@ if grep -q GDSA01 /config/rclone-docker.conf && grep -q GDSA02 /config/rclone-do
     touch /etc/services.d/uploader-gdrive/down
 else
     touch /etc/services.d/uploader-tdrive/down
+fi
+
+CLEANUPDOWN=${CLEANUPDOWN}
+
+if [ "${CLEANUPDOWN}" == 'down' ] || [ "${CLEANUPDOWN}" == 'false' ]; then
+   touch /etc/services.d/cleaning/down
+   echo " [ USER WISH ACTION ] "
+   echo "   Shutdown Cleaning  "
+   echo " [ USER WISH ACTION ] "
+   sleep 10
+else 
+   echo " [ USER WISH ACTION ] "
+   echo "   Starting Cleaning  "
+   echo " [ USER WISH ACTION ] "
+   sleep 5
 fi
