@@ -99,12 +99,11 @@ while true; do
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
 
    rclone rmdirs --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+                 --log-file="${LOGFILE}" --log-level INFO --stats 2s --leave-root \
                  --no-traverse "${REMOTEDRIVE}:"
 
-   rclone cleanup --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-                 --no-traverse "${REMOTEDRIVE}:"
+   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
+   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
 
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
