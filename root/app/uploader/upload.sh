@@ -2,8 +2,8 @@
 # shellcheck shell=bash
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
-# Logging Functio
-####
+#
+#####
 function log() {
    echo "[Uploader] ${1}"
 }
@@ -76,11 +76,11 @@ chmod 777 "${LOGFILE}"
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
-       --config=${RCLONEDOCKER} \
-       --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-       --no-traverse --user-agent="SomeLegitUserAgent" \
-       --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
-       "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
+              --config=${RCLONEDOCKER} \
+              --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+              --no-traverse --user-agent="SomeLegitUserAgent" \
+              --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
+              "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 if [ "${RC_ENABLED}" == "true" ]; then
     sleep 10s && rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
@@ -105,8 +105,7 @@ else
 fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
-   sleep 1
-   rm -f "${FILE}.lck" \
+   rm -rf "${FILE}.lck" \
          "${PLEX_JSON}" \
          "${PLEX_STREAMS}" \
          "${LOGFILE}" \
@@ -114,14 +113,13 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
          "${DISCORD}" \
          "${JSONFILE}"    
 else
-   sleep 1
-   rm -f "${FILE}.lck" \
+   rm -rf "${FILE}.lck" \
          "${PLEX_JSON}" \
          "${PLEX_STREAMS}" \
          "${LOGFILE}" \
          "${PID}/${FILEBASE}.trans" \
          "${DISCORD}"
    sleep "${LOGHOLDUI}"
-   rm -f "${JSONFILE}"
+   rm -rf "${JSONFILE}"
 fi
 ##EOF
