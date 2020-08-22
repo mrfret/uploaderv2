@@ -97,8 +97,12 @@ while true; do
                  --log-file="${LOGFILE}" --log-level INFO --stats 2s \
                  --no-traverse --delete-empty-src-dirs ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-   sleep 5
+
    rclone rmdirs --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
+                 --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+                 --no-traverse "${REMOTEDRIVE}:"
+
+   rclone cleanup --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --log-level INFO --stats 2s \
                  --no-traverse "${REMOTEDRIVE}:"
 
