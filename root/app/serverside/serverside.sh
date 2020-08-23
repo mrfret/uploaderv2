@@ -91,17 +91,25 @@ while true; do
    STARTTIME=$(date +%s)
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-
    rclone moveto --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --log-level INFO --stats 2s \
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-   rclone dedupe --dedupe-mode largest --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
-   rclone dedupe --dedupe-mode largest --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
+
+   log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
+   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
+                 --verbose=1 --fast-list --retries 3 --no-update-modtime \
+                 --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
+
+   log "Starting Server-Side dedupe for "${SERVERSIDEDRIVE}"
+   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
+                 --verbose=1 --fast-list --retries 3 --no-update-modtime \               
+                 --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
+
+   log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
    rclone rmdirs --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 2s --leave-root \
-                 --no-traverse "${REMOTEDRIVE}:"
+                 --leave-root --no-traverse "${REMOTEDRIVE}:"
 
    rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
    rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
