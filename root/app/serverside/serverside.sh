@@ -53,7 +53,7 @@ fi
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
    if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
       REMOTEDRIVE=tdrive
-   else 
+   else
       sleep 10
       touch /etc/services.d/serverside/down
       exit 0
@@ -71,7 +71,7 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
 fi
 if [[ "${SERVERSIDEDAY}" == 'null' ]]; then
    SERVERSIDEDAY=Sunday
-else 
+ else
    SERVERSIDEDAY=${SERVERSIDEDAY}
 fi
 ################
@@ -91,11 +91,29 @@ while true; do
    STARTTIME=$(date +%s)
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-   rclone move --checkers 4 --transfers 2 \
-               --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-               --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-               --no-traverse ${SERVERSIDEAGE} \
-               "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+   rclone moveto --checkers 4 --transfers 2 \
+                 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
+                 --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+                 --no-traverse ${SERVERSIDEAGE} \
+                 "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+
+   log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
+   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
+                 --verbose=1 --fast-list --retries 3 --no-update-modtime \
+                 --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
+
+   log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
+   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
+                 --verbose=1 --fast-list --retries 3 --no-update-modtime \               
+                 --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
+
+   log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
+   rclone rmdirs --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
+                 --leave-root --no-traverse "${REMOTEDRIVE}:"
+
+   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
+   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
+
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
