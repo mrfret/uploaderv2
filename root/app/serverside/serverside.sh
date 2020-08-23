@@ -95,9 +95,10 @@ while true; do
    rclone moveto --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-                 --no-traverse --delete-empty-src-dirs ${SERVERSIDEAGE} \
+                 --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-
+   rclone dedupe --dedupe-mode largest --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
+   rclone dedupe --dedupe-mode largest --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
    rclone rmdirs --checkers 4 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --log-level INFO --stats 2s --leave-root \
                  --no-traverse "${REMOTEDRIVE}:"
