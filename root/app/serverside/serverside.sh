@@ -102,7 +102,7 @@ while true; do
                  --verbose=1 --fast-list --retries 3 --no-update-modtime \
                  --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
 
-   log "Starting Server-Side dedupe for "${SERVERSIDEDRIVE}"
+   log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
    rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
                  --verbose=1 --fast-list --retries 3 --no-update-modtime \               
                  --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
