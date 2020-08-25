@@ -8,6 +8,7 @@
 function log() {
    echo "[Server Side] ${1}"
 }
+source /app/functions/functions.sh
 ###execute part 
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
@@ -113,24 +114,6 @@ while true; do
                  --log-file="${LOGFILE}" --log-level INFO --stats 10s \
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-
-   log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
-   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
-                 --fast-list --retries 3 --no-update-modtime \
-                 --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
-
-   log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
-   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
-                 --fast-list --retries 3 --no-update-modtime \               
-                 --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
-
-   log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
-   rclone rmdirs --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --leave-root --no-traverse "${REMOTEDRIVE}:"
-
-   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
-   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
-
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
@@ -148,7 +131,7 @@ while true; do
       log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
       rm -rf "${lock}"
    fi
-   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   sleep 10 && cleanup_remote && sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    else
      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    fi
