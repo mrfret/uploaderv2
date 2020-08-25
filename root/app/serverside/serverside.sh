@@ -115,7 +115,7 @@ while true; do
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
 
-   cleanup_start
+   cleanup_remote
 
    #log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
    #rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
