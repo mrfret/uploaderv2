@@ -8,6 +8,7 @@
 function log() {
    echo "[Server Side] ${1}"
 }
+source /app/functions/functions.sh
 ###execute part 
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
@@ -114,22 +115,24 @@ while true; do
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
 
-   log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
-   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
+   cleanup_start
+
+   #log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
+   #rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
                  --fast-list --retries 3 --no-update-modtime \
                  --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
 
-   log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
-   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
+   #log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
+   #rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
                  --fast-list --retries 3 --no-update-modtime \               
                  --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
 
-   log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
-   rclone rmdirs --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
+   #log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
+   #rclone rmdirs --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --leave-root --no-traverse "${REMOTEDRIVE}:"
 
-   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
-   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
+   #rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
+   #rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
 
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
