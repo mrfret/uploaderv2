@@ -49,7 +49,7 @@ if [ ! -f ${BCTEST} ]; then
    fi
 fi
 }
-function rclone() {
+function rclone_update() {
 log "-> update rclone || start <-"
     wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
     unzip -qq rclone.zip && rm rclone.zip && \
