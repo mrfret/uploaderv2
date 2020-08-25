@@ -119,17 +119,17 @@ while true; do
 
    #log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
    #rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
-                 --fast-list --retries 3 --no-update-modtime \
-                 --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
+                # --fast-list --retries 3 --no-update-modtime \
+                # --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
 
    #log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
    #rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
-                 --fast-list --retries 3 --no-update-modtime \               
-                 --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
+                # --fast-list --retries 3 --no-update-modtime \               
+                # --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
 
    #log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
    #rclone rmdirs --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --leave-root --no-traverse "${REMOTEDRIVE}:"
+                # --leave-root --no-traverse "${REMOTEDRIVE}:"
 
    #rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
    #rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
