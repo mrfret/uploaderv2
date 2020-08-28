@@ -39,7 +39,6 @@ if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
    log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    sleep 10
-   touch ${downcommand} 
    exit 0
 fi
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
@@ -53,7 +52,6 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
       log ">>>>> [ WARNING ] TCrypt and GCrypt dont used the same password <<<<< [ WARNING ]"
       log ">>>>> [ WARNING ] --------------------------------------------- <<<<< [ WARNING ]"
       sleep 10
-      touch ${downcommand}
       exit 0
    else
       log "-> [ GOOD ] TCrypt and GCrypt used the same password [ GOOD ] <-"
@@ -72,7 +70,6 @@ if [[ "${REMOTEDRIVE}" == "null" ]]; then
       REMOTEDRIVE=tdrive
    else
       sleep 10
-      touch ${downcommand}
       exit 0
    fi
 fi
@@ -82,7 +79,6 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
       SERVERSIDEDRIVE=gdrive
    else
       sleep 10
-      touch ${downcommand}
       exit 0
    fi
 
