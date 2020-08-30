@@ -13,11 +13,13 @@ source /app/functions/functions.sh
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/serverside.log"
-truncate -s 0 ${LOGFILE}
+if [[ -f ${LOGFILE} ]]; then
+   truncate -s 0 ${LOGFILE}
+fi
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
-SERVERSIDE=${SERVERSIDE}
+SERVERSIDE=${SERVERSIDE:-null}
 REMOTEDRIVE=${REMOTEDRIVE:-null}
 SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
@@ -53,16 +55,14 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
       log ">>>>> [ WARNING ] --------------------------------------------- <<<<< [ WARNING ]"
       sleep 10
       exit 0
-   else
-      log "-> [ GOOD ] TCrypt and GCrypt used the same password [ GOOD ] <-"
-   fi
+      fi
 fi
 #####
-if [ "${SERVERSIDEMINAGE}" != 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
+if [ "${SERVERSIDEMINAGE}" == 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
+   SERVERSIDEAGE="--min-age 48h"
+else
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEAGE="--min-age ${SERVERSIDEMINAGE}"
-else
-   SERVERSIDEAGE="--min-age 48h"
 fi
 #####
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
@@ -72,6 +72,8 @@ if [[ "${REMOTEDRIVE}" == "null" ]]; then
       sleep 10
       exit 0
    fi
+else
+   REMOTEDRIVE=${REMOTEDRIVE}
 fi
 #####
 if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
@@ -81,7 +83,8 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
       sleep 10
       exit 0
    fi
-
+else
+   SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
 fi
 if [[ "${SERVERSIDEDAY}" == 'null' ]]; then
    SERVERSIDEDAY=Sunday
@@ -92,12 +95,12 @@ fi
 ## SERVERSIDE ##
 ################
 while true; do
-   if [[ $(date '+%A') == "${SERVERSIDEDAY}" ]]; then
+   if [ $(date '+%A') == "${SERVERSIDEDAY}" ] || [ "${SERVERSIDEDAY}" == 'daily' ] ; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
-   REMOTEDRIVE=${REMOTEDRIVE:}
-   SERVERSIDEMINAGE=${SERVERSIDEMINAGE:}
+   REMOTEDRIVE=${REMOTEDRIVE}
+   SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    LOGFILE="/config/logs/serverside.log"
    echo "lock" >"${lock}"
@@ -107,7 +110,7 @@ while true; do
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
    rclone moveto --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 10s \
+                 --log-file="${LOGFILE}" --log-level ERROR --stats 10s \
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
    ENDTIME=$(date +%s)
