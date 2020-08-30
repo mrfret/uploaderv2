@@ -19,7 +19,7 @@ fi
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
-SERVERSIDE=${SERVERSIDE}
+SERVERSIDE=${SERVERSIDE:-null}
 REMOTEDRIVE=${REMOTEDRIVE:-null}
 SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
@@ -58,11 +58,11 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
       fi
 fi
 #####
-if [ "${SERVERSIDEMINAGE}" != 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
+if [ "${SERVERSIDEMINAGE}" == 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
+   SERVERSIDEAGE="--min-age 48h"
+else
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEAGE="--min-age ${SERVERSIDEMINAGE}"
-else
-   SERVERSIDEAGE="--min-age 48h"
 fi
 #####
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
@@ -95,7 +95,7 @@ fi
 ## SERVERSIDE ##
 ################
 while true; do
-   if [[ $(date '+%A') == "${SERVERSIDEDAY}" ]]; then
+   if [ $(date '+%A') == "${SERVERSIDEDAY}" ] || [ "${SERVERSIDEDAY}" == 'daily' ] ; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
@@ -110,7 +110,7 @@ while true; do
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
    rclone moveto --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 10s \
+                 --log-file="${LOGFILE}" --log-level ERROR --stats 10s \
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
    ENDTIME=$(date +%s)
