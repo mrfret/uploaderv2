@@ -13,7 +13,9 @@ source /app/functions/functions.sh
 SVLOG="serverside"
 RCLONEDOCKER="/config/rclone-docker.conf"
 LOGFILE="/config/logs/serverside.log"
-truncate -s 0 ${LOGFILE}
+if [[ -f ${LOGFILE} ]]; then
+   truncate -s 0 ${LOGFILE}
+fi
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
@@ -53,9 +55,7 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
       log ">>>>> [ WARNING ] --------------------------------------------- <<<<< [ WARNING ]"
       sleep 10
       exit 0
-   else
-      log "-> [ GOOD ] TCrypt and GCrypt used the same password [ GOOD ] <-"
-   fi
+      fi
 fi
 #####
 if [ "${SERVERSIDEMINAGE}" != 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
@@ -72,6 +72,8 @@ if [[ "${REMOTEDRIVE}" == "null" ]]; then
       sleep 10
       exit 0
    fi
+else
+   REMOTEDRIVE=${REMOTEDRIVE}
 fi
 #####
 if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
@@ -81,7 +83,8 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
       sleep 10
       exit 0
    fi
-
+else
+   SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
 fi
 if [[ "${SERVERSIDEDAY}" == 'null' ]]; then
    SERVERSIDEDAY=Sunday
