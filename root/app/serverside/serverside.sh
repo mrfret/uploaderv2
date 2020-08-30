@@ -87,7 +87,7 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
    if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
       SERVERSIDEDRIVE=gdrive
    else
-      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+      sleep 60
       exit 0
    fi
 else
