@@ -96,8 +96,8 @@ while true; do
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
    RCLONEDOCKER="/config/rclone-docker.conf"
-   REMOTEDRIVE=${REMOTEDRIVE:}
-   SERVERSIDEMINAGE=${SERVERSIDEMINAGE:}
+   REMOTEDRIVE=${REMOTEDRIVE}
+   SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    LOGFILE="/config/logs/serverside.log"
    echo "lock" >"${lock}"
