@@ -25,24 +25,31 @@ SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
 downcommand=/etc/services.d/serverside/down
 LOCK=/config/json/serverside.lck
+#####
 if [ -e ${LOCK} ]; then
     rm -rf ${LOCK}
 fi
-
+#####
+if [[ "${SERVERSIDE}" != 'true' ]]; then
+   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   exit 0
+fi
+#####
 if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
    if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDE}" != 'down' ]; then
       sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
    fi
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
+if [[ "${SERVERSIDECHECK}" -lt "2" && "${SERVERSIDE}" == 'true' ]]; then
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
-   sleep 10
+   sleep 60
    exit 0
 fi
+#####
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
    rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
    rccommand2=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 2 | tail -n 1))
@@ -53,9 +60,9 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
       log ">>>>> [ WARNING ]           Server_side can't be used           <<<<< [ WARNING ]"
       log ">>>>> [ WARNING ] TCrypt and GCrypt dont used the same password <<<<< [ WARNING ]"
       log ">>>>> [ WARNING ] --------------------------------------------- <<<<< [ WARNING ]"
-      sleep 10
+      sleep 60
       exit 0
-      fi
+   fi
 fi
 #####
 if [ "${SERVERSIDEMINAGE}" == 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
@@ -69,7 +76,7 @@ if [[ "${REMOTEDRIVE}" == "null" ]]; then
    if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
       REMOTEDRIVE=tdrive
    else
-      sleep 10
+      sleep 60
       exit 0
    fi
 else
@@ -80,12 +87,13 @@ if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
    if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
       SERVERSIDEDRIVE=gdrive
    else
-      sleep 10
+      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
       exit 0
    fi
 else
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
 fi
+#####
 if [[ "${SERVERSIDEDAY}" == 'null' ]]; then
    SERVERSIDEDAY=Sunday
  else
