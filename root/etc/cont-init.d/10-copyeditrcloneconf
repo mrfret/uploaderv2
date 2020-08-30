@@ -5,15 +5,14 @@
 function log() {
 echo "[Uploader] ${1}"
 }
-function rclonetest() {
+
 rclone_base=/config/rclone.conf
 if [ ! -f ${rclone_base} ]; then
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    sleep 60
    exit 1
 fi
-}
-function rclonestart() {
+
 rclone_docker=/config/rclone-docker.conf
 rclone_base=/config/rclone.conf
 if [ -f ${rclone_base} ]; then
@@ -29,8 +28,6 @@ if [ -f ${rclone_base} ]; then
       sed -i '/pgunion/d' ${rclone_docker}
   log "-> rclone_docker.conf edits done <-"
 fi
-}
-function rcloneinstall() {
 rclone_bin=/usr/bin/rclone
 if [ ! -f ${rclone_bin} ]; then
   log "-> install rclone || start <-"
@@ -39,8 +36,3 @@ if [ ! -f ${rclone_bin} ]; then
       mv rclone*/rclone /usr/bin && rm -rf rclone* 
   log "-> install rclone || done <-"
 fi
-}
-###
-rclonetest
-rclonestart
-rcloneinstall

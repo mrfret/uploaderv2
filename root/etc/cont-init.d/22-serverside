@@ -13,7 +13,6 @@ downcommand=/etc/services.d/serverside/down
 if [ -e ${downcommand} ]; then
    rm -rf ${downcommand}
 fi
-
 if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDECHECK}" != 'down' ]; then 
    log "-> Server_side will be used <-"
 else
