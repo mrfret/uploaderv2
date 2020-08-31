@@ -73,12 +73,10 @@ RUN \
   rm /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
 
-VOLUME [ "/unionfs" ]
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
 
-RUN chown 911:911 /unionfs && \
-    chown 911:911 /config && \
+RUN chown 911:911 /config && \
     chown -hR 911:911 /move && \
     chown -hR 911:911 /mnt && \
     mkdir -p /var/www/html && \
