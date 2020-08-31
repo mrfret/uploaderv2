@@ -33,8 +33,8 @@ ENV ADDITIONAL_IGNORES=null \
 RUN \
  echo "**** install build packages ****" && \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && \
- apk add --quiet --no-cache \
+ apk --no-cache --no-progress update -qq && apk --no-cache --no-progress upgrade -qq && apk --no-cache --no-progress fix -qq && \
+ apk add --quiet --no-cache --no-progress\
         ca-certificates \
         logrotate \
         shadow \

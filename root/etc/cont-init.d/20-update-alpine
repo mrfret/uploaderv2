@@ -5,12 +5,16 @@
 function log() {
 echo "[Uploader] ${1}"
 }
-cron=/crontab.con
-if [ ! -f ${cron} ]; then
+cron=/tmp/crontab.conf
+if [ -f ${cron} ]; then
+   rm -f ${cron}
    log "-> update packages || start <-"
    apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
-   echo "@daily bash /app/update-alpine/update-alpine.sh" > /crontab.conf
-   crontab /crontab.conf
+  echo -e "## update alpine weekly \n
+@weekly bash /app/update-alpine/update-alpine.sh" > /tmp/crontab.conf
+   crontab /tmp/crontab.conf
    rm -rf /var/cache/apk/*
    log "-> update packages || done <-"
 fi
+sleep 5
+#>EOF<#
