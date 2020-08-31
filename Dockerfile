@@ -76,8 +76,7 @@ RUN \
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
 
-RUN chown 911:911 /unionfs && \
-    chown 911:911 /config && \
+RUN chown 911:911 /config && \
     chown -hR 911:911 /move && \
     chown -hR 911:911 /mnt && \
     mkdir -p /var/www/html && \
