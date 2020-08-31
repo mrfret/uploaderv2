@@ -121,17 +121,17 @@ function cleanup_remote() {
 ## function source start
 IFS=$'\n'
 filter="$1"
-config=/config/rclone.conf
+config=/config/rclone-docker.conf
 #rclone listremotes | gawk "$filter"
-mapfile -t mounts < <(eval rclone listremotes --config=${config} | grep "$filter" | sed -e 's/[GDSA00-99C:]//g' | sed '/^$/d')
+mapfile -t mounts < <(eval rclone listremotes --config=${config} | grep "$filter" | sed -e 's/[GDSA00-99C:]//g' | sed -e 's/gcrypt//g' |  sed -e 's/tcrypt//g' | sed '/^$/d')
 ## function source end
 for i in ${mounts[@]}; do
   #echo; echo STARTING DEDUPE of identical files from $i; echo
-  rclone dedupe skip $i: --config=${config} --drive-use-trash=false --no-traverse --transfers=50 --user-agent="SomeLegitUserAgent" 
+  rclone dedupe skip $i: --config=${config} --drive-use-trash=false --no-traverse --transfers=1 --user-agent="SomeLegitUserAgent" 
   #echo; echo REMOVING EMPTY DIRECTORIES from $i; echo
-  rclone rmdirs $i: --config=${config} --drive-use-trash=false --fast-list --transfers=50 --user-agent="SomeLegitUserAgent" 
+  rclone rmdirs $i: --config=${config} --drive-use-trash=false --fast-list --transfers=1 --user-agent="SomeLegitUserAgent" 
   #echo; echo PERMANENTLY DELETING TRASH from $i; echo
-  rclone delete $i: --config=${config} --fast-list --drive-trashed-only --drive-use-trash=false --transfers 50 --user-agent="SomeLegitUserAgent" 
+  rclone delete $i: --config=${config} --fast-list --drive-trashed-only --drive-use-trash=false --transfers 1 --user-agent="SomeLegitUserAgent" 
   rclone cleanup $i: --config=${config} --user-agent="SomeLegitUserAgent" 
 done
 }
