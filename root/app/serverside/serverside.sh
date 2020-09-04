@@ -138,7 +138,7 @@ while true; do
       log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
       rm -rf "${lock}"
    fi
-   sleep 10 && cleanup_remote && sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   sleep 10 && sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    else
      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    fi
