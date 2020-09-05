@@ -70,18 +70,11 @@ else
     exit 1
 fi
 
-MINAGE=${MINAGE}
-if [[ "${MINAGE}" != 'null' ]]; then
-   MINAGEHOLD="-mmin +${MINAGE}"
-else
-   MINAGEHOLD=""
-fi
-
 # Run Loop
 while true; do
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} ${MINAGEHOLD} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
@@ -99,7 +92,6 @@ while true; do
                     sleep 5
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
-                       ##log "File is still getting bigger ${i}" 
                        sleep 5
                        continue
                     fi
