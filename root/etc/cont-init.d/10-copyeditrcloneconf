@@ -12,20 +12,25 @@ if [ ! -f ${rclone_base} ]; then
    sleep 60
    exit 1
 fi
+if [ ! -d "/config/rclone/" ]; then
+   mkdir -p /config/rclone/
+   chown -R abc:abc /config/rclone/ && chmod 755 /config/rclone/
+fi
 
-rclone_docker=/config/rclone-docker.conf
-rclone_base=/config/rclone.conf
 if [ -f ${rclone_base} ]; then
   log "-> Copying rclone.conf <-"
-      rm -f ${rclone_docker}
-      cp ${rclone_base} ${rclone_docker}
+      mkdir -p /config/rclone/
+      chown -R abc:abc /config/rclone/ && chmod 755 /config/rclone/
+      rm -f /config/rclone/rclone-docker.conf
+      cp /config/rclone.conf /config/rclone/rclone-docker.conf
   log "-> Make needed edits to rclone-docker.conf <-"
-      sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" ${rclone_docker}
-      sed -i "s#/opt/appdata/uploader/#/config/keys/#g" ${rclone_docker}
-      sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" ${rclone_docker}
-      sed -i "s#/opt/uploader/keys/#/config/keys/#g" ${rclone_docker}
-      sed -i '/pgunion/{n;N;d;}' ${rclone_docker}
-      sed -i '/pgunion/d' ${rclone_docker}
+      sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+      sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
+      sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+      sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+      sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
+      sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
+      chown -R abc:abc /config/rclone/ && chmod 755 /config/rclone/
   log "-> rclone_docker.conf edits done <-"
 fi
 rclone_bin=/usr/bin/rclone
