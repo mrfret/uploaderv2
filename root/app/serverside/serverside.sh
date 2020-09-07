@@ -118,9 +118,14 @@ while true; do
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
    rclone moveto --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level ERROR --stats 10s \
+                 --log-file="${LOGFILE}" --log-level INFO --stats 10s \
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+   rclone rmdirs "${REMOTEDRIVE}:" --config="${RCLONEDOCKER}" \
+                 --drive-use-trash=false \
+				 --fast-list \
+				 --transfers=50 \
+				 --user-agent="SomeLegitUserAgent" 
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
