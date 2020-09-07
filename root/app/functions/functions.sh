@@ -53,6 +53,7 @@ function rclone_update() {
 log "-> update rclone || start <-"
     apk add unzip --quiet
     curl --no-progress-meter https://rclone.org/install.sh | bash -s beta >/dev/null 2>&1
+    rm -rf /root/.cache/rclone/ && rm -rf /root/.config/rclone/
 log "-> update rclone || done <-"
 }
 function update() {
