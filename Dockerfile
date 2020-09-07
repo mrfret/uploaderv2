@@ -10,7 +10,7 @@
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
 FROM alpine:latest
-LABEL maintainer=60312740+doob187@users.noreply.github.com \
+LABEL maintainer=60312740+doob187@users.noreply.github.com
 
 ENV ADDITIONAL_IGNORES=null \
     SERVERSIDEMINAGE=null \
