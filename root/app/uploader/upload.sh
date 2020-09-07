@@ -82,9 +82,6 @@ rclone moveto --tpslimit 6 --checkers=${CHECKERS} \
               --drive-chunk-size=${CHUNK}M ${BWLIMIT} \
               "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
-if [ "${RC_ENABLED}" == "true" ]; then
-    sleep 10s && rclone rc vfs/forget dir="${FILEDIR}" --user "${RC_USER:-user}" --pass "${RC_PASS:-xxx}" --no-output
-fi
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 ### send note to discod 
