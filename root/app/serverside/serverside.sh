@@ -35,7 +35,7 @@ if [[ "${SERVERSIDE}" != 'true' ]]; then
    exit 0
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -le '1' ]] ; then
+if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
    if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDE}" != 'down' ]; then
       sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
    fi
