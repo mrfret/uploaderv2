@@ -13,7 +13,7 @@ FIND_ACTION='-delete 1>/dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_FILE_ACTION} ${FIND_FILE} ${FIND_BASE} ${FIND_ACTION}"
 eval ${command}
 
-if grep -q GDSA01 /config/rclone-docker.conf && grep -q GDSA02 /config/rclone-docker.conf; then
+if grep -q GDSA01 /config/rclone/rclone-docker.conf && grep -q GDSA02 /config/rclone/rclone-docker.conf; then
     touch /etc/services.d/uploader-gdrive/down
 else
     touch /etc/services.d/uploader-tdrive/down
