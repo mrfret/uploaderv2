@@ -41,9 +41,7 @@ if [[ "${SERVERSIDECHECK}" -le '1' ]] ; then
    fi
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -gt "2" ]]; then
-   log " Server check done "
-else
+if [[ "${SERVERSIDECHECK}" -lt "2" && "${SERVERSIDE}" == 'true' ]]; then
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
