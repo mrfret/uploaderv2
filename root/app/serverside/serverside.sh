@@ -116,16 +116,17 @@ while true; do
    STARTTIME=$(date +%s)
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-   rclone moveto --checkers 4 --transfers 2 \
-                 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 10s \
-                 --no-traverse ${SERVERSIDEAGE} \
+   rclone moveto --checkers 4 --transfers 2 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
+                 --log-file="${LOGFILE}" --use-server-modtime --log-level INFO --stats 10s --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-   rclone rmdirs "${REMOTEDRIVE}:" --config="${RCLONEDOCKER}" \
-                 --drive-use-trash=false \
-				 --fast-list \
-				 --transfers=50 \
-				 --user-agent="SomeLegitUserAgent" 
+   IFS=$'\n'
+   filter="$1"
+   mapfile -t remotes < <(eval rclone listremotes --config=${RCLONEDOCKER} | grep "$filter" | sed -e 's/tcrypt://g' | sed -e 's/gcrypt://g' | sed -e 's/[GDSA00-99C:]//g' | sed '/^$/d')
+   for i in ${remotes[@]}; do 
+       rclone rmdirs $i: --config=${RCLONEDOCKER} --drive-use-trash=false --fast-list --transfers=50 --user-agent="SomeLegitUserAgent"
+       rclone delete $i: --config=${RCLONEDOCKER} --fast-list --drive-trashed-only --drive-use-trash=false --transfers 50 --user-agent="SomeLegitUserAgent"
+       rclone cleanup $i: --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent"
+   done
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
@@ -133,8 +134,9 @@ while true; do
       DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
       TIME="$((count=${ENDTIME}-${STARTTIME}))"
       duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
+	  MOVEDFILES=$(cat ${LOGFILE} | grep "Renamed" | tail -n 1 | awk '{print $2}')
       # shellcheck disable=SC2006 
-      echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nTime : ${duration}" >"${DISCORD}"
+      echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nMoved Files : ${MOVEDFILES} \nTime : ${duration}" >"${DISCORD}"
       msg_content=$(cat "${DISCORD}")
       curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
       rm -rf "${DISCORD}"
