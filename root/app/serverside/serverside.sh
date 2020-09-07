@@ -11,7 +11,7 @@ function log() {
 source /app/functions/functions.sh
 ###execute part 
 SVLOG="serverside"
-RCLONEDOCKER="/config/rclone-docker.conf"
+RCLONEDOCKER="/config/rclone/rclone-docker.conf"
 LOGFILE="/config/logs/serverside.log"
 if [[ -f ${LOGFILE} ]]; then
    truncate -s 0 ${LOGFILE}
