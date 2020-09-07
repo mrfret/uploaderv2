@@ -51,9 +51,8 @@ fi
 }
 function rclone_update() {
 log "-> update rclone || start <-"
-    wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip >/dev/null 2>&1 && \
-    unzip -qq rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -rf rclone* 
+    apk add unzip --quiet
+    curl --no-progress-meter https://rclone.org/install.sh | bash -s beta >/dev/null 2>&1
 log "-> update rclone || done <-"
 }
 function update() {
