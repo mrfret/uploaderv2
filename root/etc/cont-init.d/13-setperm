@@ -7,10 +7,11 @@ function log() {
 echo "[Uploader] ${1}"
 }
 log "-> Setting Permissions || start <-"
-chown -hR abc:abc  \
+chown -R abc:abc  \
          /config \
          /mnt \
-         /move
+         /move \
+         /config/rclone
 chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
