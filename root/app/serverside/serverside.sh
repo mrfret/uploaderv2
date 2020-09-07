@@ -8,11 +8,14 @@
 function log() {
    echo "[Server Side] ${1}"
 }
+source /app/functions/functions.sh
 ###execute part 
 SVLOG="serverside"
-RCLONEDOCKER="/config/rclone-docker.conf"
+RCLONEDOCKER="/config/rclone/rclone-docker.conf"
 LOGFILE="/config/logs/serverside.log"
-truncate -s 0 ${LOGFILE}
+if [[ -f ${LOGFILE} ]]; then
+   truncate -s 0 ${LOGFILE}
+fi
 DISCORD="/config/discord/${SVLOG}.discord"
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
@@ -22,25 +25,31 @@ SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
 downcommand=/etc/services.d/serverside/down
 LOCK=/config/json/serverside.lck
+#####
 if [ -e ${LOCK} ]; then
     rm -rf ${LOCK}
 fi
-
+#####
+if [[ "${SERVERSIDE}" != 'true' ]]; then
+   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   exit 0
+fi
+#####
 if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
    if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDE}" != 'down' ]; then
       sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
    fi
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -lt "2" ]]; then
+if [[ "${SERVERSIDECHECK}" -lt "2" && "${SERVERSIDE}" == 'true' ]]; then
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
-   sleep 10
-   touch ${downcommand} 
+   sleep 60
    exit 0
 fi
+#####
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
    rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
    rccommand2=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 2 | tail -n 1))
@@ -51,41 +60,40 @@ if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER};
       log ">>>>> [ WARNING ]           Server_side can't be used           <<<<< [ WARNING ]"
       log ">>>>> [ WARNING ] TCrypt and GCrypt dont used the same password <<<<< [ WARNING ]"
       log ">>>>> [ WARNING ] --------------------------------------------- <<<<< [ WARNING ]"
-      sleep 10
-      touch ${downcommand}
+      sleep 60
       exit 0
-   else
-      log "-> [ GOOD ] TCrypt and GCrypt used the same password [ GOOD ] <-"
    fi
 fi
 #####
-if [ "${SERVERSIDEMINAGE}" != 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
+if [ "${SERVERSIDEMINAGE}" == 'null' ] || [ "${SERVERSIDEMINAGE}" == 'false' ]; then
+   SERVERSIDEAGE="--min-age 48h"
+else
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEAGE="--min-age ${SERVERSIDEMINAGE}"
-else
-   SERVERSIDEAGE="--min-age 48h"
 fi
 #####
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
    if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
       REMOTEDRIVE=tdrive
    else
-      sleep 10
-      touch ${downcommand}
+      sleep 60
       exit 0
    fi
+else
+   REMOTEDRIVE=${REMOTEDRIVE}
 fi
 #####
 if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
    if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
       SERVERSIDEDRIVE=gdrive
    else
-      sleep 10
-      touch ${downcommand}
+      sleep 60
       exit 0
    fi
-
+else
+   SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
 fi
+#####
 if [[ "${SERVERSIDEDAY}" == 'null' ]]; then
    SERVERSIDEDAY=Sunday
  else
@@ -95,12 +103,12 @@ fi
 ## SERVERSIDE ##
 ################
 while true; do
-   if [[ $(date '+%A') == "${SERVERSIDEDAY}" ]]; then
+   if [ $(date '+%A') == "${SERVERSIDEDAY}" ] || [ "${SERVERSIDEDAY}" == 'daily' ] ; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
-   RCLONEDOCKER="/config/rclone-docker.conf"
-   REMOTEDRIVE=${REMOTEDRIVE:}
-   SERVERSIDEMINAGE=${SERVERSIDEMINAGE:}
+   RCLONEDOCKER="/config//rclone/rclone-docker.conf"
+   REMOTEDRIVE=${REMOTEDRIVE}
+   SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
    LOGFILE="/config/logs/serverside.log"
    echo "lock" >"${lock}"
@@ -110,27 +118,9 @@ while true; do
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
    rclone moveto --checkers 4 --transfers 2 \
                  --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --log-file="${LOGFILE}" --log-level INFO --stats 10s \
+                 --log-file="${LOGFILE}" --log-level ERROR --stats 10s \
                  --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-
-   log "Starting Server-Side dedupe for ${REMOTEDRIVE}"
-   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
-                 --fast-list --retries 3 --no-update-modtime \
-                 --config=${RCLONEDOCKER} "${REMOTEDRIVE}:"
-
-   log "Starting Server-Side dedupe for ${SERVERSIDEDRIVE}"
-   rclone dedupe --dedupe-mode largest user-agent="SomeLegitUserAgent" \
-                 --fast-list --retries 3 --no-update-modtime \               
-                 --config=${RCLONEDOCKER} "${SERVERSIDEDRIVE}:"
-
-   log "Starting Server-Side cleanup empty folders on ${REMOTEDRIVE}"
-   rclone rmdirs --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
-                 --leave-root --no-traverse "${REMOTEDRIVE}:"
-
-   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${REMOTEDRIVE}:"
-   rclone cleanup --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" "${SERVERSIDEDRIVE}:"
-
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
@@ -148,7 +138,7 @@ while true; do
       log "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
       rm -rf "${lock}"
    fi
-   sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
+   sleep 10 && sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    else
      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    fi

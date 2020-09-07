@@ -7,6 +7,6 @@
 # shellcheck disable=SC2086
 umask 022
 uploader_command="/app/gdrive/uploader.sh"
-sleep 10s
+sleep 10
 echo "-> Starting gdrive Uploader <-"
 exec s6-setuidgid abc $uploader_command

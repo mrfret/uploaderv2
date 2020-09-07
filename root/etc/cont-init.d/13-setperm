@@ -6,41 +6,29 @@
 function log() {
 echo "[Uploader] ${1}"
 }
-DISABLE_UNIONFS_CHOWN=${DISABLE_UNIONFS_CHOWN:-false}
-#log "-> Making sure we have the correct Directorys <-"
-#mkdir -p /mnt/tdrive1 \
-#         /mnt/tdrive2 \
-#         /mnt/gdrive \
-#         /mnt/gcrypt
 log "-> Setting Permissions || start <-"
-chown -hR abc:abc  \
+chown -R abc:abc  \
          /config \
          /mnt \
-         /move
+         /move \
+         /config/rclone
 chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
          /app/cleanup/cleanup.sh \
          /app/serverside/serverside.sh \
          /app/functions/functions.sh \
-         /app/update-alpine/update-alpine.sh \
-         /app/mergerfs.sh
+         /app/update-alpine/update-alpine.sh
 chown -hR abc:abc /app/uploader/upload.sh \
          /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/cleanup/cleanup.sh \
          /app/functions/functions.sh \
          /app/serverside/serverside.sh \
-         /app/update-alpine/update-alpine.sh \
-         /app/mergerfs.sh
+         /app/update-alpine/update-alpine.sh
 chown -R abc:abc /run \
          /var/lib/nginx \
          /var/log/nginx \
          /var/www
 log "-> Setting Permissions || done <-"
-if [ "${DISABLE_UNIONFS_CHOWN}" == "false" ]; then
-    chown -hR abc:abc /unionfs
-else
-    log "-> Unionfs Chown disabled <-"
-fi
 #EOF

@@ -10,8 +10,6 @@
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
 FROM alpine:latest
-ARG OVERLAY_ARCH="amd64"
-ARG OVERLAY_VERSION="v2.0.0.1"
 ARG BUILD_DATE="unknown"
 ARG COMMIT_AUTHOR="unknown"
 LABEL maintainer=${COMMIT_AUTHOR} \
@@ -35,8 +33,8 @@ ENV ADDITIONAL_IGNORES=null \
 RUN \
  echo "**** install build packages ****" && \
  echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories && \
- apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq && \
- apk add --quiet --no-cache \
+ apk --no-cache --no-progress update -qq && apk --no-cache --no-progress upgrade -qq && apk --no-cache --no-progress fix -qq && \
+ apk add --quiet --no-cache --no-progress\
         ca-certificates \
         logrotate \
         shadow \
@@ -65,17 +63,20 @@ RUN \
         tzdata \
         openntpd \
         grep \ 
-        tar && \
- echo "**** ${OVERLAY_VERSION} used ****" && \
-  curl -o /tmp/s6-overlay.tar.gz -L "https://github.com/just-containers/s6-overlay/releases/download/${OVERLAY_VERSION}/s6-overlay-${OVERLAY_ARCH}.tar.gz" >/dev/null 2>&1 && \
-  tar xfz /tmp/s6-overlay.tar.gz -C / >/dev/null 2>&1 && rm -rf /tmp/s6-overlay.tar.gz >/dev/null 2>&1
+        tar
 
-VOLUME [ "/unionfs" ]
+RUN \
+  echo "**** Install s6-overlay ****" && \ 
+  curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]' > /etc/S6_RELEASE && \
+  wget https://github.com/just-containers/s6-overlay/releases/download/`cat /etc/S6_RELEASE`/s6-overlay-amd64.tar.gz -O /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
+  tar xzf /tmp/s6-overlay-amd64.tar.gz -C / >/dev/null 2>&1 && \
+  rm /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
+  echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
+
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
 
-RUN chown 911:911 /unionfs && \
-    chown 911:911 /config && \
+RUN chown 911:911 /config && \
     chown -hR 911:911 /move && \
     chown -hR 911:911 /mnt && \
     mkdir -p /var/www/html && \
