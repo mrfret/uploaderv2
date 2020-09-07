@@ -35,13 +35,15 @@ if [[ "${SERVERSIDE}" != 'true' ]]; then
    exit 0
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
+if [[ "${SERVERSIDECHECK}" -le '1' ]] ; then
    if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDE}" != 'down' ]; then
       sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
    fi
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -lt "2" && "${SERVERSIDE}" == 'true' ]]; then
+if [[ "${SERVERSIDECHECK}" -gt "2" ]]; then
+   log " Server check done "
+else
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
