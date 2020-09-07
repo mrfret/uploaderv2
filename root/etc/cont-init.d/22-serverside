@@ -5,7 +5,7 @@
 function log() {
     echo "[Server Side] ${1}"
 }
-RCLONEDOCKER=/config/rclone-docker.conf
+RCLONEDOCKER=/config/rclone/rclone-docker.conf
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
 SERVERSIDE=${SERVERSIDE}
 downcommand=/etc/services.d/serverside/down
