@@ -80,8 +80,8 @@ RUN chown 911:911 /config && \
     chown -hR 911:911 /move && \
     chown -hR 911:911 /mnt && \
     mkdir -p /var/www/html && \
-    addgroup -g 911 -S abc && \
-    adduser -u 911 -s /bin/bash -D -G abc abc
+    addgroup -g 911 abc && \
+    adduser -u 911 -D -G abc abc
 
 COPY root/ /
 COPY --chown=abc html/ /var/www/html
