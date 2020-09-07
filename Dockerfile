@@ -10,10 +10,7 @@
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
 FROM alpine:latest
-ARG BUILD_DATE="unknown"
-ARG COMMIT_AUTHOR="unknown"
-LABEL maintainer=${COMMIT_AUTHOR} \
-      org.label-schema.build-date=${BUILD_DATE}
+LABEL maintainer=60312740+doob187@users.noreply.github.com
 
 ENV ADDITIONAL_IGNORES=null \
     SERVERSIDEMINAGE=null \
