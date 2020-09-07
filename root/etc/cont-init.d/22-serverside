@@ -8,6 +8,7 @@ function log() {
 RCLONEDOCKER=/config/rclone-docker.conf
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
 SERVERSIDE=${SERVERSIDE}
+downcommand=/etc/services.d/serverside/down
 
 if [ -e ${downcommand} ]; then
    rm -rf ${downcommand}
