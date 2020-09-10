@@ -9,8 +9,7 @@ echo "[Uploader] ${1}"
 vnstat=/etc/vnstat.conf
 if [ ! -f ${vnstat} ]; then
    log "-> install vnstat || start <-"
-   apk --no-cache update -qq && apk --no-cache upgrade -qq && apk --no-cache fix -qq
-   apk add vnstat -qq
+   apk add --quiet --no-cache --no-progress vnstat
    rm -rf /var/cache/apk/*
    sed -i 's/Interface ""/Interface "eth0"/g' /etc/vnstat.conf
    sed -i 's/UnitMode 0/UnitMode 1/g' /etc/vnstat.conf

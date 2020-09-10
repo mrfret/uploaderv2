@@ -82,18 +82,17 @@ while true; do
             FILEDIR=$(dirname "${i}" | sed "s#${downloadpath}${MOVE_BASE}##g")
             # If file has a lockfile skip
             if [ -e "${i}.lck" ]; then
-               log "Lock File found for ${i}" 
-               continue
+                log "Lock File found for ${i}"
+                continue
             else
                 if [ -e "${i}" ]; then
-                    sleep 5
                     # Check if file is still getting bigger
                     FILESIZE1=$(stat -c %s "${i}")
-                    sleep 5
+                    sleep 3
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
-                       sleep 5
-                       continue
+                        log "File is still getting bigger ${i}"
+                        continue
                     fi
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls /config/pid/ | egrep trans | wc -l )
@@ -101,12 +100,11 @@ while true; do
                     USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
-                    if [[ -e "${i}" && ${TRANSFERS} -le 4 && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                     
-                       log "attacke .....  ${TRANSFERS} are running"                       
-                       log "Upload Bandwith is less then ${BWLIMITSET}M"
+                    if [[ -e "${i}" &&  ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                    
+                       log "attacke .....  ${i} will uploaded" 
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
-                       if [ ${UPLOADFILE} -gt 40 ]; then
+                       if [ ${UPLOADFILE} -gt 36 ]; then
                            UPLOADFILE=35
                        else
                            UPLOADFILE=${UPLOADFILE}
@@ -141,12 +139,9 @@ while true; do
                         # Record GDSA transfered in case of crash/reboot
                         echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
                     else
-                       if [ ${TRANSFERS} == 4 ]; then
-                          log "( ︶︿︶) buhhhhh...... ${TRANSFERS} Upload already are running"
-                          log "wait for next free Upload slot"
-                       else 
-                          log "uploads will resume when they can ( ︶︿︶)_╭∩╮"
-                          log "Upload Bandwith is reached || wait for next loop"
+                       if [  ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
+                          log "( ︶︿︶) buhhhhh...... ${UPLOADSPEED} is greater then ${BWLIMITSET}"
+                          log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
                        fi
                        sleep 5
                        break
@@ -159,9 +154,9 @@ while true; do
             log "Sleeping 5s before looking at next file"
             sleep 10
         done
-        log "Finished looking for files, sleeping 10 secs"
+        log "Finished looking for files, sleeping 5 secs"
     else
-      log "Nothing to upload, sleeping 10 secs"
+      log "Nothing to upload, sleeping 5 secs"
     fi
     sleep 10
 done
