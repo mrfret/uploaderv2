@@ -3,33 +3,29 @@
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
 function log() {
-echo "[Uploader] ${1}"
+echo "[Mount] ${1}"
 }
 if [ ! -f "/config/rclone.conf" ]; then
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    sleep 60
    exit 0
 fi
-if [ ! -d "/config/rclone/" ]; then 
-   mkdir -p /config/rclone 
-fi
-if [ -f "/config/rclone.conf" ]; then
-    log "-> Copying rclone.conf <-"
-        rm -f /config/rclone/rclone-docker.conf
-        cp /config/rclone.conf /config/rclone/rclone-docker.conf
+log "-> Copying rclone.conf <-"
+    rclonepad=/config/rclone/rclone-docker.conf 
+    mkdir -p /config/rclone
+    rm -f ${rclonepad}
+    find /config -name "rclone.conf" -type f -exec cp {} ${rclonepad} \;
     log "-> Make needed edits to rclone-docker.conf <-"
-        sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-        sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
-        sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-        sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-        sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
-        sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
-    log "-> rclone_docker.conf edits done <-"
-fi
-log "-> install rclone || start <-"
-apk add unzip --quiet
-curl --no-progress-meter https://rclone.org/install.sh | bash -s beta >/dev/null 2>&1
-rm -rf /root/.cache/rclone/ && rm -rf /root/.config/rclone/
-log "-> install rclone || done <-"
-fi
+    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
+    sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
+log "-> rclone_docker.conf edits done <-"
+
+log "-> update rclone || start <-"
+    apk add unzip --quiet
+    curl --no-progress-meter https://rclone.org/install.sh | bash -s beta >/dev/null 2>&1
+log "-> update rclone || done <-"
 #<EOF>#
