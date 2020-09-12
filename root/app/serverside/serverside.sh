@@ -42,7 +42,7 @@ if [[ ${SERVERSIDECHECK} -le "1" && ${SERVERSIDE} == 'true' ]]; then
 fi
 sleep 5
 ####
-if [ ${SERVERSIDECHECK} -gt '1' ]; then
+if [ "${SERVERSIDECHECK}" -gt "1" ]; then
    log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
    log ">>>>> [ SERVERSIDE ]         Server-Side works             <<<<< [ SERVERSIDE ]"
    log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
