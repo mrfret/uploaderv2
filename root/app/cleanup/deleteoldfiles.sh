@@ -6,7 +6,7 @@
 # Initial release   : August 2011
 # Licence           : Simplified BSD License
 ############################################################################### 
-MOUNT="/move"
+MOUNT="/move/{nzb,torrent,sabnzbd,nzbget,qbittorrent,rutorrent,deluge,jdownloader2}"
 CAPACITY_LIMIT=${CAPACITY_LIMIT}
 MAX_CYCLES=10
 CAPACITY_LIMIT=${CAPACITY_LIMIT:-75}
@@ -19,7 +19,6 @@ reset () {
     CYCLES=0
     OLDEST_FILE=""
     OLDEST_DATE=0
-    ARCH=`uname`
 }
 reset
 check_capacity () {
