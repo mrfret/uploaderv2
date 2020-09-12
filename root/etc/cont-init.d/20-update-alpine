@@ -14,6 +14,5 @@ echo "@weekly bash /app/update-alpine/update-alpine.sh" > /tmp/crontab.conf
 crontab /tmp/crontab.conf
 rm -rf /var/cache/apk/*
 log "-> update packages || done <-"
-sleep 5
-#>EOF<#sleep 5
+sleep 2
 #>EOF<#
