@@ -23,7 +23,7 @@ reset () {
 reset
 check_capacity () {
     USAGE=`df -h | grep "$MOUNT" | awk '{ print $5 }' | sed s/%//g`
-    if [ "$USAGE" -gt "$CAPACITY_LIMIT" ]; then
+    if [ "$USAGE" -gt "${CAPACITY_LIMIT}" ]; then
         return 0
     else
         return 1
