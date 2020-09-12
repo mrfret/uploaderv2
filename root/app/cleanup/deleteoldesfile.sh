@@ -22,7 +22,7 @@ reset () {
 }
 reset
 check_capacity () {
-    USAGE=`df -h | grep "$MOUNT" | awk '{ print $5 }' | sed s/%//g`
+    USAGE=$(df -h | grep "$MOUNT" | awk '{ print $5 }' | sed s/%//g)
     if [ "$USAGE" -gt "${CAPACITY_LIMIT}" ]; then
         return 0
     else
@@ -31,8 +31,8 @@ check_capacity () {
 }
 check_age () {
     FILE="$1"
-    FILE_DATE=`stat -c %Z "$FILE"`
-    NOW=`date +%s`
+    FILE_DATE=$(stat -c %Z "$FILE")
+    NOW=$(date +%s)
     AGE=$((NOW-FILE_DATE))
     if [ "$AGE" -gt "$OLDEST_DATE" ]
     then
@@ -51,7 +51,7 @@ do
         exit 1
     fi
     reset
-    FILES=`find "$MOUNT" -type f`
+    FILES=$(find "$MOUNT" -type f)
     IFS=$'\n'
     for x in $FILES
     do
