@@ -16,7 +16,7 @@ chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
          /app/cleanup/cleanup.sh \
-         /app/cleanup/deleteoldfiles.sh \
+         /app/cleanup/deleteoldesfile.sh \
          /app/serverside/serverside.sh \
          /app/functions/functions.sh \
          /app/update-alpine/update-alpine.sh
