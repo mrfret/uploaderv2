@@ -35,13 +35,14 @@ if [[ "${SERVERSIDE}" != 'true' ]]; then
    exit 0
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
+if [[ ${SERVERSIDECHECK} -le "1" && ${SERVERSIDE} == 'true' ]]; then
    if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDE}" != 'down' ]; then
       sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
    fi
 fi
-#####
-if [[ ${SERVERSIDECHECK} -gt '1' && ${SERVERSIDE} == 'true' ]]; then
+sleep 5
+####
+if [ "${SERVERSIDECHECK}" -gt "1" ]; then
    log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
    log ">>>>> [ SERVERSIDE ]         Server-Side works             <<<<< [ SERVERSIDE ]"
    log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
@@ -53,7 +54,7 @@ else
    sleep 60
    exit 0
 fi
-#####
+####
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
    rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
    rccommand2=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 2 | tail -n 1))
@@ -123,14 +124,6 @@ while true; do
    rclone moveto --checkers 4 --transfers 2 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --use-server-modtime --log-level INFO --stats 10s --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-   IFS=$'\n'
-   filter="$1"
-   mapfile -t remotes < <(eval rclone listremotes --config=${RCLONEDOCKER} | grep "$filter" | sed -e 's/tcrypt://g' | sed -e 's/gcrypt://g' | sed -e 's/[GDSA00-99C:]//g' | sed '/^$/d')
-   for i in ${remotes[@]}; do 
-       rclone rmdirs $i: --config=${RCLONEDOCKER} --drive-use-trash=false --fast-list --transfers=50 --user-agent="SomeLegitUserAgent"
-       rclone delete $i: --config=${RCLONEDOCKER} --fast-list --drive-trashed-only --drive-use-trash=false --transfers 50 --user-agent="SomeLegitUserAgent"
-       rclone cleanup $i: --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent"
-   done
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
