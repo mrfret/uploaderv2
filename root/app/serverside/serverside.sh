@@ -35,25 +35,26 @@ if [[ "${SERVERSIDE}" != 'true' ]]; then
    exit 0
 fi
 #####
-if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
+if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]]; then
    if [ "${SERVERSIDE}" != 'false' ] || [ "${SERVERSIDE}" != 'down' ]; then
       sed -i '/type = drive/a\server_side_across_configs = true' ${RCLONEDOCKER}
    fi
 fi
-#####
-# if [[ ${SERVERSIDECHECK} -gt '1' && ${SERVERSIDE} == 'true' ]]; then
-   # log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
-   # log ">>>>> [ SERVERSIDE ]         Server-Side works             <<<<< [ SERVERSIDE ]"
-   # log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
-# else
-   # log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
-   # log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
-   # log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
-   # log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
-   # sleep 60
-   # exit 0
-# fi
-#####
+sleep 5
+####
+if [[ "${SERVERSIDECHECK}" -gt "1" && "${SERVERSIDE}" == 'true' ]]; then
+   log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
+   log ">>>>> [ SERVERSIDE ]         Server-Side works             <<<<< [ SERVERSIDE ]"
+   log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
+else
+   log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
+   log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
+   log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
+   log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
+   sleep 60
+   exit 0
+fi
+####
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
    rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
    rccommand2=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 2 | tail -n 1))
