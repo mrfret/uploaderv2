@@ -124,14 +124,6 @@ while true; do
    rclone moveto --checkers 4 --transfers 2 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --use-server-modtime --log-level INFO --stats 10s --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-   IFS=$'\n'
-   filter="$1"
-   mapfile -t remotes < <(eval rclone listremotes --config=${RCLONEDOCKER} | grep "$filter" | sed -e 's/tcrypt://g' | sed -e 's/gcrypt://g' | sed -e 's/[GDSA00-99C:]//g' | sed '/^$/d')
-   for i in ${remotes[@]}; do 
-       rclone rmdirs $i: --config=${RCLONEDOCKER} --drive-use-trash=false --fast-list --transfers=50 --user-agent="SomeLegitUserAgent"
-       rclone delete $i: --config=${RCLONEDOCKER} --fast-list --drive-trashed-only --drive-use-trash=false --transfers 50 --user-agent="SomeLegitUserAgent"
-       rclone cleanup $i: --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent"
-   done
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
