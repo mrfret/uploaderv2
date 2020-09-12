@@ -41,18 +41,18 @@ if [[ "${SERVERSIDECHECK}" -le "1" && "${SERVERSIDE}" == 'true' ]] ; then
    fi
 fi
 #####
-if [[ ${SERVERSIDECHECK} -gt '1' && ${SERVERSIDE} == 'true' ]]; then
-   log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
-   log ">>>>> [ SERVERSIDE ]         Server-Side works             <<<<< [ SERVERSIDE ]"
-   log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
-else
-   log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
-   log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
-   log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
-   log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
-   sleep 60
-   exit 0
-fi
+# if [[ ${SERVERSIDECHECK} -gt '1' && ${SERVERSIDE} == 'true' ]]; then
+   # log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
+   # log ">>>>> [ SERVERSIDE ]         Server-Side works             <<<<< [ SERVERSIDE ]"
+   # log ">>>>> [ SERVERSIDE ] ------------------------------------- <<<<< [ SERVERSIDE ]"
+# else
+   # log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
+   # log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
+   # log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
+   # log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
+   # sleep 60
+   # exit 0
+# fi
 #####
 if grep -q "\[tcrypt\]" ${RCLONEDOCKER} && grep -q "\[gcrypt\]" ${RCLONEDOCKER}; then
    rccommand1=$(rclone reveal $(cat ${RCLONEDOCKER} | awk '$1 == "password" {print $3}' | head -n 1 | tail -n 1))
