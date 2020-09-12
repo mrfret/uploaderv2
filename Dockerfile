@@ -25,7 +25,8 @@ ENV ADDITIONAL_IGNORES=null \
     CLEANUPDOWN=null \
     MINAGE=null \
     SERVERSIDEDAY=null \
-    LOGHOLDUI="5m" 
+    LOGHOLDUI="5m" \
+    CAPACITY_LIMIT=null
 
 COPY root/ /
 RUN \
