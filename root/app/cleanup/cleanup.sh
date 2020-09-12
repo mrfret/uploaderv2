@@ -42,7 +42,7 @@ eval ${command}
 
 cleaning() {
  while true; do
-    bash /app/cleanup/deleteoldesfiles.sh
+    bash /app/cleanup/deleteoldesfile.sh
     sleep 5
     emptyfolder
     sleep 5
