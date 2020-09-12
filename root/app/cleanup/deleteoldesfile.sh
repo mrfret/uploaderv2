@@ -6,7 +6,7 @@
 # Initial release   : August 2011
 # Licence           : Simplified BSD License
 ############################################################################### 
-MOUNT="/move/"
+MOUNT="/move"
 CAPACITY_LIMIT=${CAPACITY_LIMIT}
 MAX_CYCLES=10
 CAPACITY_LIMIT=${CAPACITY_LIMIT:-75}
