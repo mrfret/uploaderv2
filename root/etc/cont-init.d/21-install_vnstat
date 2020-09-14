@@ -10,7 +10,7 @@ apk add --quiet --no-cache --no-progress vnstat
 rm -rf /var/cache/apk/*
 vnstat --add -i eth0 1>/dev/null 2>&1
 sed -i '/Interface/s/""/"eth0"/' /etc/vnstat.conf
-sed -i '/UseLogging/s/2/0/' /etc/vnstat.conf \
+sed -i '/UseLogging/s/2/0/' /etc/vnstat.conf
 sed -i '/RateUnit/s/1/0/' /etc/vnstat.conf
 sed -i '/UnitMode/s/0/1/' /etc/vnstat.conf
 vnstat --remove -i eth1 --force 1>/dev/null 2>&1
