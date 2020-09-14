@@ -59,8 +59,8 @@ if [ "$CAPACITY" -gt ${CAPACITY_LIMIT} ]; then
                 CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
                 if [ "$CAPACITY" -le ${CAPACITY_LIMIT} ]
                 then
-                     exit
-                fi
+                 echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
+               fi
             fi
         fi
     done
