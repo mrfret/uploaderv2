@@ -2,16 +2,16 @@
 # shellcheck shell=bash
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
-######## FUNCTIONS ##########
-downloadpath=/move
-CLEANUPDOWN=${CLEANUPDOWN:-null}
-if [ "${CLEANUPDOWN}" == 'null' ] || [ "${CLEANUPDOWN}" == 'false' ]; then
-   CLEANUPDOWN=7
-else 
-   CLEANUPDOWN=${CLEANUPDOWN}
-fi
-
-function emptyfolder() {
+cleaning() {
+ while true; do
+    cleanup
+    sleep 5
+    empty_folder
+    sleep 5
+ done
+}
+#####
+function empty_folder() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/"
 FIND=$(which find)
@@ -30,7 +30,7 @@ WANTED_FOLDERS=(
     '**qbittorrent/**'
     '**jdownloader2/**'
     '**deluge/**'
-	)
+    )
 condition="-not -path '${WANTED_FOLDERS[0]}'"
 for ((i = 1; i < ${#WANTED_FOLDERS[@]}; i++))
 do
@@ -39,18 +39,34 @@ done
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_EMPTY} ${FIND_ACTION}"
 eval ${command}
 }
-
-cleaning() {
- while true; do
-    bash /app/cleanup/deleteoldesfile.sh
-    sleep 5
-    emptyfolder
-    sleep 5
- done
+function cleanup() {
+CAPACITY_LIMIT=${CAPACITY_LIMIT}
+downloadpath=/move
+if [[ ${CAPACITY_LIMIT} == 'null' ]]; then
+    CAPACITY_LIMIT=75
+else
+    CAPACITY_LIMIT=${CAPACITY_LIMIT}
+fi
+CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
+if [ "$CAPACITY" -gt ${CAPACITY_LIMIT} ]; then
+      ls -art | while read FILE
+    do
+        if [ -f $FILE ]
+        then
+            if rm -rf $FILE
+            then
+                ## echo "Deleted $FILE"
+                CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
+                if [ "$CAPACITY" -le ${CAPACITY_LIMIT} ]
+                then
+                     exit
+                fi
+            fi
+        fi
+    done
+fi
 }
-
-
 # keeps the function in a loop
-cheeseballs=0
-while [[ "$cheeseballs" == "0" ]]; do cleaning; done
+balls=0
+while [[ "$balls" == "0" ]]; do cleaning; done
 #EOF
