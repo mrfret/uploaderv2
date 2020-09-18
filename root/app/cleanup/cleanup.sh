@@ -8,9 +8,20 @@ cleaning() {
     sleep 5
     empty_folder
     sleep 5
+    cleannzb
  done
 }
 #####
+function cleannzb() {
+downloadpath=/move
+TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
+FIND=$(which find)
+FIND_BASE='-type f'
+FIND_SIZE='-size -100M'
+FIND_ACTION='-delete 1>/dev/null 2>&1'
+command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION}"
+eval ${command}
+}
 function empty_folder() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/"
