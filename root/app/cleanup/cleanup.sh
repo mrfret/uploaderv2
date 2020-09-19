@@ -12,7 +12,7 @@ cleaning() {
  done
 }
 #####
-function cleanup() {
+function cleannzb() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
