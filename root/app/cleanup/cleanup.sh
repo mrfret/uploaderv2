@@ -18,7 +18,7 @@ TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
 FIND_BASE='-type f'
 FIND_SIZE='-size -100M'
-FIND_ACTION='-delete 1>/dev/null 2>&1'
+FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION}"
 eval ${command}
 }
@@ -41,7 +41,7 @@ WANTED_FOLDERS=(
     '**qbittorrent/**'
     '**jdownloader2/**'
     '**deluge/**'
-    )
+)
 condition="-not -path '${WANTED_FOLDERS[0]}'"
 for ((i = 1; i < ${#WANTED_FOLDERS[@]}; i++))
 do
