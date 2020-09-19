@@ -12,15 +12,18 @@ cleaning() {
  done
 }
 #####
-function cleannzb() {
+function cleanup() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
 FIND_BASE='-type f'
 FIND_SIZE='-size -100M'
-FIND_ACTION='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
-command="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION}"
-eval ${command}
+FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
+FIND_ACTION2='-regex -regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
+command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION1}"
+command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION2}"
+eval ${command1}
+eval ${command2}
 }
 function empty_folder() {
 downloadpath=/move
