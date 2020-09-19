@@ -9,11 +9,8 @@
 ######################################################
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
-FROM golang:alpine AS build-env
-RUN apk add --no-cache git
-RUN go get -u -v github.com/ncw/rclone
-RUN /go/bin/rclone version
-FROM alpine:latest
+FROM rclone/rclone AS build-env
+
 LABEL maintainer=60312740+doob187@users.noreply.github.com
 ENV ADDITIONAL_IGNORES=null \
     SERVERSIDEMINAGE=null \
