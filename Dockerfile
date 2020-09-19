@@ -35,7 +35,7 @@ RUN \
  apk add --quiet --no-cache --no-progress \
         ca-certificates logrotate shadow bash  bc findutils coreutils openssl php7 php7-fpm php7-mysqli php7-json php7-openssl \
         php7-curl php7-zlib php7-xml php7-phar php7-dom php7-xmlreader php7-ctype php7-mbstring php7-gd \
-        curl nginx libxml2-utils tzdata openntpd grep tar fuse rclone
+        curl nginx libxml2-utils tzdata openntpd grep tar
 
 RUN \
   echo "**** Install s6-overlay ****" && \ 
@@ -44,6 +44,11 @@ RUN \
   tar xzf /tmp/s6-overlay-amd64.tar.gz -C / >/dev/null 2>&1 && \
   rm /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
+
+RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip --no-check-certificate && \
+    unzip rclone.zip && rm rclone.zip && \
+    mv rclone*/rclone /usr/bin && rm -r rclone* && \
+    mkdir -p /rclone
 
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
