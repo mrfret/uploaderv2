@@ -23,23 +23,3 @@ log "-> Copying rclone.conf <-"
     sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
     sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
 log "-> rclone_docker.conf edits done <-"
-
-log "-> install rclone || start <-"
-    apk add unzip bash curl wget --quiet
-    wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
-    unzip -q rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -r rclone*
-	chown abc:abc /usr/bin/rclone && chmod 755 /usr/bin/rclone
-log "-> install rclone || done <-"
-### failsafe install of rclone 
-if [[ $(command -v rclone | wc -l) == 0 ]] ; then
-log "-> install rclone agagin || start <-"
-    apk add unzip bash curl wget --quiet
-    wget --quiet https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip
-    unzip -q rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -r rclone*
-    chown abc:abc /usr/bin/rclone && chmod 755 /usr/bin/rclone
-log "-> install rclone again || done <-"
-else
-  echo "installed version $(rclone --version) of rclone"
-fi
