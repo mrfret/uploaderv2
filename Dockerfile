@@ -9,7 +9,7 @@
 ######################################################
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
-FROM rclone/rclone AS build-env
+FROM rclone/rclone
 
 LABEL maintainer=60312740+doob187@users.noreply.github.com
 ENV ADDITIONAL_IGNORES=null \
@@ -55,7 +55,7 @@ RUN chown 911:911 /config && \
     addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
 
-COPY --from=build-env /go/bin/rclone /usr/bin/rclone
+COPY /go/bin/rclone /usr/bin/rclone
 COPY --chown=abc html/ /var/www/html
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
