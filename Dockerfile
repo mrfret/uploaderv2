@@ -10,8 +10,8 @@
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
 FROM alpine:latest
-LABEL maintainer=60312740+doob187@users.noreply.github.com
 
+LABEL maintainer=60312740+doob187@users.noreply.github.com
 ENV ADDITIONAL_IGNORES=null \
     SERVERSIDEMINAGE=null \
     SERVERSIDE=false \
@@ -29,6 +29,7 @@ ENV ADDITIONAL_IGNORES=null \
     CAPACITY_LIMIT=null
 
 COPY root/ /
+
 RUN \
  echo "**** install build packages ****" && \
  apk add --quiet --no-cache --no-progress \
@@ -43,6 +44,11 @@ RUN \
   tar xzf /tmp/s6-overlay-amd64.tar.gz -C / >/dev/null 2>&1 && \
   rm /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
+
+RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -O rclone.zip --no-check-certificate && \
+    unzip rclone.zip && rm rclone.zip && \
+    mv rclone*/rclone /usr/bin && rm -r rclone* && \
+    mkdir -p /rclone
 
 VOLUME [ "/config" ]
 VOLUME [ "/move" ]
