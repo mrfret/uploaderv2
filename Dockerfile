@@ -9,7 +9,7 @@
 ######################################################
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
-FROM rclone/rclone
+FROM alpine:latest
 
 LABEL maintainer=60312740+doob187@users.noreply.github.com
 ENV ADDITIONAL_IGNORES=null \
@@ -35,7 +35,7 @@ RUN \
  apk add --quiet --no-cache --no-progress \
         ca-certificates logrotate shadow bash  bc findutils coreutils openssl php7 php7-fpm php7-mysqli php7-json php7-openssl \
         php7-curl php7-zlib php7-xml php7-phar php7-dom php7-xmlreader php7-ctype php7-mbstring php7-gd \
-        curl nginx libxml2-utils tzdata openntpd grep tar fuse
+        curl nginx libxml2-utils tzdata openntpd grep tar fuse rclone
 
 RUN \
   echo "**** Install s6-overlay ****" && \ 
