@@ -1,8 +1,14 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
+function log() {
+echo "[UPDATE] ${1}"
+}
+## function source start
 log "-> update rclone || start <-"
-    apk add unzip --quiet
-    curl --no-progress-meter https://rclone.org/install.sh | bash -s beta >/dev/null 2>&1
+apk add unzip bash curl --quiet
+wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
+unzip -q rclone.zip && rm rclone.zip && \
+mv rclone*/rclone /usr/bin && rm -r rclone*
 log "-> update rclone || done <-"
 
 log "-> update packages || start <-"
