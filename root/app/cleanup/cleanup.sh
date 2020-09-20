@@ -2,16 +2,8 @@
 # shellcheck shell=bash
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
-cleaning() {
- while true; do
-    cleanup
-    sleep 5
-    empty_folder
-    sleep 5
-    cleannzb
- done
-}
 #####
+
 function cleannzb() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
@@ -22,9 +14,10 @@ FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 FIND_ACTION2='-regex -regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION1}"
 command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION2}"
-eval ${command1}
-eval ${command2}
+eval "${command1}"
+eval "${command2}"
 }
+
 function empty_folder() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/"
@@ -51,8 +44,9 @@ do
   condition="${condition} ${FIND_ADD_NAME} '${WANTED_FOLDERS[i]}'"
 done
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_EMPTY} ${FIND_ACTION}"
-eval ${command}
+eval "${command}"
 }
+
 function cleanup() {
 CAPACITY_LIMIT=${CAPACITY_LIMIT}
 downloadpath=/move
@@ -63,8 +57,7 @@ else
 fi
 CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
 if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
-    filter="$1"
-    mapfile -t files < <(eval find ${downloadpath} -type f | tac | grep "$filter" )
+    mapfile -t files < <(eval find ${downloadpath} -type f | tac )
      for i in "${files[@]}"; do
         if [ "$CAPACITY" -le "${CAPACITY_LIMIT}" ]; then
            echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
@@ -74,6 +67,16 @@ if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
         fi
     done
 fi
+}
+
+cleaning() {
+ while true; do
+    cleanup
+    sleep 5
+    empty_folder
+    sleep 5
+    cleannzb
+ done
 }
 # keeps the function in a loop
 balls=0
