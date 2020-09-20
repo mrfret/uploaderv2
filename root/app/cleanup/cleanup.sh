@@ -62,20 +62,15 @@ else
     CAPACITY_LIMIT=${CAPACITY_LIMIT}
 fi
 CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
-if [ "$CAPACITY" -gt ${CAPACITY_LIMIT} ]; then
-      ls -art | while read FILE
-    do
-        if [ -f $FILE ]
-        then
-            if rm -rf $FILE
-            then
-                ## echo "Deleted $FILE"
-                CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
-                if [ "$CAPACITY" -le ${CAPACITY_LIMIT} ]
-                then
-                 echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
-               fi
-            fi
+if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
+    filter="$1"
+    mapfile -t files < <(eval find ${downloadpath} -type f | tac | grep "$filter" )
+     for i in "${files[@]}"; do
+        if [ "$CAPACITY" -le "${CAPACITY_LIMIT}" ]; then
+           echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
+        else
+           rm -rf "$i"
+           continue
         fi
     done
 fi
