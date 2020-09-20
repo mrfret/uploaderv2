@@ -1,11 +1,12 @@
 <?php
-# Copyright (c) 2019, PhysK
-# All rights reserved.
-function secondsToTime($inputSeconds) {
 
+// Copyright (c) 2019, PhysK
+// All rights reserved.
+function secondsToTime($inputSeconds)
+{
     $secondsInAMinute = 60;
-    $secondsInAnHour  = 60 * $secondsInAMinute;
-    $secondsInADay    = 24 * $secondsInAnHour;
+    $secondsInAnHour = 60 * $secondsInAMinute;
+    $secondsInADay = 24 * $secondsInAnHour;
 
     // extract days
     $days = floor($inputSeconds / $secondsInADay);
@@ -23,12 +24,12 @@ function secondsToTime($inputSeconds) {
     $seconds = ceil($remainingSeconds);
 
     // return the final array
-    $obj = array(
+    $obj = [
         'd' => (int) $days,
         'h' => (int) $hours,
         'm' => (int) $minutes,
         's' => (int) $seconds,
-    );
+    ];
+
     return $obj;
-    }
-?>
+}
