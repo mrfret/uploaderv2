@@ -11,7 +11,8 @@ chown -R abc:abc  \
          /config \
          /mnt \
          /move \
-         /config/rclone
+         /config/rclone \
+         /root
 chmod a+x /app/gdrive/uploader.sh \
          /app/tdrive/uploader.sh \
          /app/uploader/upload.sh \
@@ -30,5 +31,10 @@ chown -R abc:abc /run \
          /var/lib/nginx \
          /var/log/nginx \
          /var/www
+
+if [[ $(command -v rclone | wc -l) == "1" ]]; then
+    chown -cf abc:abc /root
+fi
+
 log "-> Setting Permissions || done <-"
 #EOF

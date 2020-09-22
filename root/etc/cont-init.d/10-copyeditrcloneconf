@@ -23,3 +23,10 @@ log "-> Copying rclone.conf <-"
     sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
     sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
 log "-> rclone_docker.conf edits done <-"
+
+log "-> install rclone || start <-"
+    apk add unzip bash curl --quiet
+    wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
+    unzip -q rclone.zip && rm rclone.zip && \
+    mv rclone*/rclone /usr/bin && rm -r rclone*
+log "-> install rclone || done <-
