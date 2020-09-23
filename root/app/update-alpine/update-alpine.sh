@@ -3,12 +3,15 @@
 function log() {
 echo "[UPDATE] ${1}"
 }
-## function source start
+# function source start
 log "-> update rclone || start <-"
-apk add unzip bash curl --quiet
-wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
-unzip -q rclone.zip && rm rclone.zip && \
-mv rclone*/rclone /usr/bin && rm -r rclone*
+    apk add unzip bash curl --quiet
+    wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
+    unzip -q rclone.zip && rm rclone.zip && \
+    mv rclone*/rclone /usr/bin && rm -r rclone*
+if [[ $(command -v rclone | wc -l) == "1" ]]; then
+    chown -cf abc:abc /root/
+fi
 log "-> update rclone || done <-"
 
 log "-> update packages || start <-"
