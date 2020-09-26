@@ -96,11 +96,15 @@ while true; do
                     fi
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls /config/pid/ | egrep trans | wc -l )
-                    UPLOADSPEED=$(vnstat -i eth0 -tr 8 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                    USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    test1=$(vnstat -i eth0 -tr 2 | awk '$1 == "tx" {print $3}')
+                    if [ ${test1} != "MB/s" ]; then
+                       UPLOADSPEED=1
+                    else
+                       UPLOADSPEED=$(vnstat -i eth0 -tr 2 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    fi
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
-                    if [[ -e "${i}" &&  ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                    
+                    if [[ -e "${i}" && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 15 ]]; then                    
                        log "attacke .....  ${i} will uploaded" 
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
@@ -139,8 +143,8 @@ while true; do
                         # Record GDSA transfered in case of crash/reboot
                         echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
                     else
-                       if [  ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
-                          log "( ︶︿︶) buhhhhh...... ${UPLOADSPEED} is greater then ${BWLIMITSET}"
+                       if [ ${TRANSFERS} -gt 4 ]; then
+                          log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
                           log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
                        fi
                        sleep 5
