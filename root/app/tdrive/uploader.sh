@@ -102,14 +102,14 @@ while true; do
                     else
                        UPLOADSPEED=$(vnstat -i eth0 -tr 2 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     fi
-                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})-${TRANSFERS}) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
-                    if [[ -e "${i}" && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 15 ]]; then                    
+                    if [[ -e "${i}" && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 10 ]]; then                    
                        log "attacke .....  ${i} will uploaded" 
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
-                       if [ ${UPLOADFILE} -gt 36 ]; then
-                           UPLOADFILE=35
+                       if [ ${UPLOADFILE} -gt 30 ]; then
+                           UPLOADFILE=28
                        else
                            UPLOADFILE=${UPLOADFILE}
                        fi
@@ -145,7 +145,10 @@ while true; do
                     else
                        if [ ${TRANSFERS} -gt 4 ]; then
                           log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
+                       elif [ ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
                           log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
+                       else
+                          log "uhhhii ... damm some is wrong"
                        fi
                        sleep 5
                        break
