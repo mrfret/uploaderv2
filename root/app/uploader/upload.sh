@@ -39,13 +39,6 @@ if [ ${BWLIMITSET} == 'null' ]; then
 else
    BWLIMITSET=${BWLIMITSET}
 fi
-GCE=${GCE:-false}
-if [ ${GCE} == "false" ]; then
-   gcheck=$(dnsdomainname | tail -c 10)
-   if [ "$gcheck" == ".internal" ]; then
-      GCE=true
-   fi
-fi
 # TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 LOGHOLDUI=${LOGHOLDUI}
@@ -64,8 +57,6 @@ LOGFILE="/config/logs/${FILEBASE}.log"
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
     BWLIMITSPEED="$(cat ${PLEX_JSON})"
     BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
-elif [ ${GCE} == "true" ]; then
-    BWLIMIT=""
 else
     BWLIMIT=""
     BWLIMITSPEED="no LIMIT was set"
