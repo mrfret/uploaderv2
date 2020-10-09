@@ -57,7 +57,7 @@ else
 fi
 CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
 if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
-    mapfile -t files < <(eval find ${downloadpath} -type f -printf '%T+ %p\n' | sort | cat | awk '{print $2}' )
+    mapfile -t files < <(eval find ${downloadpath} -type f -printf '%T+ %p\n' | sort | cat | awk '{print $2}')
      for i in "${files[@]}"; do
         if [ "$CAPACITY" -le "${CAPACITY_LIMIT}" ]; then
            echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
@@ -72,10 +72,11 @@ fi
 cleaning() {
  while true; do
     cleanup
-    sleep 1
+    sleep 10
     empty_folder
-    sleep 1
+    sleep 10
     cleannzb
+    sleep 10
  done
 }
 # keeps the function in a loop
