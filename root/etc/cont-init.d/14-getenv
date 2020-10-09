@@ -16,14 +16,6 @@ if [ "${BWLIMITSET}" == 'null' ]; then
 else
    BWLIMITSET=${BWLIMITSET}
 fi
-GCE=${GCE:-false}
-if [[ "${GCE}" == "false" ]]; then
-gcheck=$(dnsdomainname | tail -c 10)
- if [ "$gcheck" == ".internal" ]; then
-    GCE=true
- fi
-fi
-
 function envs() {
 echo "
    DOCKER ENV vars
@@ -31,8 +23,6 @@ echo "
    BWLIMITSET                  ${BWLIMITSET}
    CHUNK                       ${CHUNK}
    TimeZone                    ${TZ}
-
-   GCE                         ${GCE}
    PLEX                        ${PLEX}
    DISCORD_EMBED_TITEL         ${DISCORD_EMBED_TITEL}
    DISCORD_NAME_OVERRIDE       ${DISCORD_NAME_OVERRIDE}
