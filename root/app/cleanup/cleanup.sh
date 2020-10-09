@@ -10,10 +10,11 @@ TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
 FIND_BASE='-type f'
 FIND_SIZE='-size -100M'
+FIND_MINAGE='-cmin +5'
 FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
 FIND_ACTION2='-regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf {} + > /dev/null 2>&1'
-command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION1}"
-command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_ACTION2}"
+command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION1}"
+command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION2}"
 eval "${command1}"
 eval "${command2}"
 }
@@ -25,6 +26,7 @@ FIND=$(which find)
 FIND_BASE='-type d'
 FIND_EMPTY='-empty'
 FIND_MINDEPTH='-mindepth 2'
+FIND_MINAGE='-cmin +5'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
 FIND_ADD_NAME='-o -path'
 WANTED_FOLDERS=(
@@ -43,7 +45,7 @@ for ((i = 1; i < ${#WANTED_FOLDERS[@]}; i++))
 do
   condition="${condition} ${FIND_ADD_NAME} '${WANTED_FOLDERS[i]}'"
 done
-command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_EMPTY} ${FIND_ACTION}"
+command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_BASE} \( ${condition} \) ${FIND_MINAGE} ${FIND_EMPTY} ${FIND_ACTION}"
 eval "${command}"
 }
 
@@ -57,7 +59,7 @@ else
 fi
 CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
 if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
-    mapfile -t files < <(eval find ${downloadpath} -type f -printf '%T+ %p\n' | sort | cat | awk '{print $2}' )
+    mapfile -t files < <(eval find ${downloadpath} -type f -printf '%T+ %p\n' | sort | cat | awk '{print $2}')
      for i in "${files[@]}"; do
         if [ "$CAPACITY" -le "${CAPACITY_LIMIT}" ]; then
            echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
@@ -72,10 +74,11 @@ fi
 cleaning() {
  while true; do
     cleanup
-    sleep 1
+    sleep 10
     empty_folder
-    sleep 1
+    sleep 10
     cleannzb
+    sleep 10
  done
 }
 # keeps the function in a loop
