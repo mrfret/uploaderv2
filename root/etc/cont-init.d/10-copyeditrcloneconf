@@ -29,4 +29,4 @@ log "-> install rclone || start <-"
     wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
     unzip -q rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -r rclone*
-log "-> install rclone || done <-
+log "-> install rclone || done <-"
