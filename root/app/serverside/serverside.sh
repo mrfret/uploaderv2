@@ -78,8 +78,8 @@ else
 fi
 #####
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
-   if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
-      REMOTEDRIVE=tdrive
+   if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
+      REMOTEDRIVE=gdrive
    else
       sleep 60
       exit 0
@@ -89,8 +89,8 @@ else
 fi
 #####
 if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
-   if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
-      SERVERSIDEDRIVE=gdrive
+   if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
+      SERVERSIDEDRIVE=tdrive
    else
       sleep 60
       exit 0
