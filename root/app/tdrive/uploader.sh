@@ -148,7 +148,7 @@ while true; do
                        elif [ ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
                           log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
                        else
-                          log "uhhhii.... Active ${TRANSFERS} are running, ${UPLOADSPEED} Mb Upload Bandwith is used "
+                          log "uhhhii.... Active ${TRANSFERS} Transfers are running with ${UPLOADSPEED} Mb Upload Bandwith "
                        fi
                        sleep 5
                        break

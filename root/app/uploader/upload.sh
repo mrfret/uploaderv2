@@ -19,32 +19,15 @@ JSONFILE="/config/json/${FILEBASE}.json"
 DISCORD="/config/discord/${FILEBASE}.discord"
 RCLONEDOCKER="/config/rclone/rclone-docker.conf"
 PID="/config/pid"
-PLEX=${PLEX:-false}
-test_2=$(ls /config | grep -c xml)
-test_1=$(ls /app | grep -c xml)
-if [ ${PLEX} == "false" ]; then
-   if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
-      PLEX=true
-   fi
-fi
+PLEX=${PLEX}
 BWLIMITSET=${BWLIMITSET}
-test_2=$(ls /config | grep -c xml)
-test_1=$(ls /app | grep -c xml)
-if [ ${BWLIMITSET} == 'null' ]; then
-   if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
-      BWLIMITSET=80
-   else
-      BWLIMITSET=100
-   fi
-else
-   BWLIMITSET=${BWLIMITSET}
-fi
-# TITEL=${DISCORD_EMBED_TITEL}
+TITEL=${DISCORD_EMBED_TITEL}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 LOGHOLDUI=${LOGHOLDUI}
 TRANSFERS=$(ls /config/pid/ | wc -l)
 CHECKERS="$((${TRANSFERS}*2))"
-PLEX_JSON="/config/json/${FILEBASE}.bwlimit"
+BWJSON="/config/json/${FILEBASE}.bwlimit"
+
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 echo "lock" >"${DISCORD}"
@@ -55,8 +38,8 @@ log "[Upload] Uploading ${FILE} to ${REMOTE}"
 LOGFILE="/config/logs/${FILEBASE}.log"
 ##bwlimitpart
 if [[ ${PLEX} == "true" || ${BWLIMITSET} != "null" ]]; then
-    BWLIMITSPEED="$(cat ${PLEX_JSON})"
-    BWLIMIT="--bwlimit=${BWLIMITSPEED}M"
+    BWLIMITSPEED="$(cat ${BWJSON})"
+    BWLIMIT="--bwlimit-file=${BWLIMITSPEED}M"
 else
     BWLIMIT=""
     BWLIMITSPEED="no LIMIT was set"
@@ -94,20 +77,18 @@ fi
 #remove file lock
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    rm -rf "${FILE}.lck" \
-         "${PLEX_JSON}" \
-         "${PLEX_STREAMS}" \
-         "${LOGFILE}" \
-         "${PID}/${FILEBASE}.trans" \
-         "${DISCORD}" \
-         "${JSONFILE}"    
+          "${PLEX_JSON}" \
+          "${LOGFILE}" \
+          "${PID}/${FILEBASE}.trans" \
+          "${DISCORD}" \
+          "${JSONFILE}"    
 else
    rm -rf "${FILE}.lck" \
-         "${PLEX_JSON}" \
-         "${PLEX_STREAMS}" \
-         "${LOGFILE}" \
-         "${PID}/${FILEBASE}.trans" \
-         "${DISCORD}"
+          "${PLEX_JSON}" \
+          "${LOGFILE}" \
+          "${PID}/${FILEBASE}.trans" \
+          "${DISCORD}"
    sleep "${LOGHOLDUI}"
    rm -rf "${JSONFILE}"
 fi
-##EOF
+#<EoF>#

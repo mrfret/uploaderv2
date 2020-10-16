@@ -78,8 +78,8 @@ else
 fi
 #####
 if [[ "${REMOTEDRIVE}" == "null" ]]; then
-   if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
-      REMOTEDRIVE=tdrive
+   if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
+      REMOTEDRIVE=gdrive
    else
       sleep 60
       exit 0
@@ -89,8 +89,8 @@ else
 fi
 #####
 if [[ "${SERVERSIDEDRIVE}" == "null" ]]; then
-   if grep -q "\[gdrive\]" ${RCLONEDOCKER} ; then
-      SERVERSIDEDRIVE=gdrive
+   if grep -q "\[tdrive\]" ${RCLONEDOCKER} ; then
+      SERVERSIDEDRIVE=tdrive
    else
       sleep 60
       exit 0
@@ -124,6 +124,10 @@ while true; do
    rclone moveto --checkers 4 --transfers 2 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
                  --log-file="${LOGFILE}" --use-server-modtime --log-level INFO --stats 10s --no-traverse ${SERVERSIDEAGE} \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
+   rclone dedupe skip ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" --drive-use-trash=false --no-traverse --transfers=50
+   rclone rmdirs ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" --drive-use-trash=false --fast-list --transfers=50
+   rclone delete ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" --fast-list --drive-trashed-only --drive-use-trash=false --transfers=50
+   rclone cleanup ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent"
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
       TITEL="Server-Side Move"
@@ -131,7 +135,7 @@ while true; do
       DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
       TIME="$((count=${ENDTIME}-${STARTTIME}))"
       duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-	  MOVEDFILES=$(cat ${LOGFILE} | grep "Renamed" | tail -n 1 | awk '{print $2}')
+      MOVEDFILES=$(cat ${LOGFILE} | grep "Renamed" | tail -n 1 | awk '{print $2}')
       # shellcheck disable=SC2006 
       echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nMoved Files : ${MOVEDFILES} \nTime : ${duration}" >"${DISCORD}"
       msg_content=$(cat "${DISCORD}")
@@ -147,3 +151,4 @@ while true; do
      sleep $(($(date -f - +%s- <<< $'tomorrow 00:30\nnow')0))
    fi
 done
+#<EOF>#

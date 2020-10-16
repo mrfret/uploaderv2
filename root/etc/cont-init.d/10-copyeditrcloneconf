@@ -30,3 +30,4 @@ log "-> install rclone || start <-"
     unzip -q rclone.zip && rm rclone.zip && \
     mv rclone*/rclone /usr/bin && rm -r rclone*
 log "-> install rclone || done <-"
+#<EOF>#
