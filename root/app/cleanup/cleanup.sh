@@ -8,15 +8,21 @@ function cleannzb() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
-FIND_BASE='-type f'
+FIND_BASE1='-type f'
+FIND_BASE2='-type d'
 FIND_SIZE='-size -100M'
 FIND_MINAGE='-cmin +5'
 FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 FIND_ACTION2='-regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
-command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION1}"
-command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION2}"
+FIND_ACTION3='-name "**_FAILED_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
+
+command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION1}"
+command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION2}"
+command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION3}"
+
 eval "${command1}"
 eval "${command2}"
+eval "${command3}"
 }
 
 function empty_folder() {
