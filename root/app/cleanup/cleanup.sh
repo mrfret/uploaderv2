@@ -11,7 +11,7 @@ FIND=$(which find)
 FIND_BASE='-type f'
 FIND_SIZE='-size -100M'
 FIND_MINAGE='-cmin +5'
-FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf \{\} \;'
+FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 FIND_ACTION2='-regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf \{\} \;'
 command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION1}"
 command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION2}"
@@ -27,7 +27,7 @@ FIND_BASE='-type d'
 FIND_EMPTY='-empty'
 FIND_MINDEPTH='-mindepth 2'
 FIND_MINAGE='-cmin +5'
-FIND_ACTION='-delete 1>/dev/null 2>&1'
+FIND_ACTION='-delete >>/dev/null 2>&1'
 FIND_ADD_NAME='-o -path'
 WANTED_FOLDERS=(
     '**torrent/**'
@@ -64,7 +64,7 @@ if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
         if [ "$CAPACITY" -le "${CAPACITY_LIMIT}" ]; then
            echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
         else
-           rm -rf "$i"
+           rm -rf "$i" >>/dev/null 2>&1
            continue
         fi
     done
