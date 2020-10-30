@@ -104,16 +104,16 @@ while true; do
                     fi
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
-                    if [[ ! ${UPLOADSPEED} -ge ${BWLIMITSET} && ! ${TRANSFERS} -ge 4 && ! ${UPLOADFILE} -ge 10 ]]; then
+                    if [[ ! ${UPLOADSPEED} -ge ${BWLIMITSET} && ! ${TRANSFERS} -ge 4 && ! ${UPLOADFILE} -le 10 ]]; then
                        if [ -e "${i}" ]; then                    
                           log "attacke .....  ${i} will uploaded" 
                           log "Upload Bandwith is calculated for ${i}"
                           log "Starting upload of ${i}"
-                          #if [ ${UPLOADFILE} -gt 50 ]; then
-                              #UPLOADFILE=40
-                          #else
-                              #UPLOADFILE=${UPLOADFILE}
-                          #fi
+                          if [ ${UPLOADFILE} -ge 60 ]; then
+                              UPLOADFILE=40
+                          else
+                              UPLOADFILE=${UPLOADFILE}
+                          fi
                           FILEBASE=$(basename "${i}")
                           echo ${UPLOADFILE} >> /config/json/${FILEBASE}.bwlimit
                           GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
