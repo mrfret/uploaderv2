@@ -99,7 +99,8 @@ while true; do
                     UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     # shellcheck disable=SC2086
                     # shellcheck disable=SC2086
-                    if [[ -e "${i}" && ${UPLOADSPEED} -le ${BWLIMITSET} && ${UPLOADFILE} -gt 15 ]]; then                  
+                    if [[ ! ${UPLOADSPEED} -ge ${BWLIMITSET} && ! ${TRANSFERS} -ge 4 ]]; then
+                    if [[ -e "${i}" ]]; then                  
                        log "attacke .....  ${i} will uploaded"                      
                        log "Upload Bandwith is calculated for ${i}"
                        log "Starting upload of ${i}"
@@ -134,27 +135,32 @@ while true; do
                        # Record GDSA transfered in case of crash/reboot
                        echo "gdrive" >/config/vars/lastGDSA
                        echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                    else 
-                       if [ ${TRANSFERS} -gt 4 ]; then
-                          log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
-                       elif [ ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
-                          log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
-                       else
-                          log "uhhhii.... Active ${TRANSFERS} are running, ${UPLOADSPEED} Mb Upload Bandwith is used"
+                          else
+                              log "File ${i} seems to have dissapeared"
+                          fi
+                      else
+                         if [ ${TRANSFERS} -gt 4 ]; then
+                            log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
+                            break
+                         elif [ ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
+                            log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
+                            break
+                         else
+                            log "uhhhii.... Active ${TRANSFERS} Transfers are running with ${UPLOADSPEED} Mb Upload Bandwith "
+                         fi
+                         sleep 5
                        fi
-                       sleep 5
-                     fi
-                else
-                    log "File not found: ${i}"
-                    continue
-                fi
+                  else
+                      log "File not found: ${i}"
+                      continue
+                  fi
             fi
             log "Sleeping 5s before looking at next file"
-            sleep 5
+            sleep 10
         done
         log "Finished looking for files, sleeping 5 secs"
     else
-        log "Nothing to upload, sleeping 5 secs"
+      log "Nothing to upload, sleeping 5 secs"
     fi
-    sleep 5
+    sleep 10
 done
