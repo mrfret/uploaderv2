@@ -105,46 +105,43 @@ while true; do
                         UPLOADSPEED=$(vnstat -i eth0 -tr 5 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     fi
                      if [[ ! ${TRANSFERS} -ge 4 && ! ${UPLOADSPEED} -ge ${BWLIMITSET} ]]; then
-                        if [ -e "${i}" ]; then
-                            log "Starting upload of ${i}"
-                            # Append filesize to GDSAAMOUNT
-                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
-                            # Set gdsa as crypt or not
-                            if [ ${ENCRYPTED} == "true" ]; then
-                                GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
-                            else
-                                GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
-                            fi
-                            # Run upload script demonised
-                            #UPLOADSPEED=$(vnstat -i eth0 -tr 5 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                            UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                            #FILEBASE=$(basename "${i}")
-                            echo ${UPLOADFILE} >> /config/json/$(basename "${i}").bwlimit
-                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                            PID=$!
-                            FILEBASE=$(basename "${i}")
-                            # Add transfer to pid directory
-                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-                            # Increase or reset $GDSAUSE?
-                            # shellcheck disable=SC2086
-                            if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                                log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
-                                if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
-                                    GDSAUSE=0
-                                    GDSAAMOUNT=0
-                                else
-                                    GDSAUSE=$(("${GDSAUSE}" + 1))
-                                    GDSAAMOUNT=0
-                                fi
-                                # Record next GDSA in case of crash/reboot
-                                echo "${GDSAUSE}" >/config/vars/lastGDSA
-                            fi
-                            log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                            # Record GDSA transfered in case of crash/reboot
-                            echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
+                        log "Starting upload of ${i}"
+                        # Append filesize to GDSAAMOUNT
+                        FILESIZE2=$(stat -c %s "${i}")
+                        GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
+                        # Set gdsa as crypt or not
+                        if [ ${ENCRYPTED} == "true" ]; then
+                            GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
                         else
-                            log "File ${i} seems to have dissapeared"
+                            GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                         fi
+                        # Run upload script demonised
+                        #UPLOADSPEED=$(vnstat -i eth0 -tr 5 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                        UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                        #FILEBASE=$(basename "${i}")
+                        echo ${UPLOADFILE} >> /config/json/$(basename "${i}").bwlimit
+                        /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                        PID=$!
+                        FILEBASE=$(basename "${i}")
+                        # Add transfer to pid directory
+                        echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                        # Increase or reset $GDSAUSE?
+                        # shellcheck disable=SC2086
+                        if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
+                           log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
+                           if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
+                              GDSAUSE=0
+                              GDSAAMOUNT=0
+                            else
+                               GDSAUSE=$(("${GDSAUSE}" + 1))
+                               GDSAAMOUNT=0
+                            fi
+                            # Record next GDSA in case of crash/reboot
+                            echo "${GDSAUSE}" >/config/vars/lastGDSA
+                         fi
+                         log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
+                         # Record GDSA transfered in case of crash/reboot
+                         echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
                     else
                         log "Already ${TRANSFERS} transfers running with ${UPLOADSPEED}MB waiting for next loop"
                         break
