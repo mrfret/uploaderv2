@@ -78,6 +78,7 @@ fi
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    rm -rf "${FILE}.lck" \
           "${PLEX_JSON}" \
+          "${BWJSON}" \
           "${LOGFILE}" \
           "${PID}/${FILEBASE}.trans" \
           "${DISCORD}" \
@@ -86,6 +87,7 @@ else
    rm -rf "${FILE}.lck" \
           "${PLEX_JSON}" \
           "${LOGFILE}" \
+          "${BWJSON}" \
           "${PID}/${FILEBASE}.trans" \
           "${DISCORD}"
    sleep "${LOGHOLDUI}"
