@@ -150,6 +150,7 @@ while true; do
                             break
                        else
                             log "uhhhii.... Active ${TRANSFERS} Transfers are running with ${UPLOADSPEED} Mb Upload Bandwith "
+                            break
                        fi
                        sleep 5
                   fi 
