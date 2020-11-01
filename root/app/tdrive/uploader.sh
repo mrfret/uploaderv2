@@ -58,7 +58,7 @@ fi
 if [ ${BWLIMITSET} == 'null' ]; then
    BWLIMITSET=80
 else
-   BWLIMITSET=${BWLIMITSET
+   BWLIMITSET=${BWLIMITSET}
 fi
 # Run Loop
 while true; do
