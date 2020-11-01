@@ -16,8 +16,8 @@ cleanup_start
 bc_start_up_test
 
 downloadpath=/move
+path=/config/keys/
 MOVE_BASE=${MOVE_BASE:-/}
-
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
