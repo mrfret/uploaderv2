@@ -116,8 +116,9 @@ while true; do
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
                             # Run upload script demonised
+                            #UPLOADSPEED=$(vnstat -i eth0 -tr 5 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                             UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                            echo ${UPLOADFILE} >> /config/json/${FILEBASE}.bwlimit                
+                            echo ${UPLOADFILE} > "/config/json/${i}.bwlimit"
                             /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
