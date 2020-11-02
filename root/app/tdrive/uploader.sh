@@ -93,7 +93,9 @@ while true; do
                     else
                         UPLOADSPEED=$(vnstat -i eth0 -tr 3 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
                     fi
-                    if [[ ! ${TRANSFERS} -ge 4 && ! ${UPLOADSPEED} -ge ${BWLIMITSET} ]]; then
+                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    MINUPLOADSPEED=$(10)
+                    if [[ ! ${TRANSFERS} -ge 4 && ! ${UPLOADSPEED} -ge ${BWLIMITSET} && ! {UPLOADFILE} -ge ${MINUPLOADSPEED} ]]; then
                         if [ -e "${i}" ]; then
                             log "Starting upload of ${i}"
                             # Append filesize to GDSAAMOUNT
