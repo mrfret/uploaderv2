@@ -21,7 +21,7 @@ MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
-    if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone-docker.conf; then
+    if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone/rclone-docker.conf; then
           ENCRYPTED=true
     fi
 fi
