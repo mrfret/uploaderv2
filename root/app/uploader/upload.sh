@@ -30,7 +30,7 @@ chmod 777 "${LOGFILE}"
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 6 --checkers=20 \
-    --config /config/rclone-docker.conf \
+    --config /config/rclone/rclone-docker.conf \
     --log-file="${LOGFILE}" --log-level INFO --stats 2s \
     --drive-chunk-size=32M \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
