@@ -1,22 +1,20 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2020, MrDoob
+
+# Copyright (c) 2020 MrDoob
 # All rights reserved.
-## function source
+
+# Logging Function
 function log() {
     echo "[Uploader] ${1}"
 }
-
-source /app/functions/functions.sh
 #Make sure all the folders we need are created
-base_folder_tdrive
-discord_start_send_tdrive
-remove_old_files_start_up
-cleanup_start
-bc_start_up_test
-
-downloadpath=/move
 path=/config/keys/
+mkdir -p /config/pid/
+mkdir -p /config/json/
+mkdir -p /config/logs/
+mkdir -p /config/vars/
+downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
@@ -25,12 +23,23 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
           ENCRYPTED=true
     fi
 fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '**.inProgress/**'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**' ! -path '**-vpn/**' ! -path '**_UNPACK_**'"
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
+    ADDITIONAL_IGNORES=""
 fi
+#Header
+log "Uploader  Started"
+log "Started for the First Time - Cleaning up if from reboot"
+# Remove left over webui and transfer files
+rm -f /config/pid/*
+rm -f /config/json/*
+rm -f /config/logs/*
+# delete any lock files for files that failed to upload
+find ${downloadpath} -type f -name '*.lck' -delete
+log "Cleaned up - Sleeping 10 secs"
+sleep 10
 #### Generates the GDSA List from the Processed Keys
 # shellcheck disable=SC2003
 # shellcheck disable=SC2006
@@ -41,11 +50,19 @@ fi
 GDSAARRAY=(`ls -la ${path} | awk '{print $9}' | egrep '(PG|GD|GS)'`)
 # shellcheck disable=SC2003
 GDSACOUNT=$(expr ${#GDSAARRAY[@]} - 1)
+
 # Check to see if we have any keys
 # shellcheck disable=SC2086
 if [ ${GDSACOUNT} -lt 1 ]; then
     log "No accounts found to upload with, Exit"
     exit 1
+fi
+# Check if BC is installed
+if [ "$(echo "10 + 10" | bc)" == "20" ]; then
+    log "BC Found! All good :)"
+else
+    log "BC Not installed, Exit"
+    exit 2
 fi
 # Grabs vars from files
 if [ -e /config/vars/lastGDSA ]; then
@@ -54,11 +71,6 @@ if [ -e /config/vars/lastGDSA ]; then
 else
     GDSAUSE=0
     GDSAAMOUNT=0
-fi
-if [ ${BWLIMITSET} == 'null' ]; then
-   BWLIMITSET=80
-else
-   BWLIMITSET=${BWLIMITSET}
 fi
 # Run Loop
 while true; do
@@ -80,36 +92,26 @@ while true; do
                     FILESIZE1=$(stat -c %s "${i}")
                     sleep 3
                     FILESIZE2=$(stat -c %s "${i}")
-                    if [[ "$FILESIZE1" -ne "$FILESIZE2" ]]; then
+                    if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
                         log "File is still getting bigger ${i}"
                         continue
                     fi
+                    # Check if we have any upload slots available
                     # shellcheck disable=SC2010
                     TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    test1=$(vnstat -i eth0 -tr 2 | awk '$1 == "tx" {print $3}')
-                    if [ ${test1} != "MB/s" ]; then
-                        UPLOADSPEED=1
-                    else
-                        UPLOADSPEED=$(vnstat -i eth0 -tr 3 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                    fi
-                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                    MINUPLOADSPEED=10
-                    if [[ ! ${TRANSFERS} -ge 4 && ! ${UPLOADSPEED} -ge ${BWLIMITSET} && ! {UPLOADFILE} -ge ${MINUPLOADSPEED} ]]; then
+                    if [ ! ${TRANSFERS} -ge 4 ]; then
                         if [ -e "${i}" ]; then
                             log "Starting upload of ${i}"
                             # Append filesize to GDSAAMOUNT
-                            #GDSAAMOUNT=$(echo "${GDSAAMOUNT} + $(stat -c %s "${i}")" | bc)
-                            GDSAAMOUNT=$(echo $(( ${GDSAAMOUNT} + ${FILESIZE2} | bc )))
+                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
                             # Set gdsa as crypt or not
-                            if [[ ${ENCRYPTED} == "true" ]]; then
+                            if [ ${ENCRYPTED} == "true" ]; then
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
                             else
                                 GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
                             fi
-                            UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                            FILEUPLOAD=$(basename "${i}")
-                            echo ${UPLOADFILE} >> /config/json/${FILEUPLOAD}.bwlimit
+                            # Run upload script demonised
                             /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
                             PID=$!
                             FILEBASE=$(basename "${i}")
@@ -117,7 +119,7 @@ while true; do
                             echo "${PID}" > "/config/pid/${FILEBASE}.trans"
                             # Increase or reset $GDSAUSE?
                             # shellcheck disable=SC2086
-                            if [[ ${GDSAAMOUNT} -gt "783831531520" ]]; then
+                            if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
                                 log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
                                 if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
                                     GDSAUSE=0
@@ -136,7 +138,7 @@ while true; do
                             log "File ${i} seems to have dissapeared"
                         fi
                     else
-                        log "Already ${TRANSFERS} transfers running with used ${UPLOADSPEED}MB, waiting for next loop"
+                        log "Already 4 transfers running, waiting for next loop"
                         break
                     fi
                 else
