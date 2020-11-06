@@ -7,6 +7,7 @@
 function log() {
     echo "[Uploader] ${1}"
 }
+source /config/env/uploader.env
 downloadpath=/move
 IFS=$'\n'
 FILE=$1
