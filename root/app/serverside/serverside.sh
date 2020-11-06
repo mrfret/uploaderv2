@@ -115,13 +115,13 @@ while true; do
    STARTTIME=$(date +%s)
    touch "${LOGFILE}"
    log "Starting Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE}"
-   rclone moveto --checkers 4 --transfers 2 --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" \
+   rclone moveto --checkers 4 --transfers 2 --config=${RCLONEDOCKER} --user-agent=${UAGENT} \
                  --log-file="${LOGFILE}" --use-server-modtime --log-level INFO --stats 10s --no-traverse ${SERVERSIDEAGE} \
                  --exclude="**backup**"--exclude="**plexguide/**" \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
    ENDTIME=$(date +%s)
    if [ ${DISCORD_WEBHOOK_URL_SERVERSIDE} != 'null' ]; then
-      TITEL="Server-Side Move"
+      DISCORD_EMBED_TITEL_SERVERSIDE=${DISCORD_EMBED_TITEL_SERVERSIDE}
       DISCORD_ICON_OVERRIDE_SERVERSIDE=${DISCORD_ICON_OVERRIDE_SERVERSIDE}              
       DISCORD_NAME_OVERRIDE_SERVERSIDE=${DISCORD_NAME_OVERRIDE_SERVERSIDE}
       TIME="$((count=${ENDTIME}-${STARTTIME}))"
@@ -130,7 +130,7 @@ while true; do
       # shellcheck disable=SC2006 
       echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nMoved Files : ${MOVEDFILES} \nTime : ${duration}" >"${DISCORD}"
       msg_content=$(cat "${DISCORD}")
-      curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE_SERVERSIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE_SERVERSIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL_SERVERSIDE
+      curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE_SERVERSIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE_SERVERSIDE}\", \"embeds\": [{ \"title\": \"${DISCORD_EMBED_TITEL_SERVERSIDE}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL_SERVERSIDE
       rm -rf "${DISCORD}"
       rm -rf "${lock}"
    else
