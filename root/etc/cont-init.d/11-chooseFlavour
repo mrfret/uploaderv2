@@ -14,22 +14,14 @@ command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_FILE_ACTION} ${FIND_FI
 eval ${command}
 
 if grep -q GDSA01 /config/rclone/rclone-docker.conf && grep -q GDSA02 /config/rclone/rclone-docker.conf; then
-    touch /etc/services.d/uploader-gdrive/down
+    echo "-->> -------------------- <<--"
+    echo "-->    TDRIVE UPLOADER    <<--"
+    echo "-->       WILL USED       <<--"
+    echo "-->> -------------------- <<--"
 else
-    touch /etc/services.d/uploader-tdrive/down
+    echo "-->> ---------------------------------------- <<--"
+    echo "-->  I DONT SUPPORT GDRIVE UPLOADER ANYMORE   <<--"
+    echo "-->> ---------------------------------------- <<--"
+    exit 0
 fi
-
-CLEANUPDOWN=${CLEANUPDOWN}
-
-if [ "${CLEANUPDOWN}" == 'down' ] || [ "${CLEANUPDOWN}" == 'false' ]; then
-   touch /etc/services.d/cleaning/down
-   echo " [ USER WISH ACTION ] "
-   echo "   Shutdown Cleaning  "
-   echo " [ USER WISH ACTION ] "
-   sleep 10
-else 
-   echo " [ USER WISH ACTION ] "
-   echo "   Starting Cleaning  "
-   echo " [ USER WISH ACTION ] "
-   sleep 5
-fi
+#<EOF>#

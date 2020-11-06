@@ -98,9 +98,10 @@ while true; do
                     fi
                     # Check if we have any upload slots available
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
+                    TRANSFERS=${TRANSFERS}
+                    ACTIVETRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [ ! ${TRANSFERS} -ge 4 ]; then
+                    if [ ! ${ACTIVRTRANSFERS} -ge ${TRANSFERS} ]; then
                         if [ -e "${i}" ]; then
                             log "Starting upload of ${i}"
                             # Append filesize to GDSAAMOUNT
@@ -138,7 +139,7 @@ while true; do
                             log "File ${i} seems to have dissapeared"
                         fi
                     else
-                        log "Already 4 transfers running, waiting for next loop"
+                        log "Already ${ACTIVRTRANSFERS} transfers running, waiting for next loop"
                         break
                     fi
                 else
