@@ -8,6 +8,7 @@
 function log() {
     echo "[Uploader] ${1}"
 }
+source /config/env/uploader.env
 #Make sure all the folders we need are created
 path=/config/keys/
 mkdir -p /config/pid/
