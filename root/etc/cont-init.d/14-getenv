@@ -2,38 +2,56 @@
 # shellcheck shell=bash
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
-PLEX=${PLEX:-false}
-test_2=$(ls -la /config  | grep -c xml)
-test_1=$(ls -la /app  | grep -c xml)
-if [ ${PLEX} == "false" ]; then
-  if [[ ${test_1} == "1"  || ${test_2} == "1" ]]; then
-    PLEX=true
-  fi
-fi
-BWLIMITSET=${BWLIMITSET}
-if [ "${BWLIMITSET}" == 'null' ]; then
-    BWLIMITSET=100
+## function source end
+UAGENT=${UAGENT:-null}
+if [[ ${UAGENT} == 'null' ]];then
+   UAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+   USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 else
-   BWLIMITSET=${BWLIMITSET}
+   UAGENT=${UAGENT}
+   USERAGENT=${USERAGENT}
 fi
-function envs() {
-echo "
-   DOCKER ENV vars
--------------------------------------------------------
-   BWLIMITSET                  ${BWLIMITSET}
-   CHUNK                       ${CHUNK}
-   TimeZone                    ${TZ}
-   PLEX                        ${PLEX}
-   DISCORD_EMBED_TITEL         ${DISCORD_EMBED_TITEL}
-   DISCORD_NAME_OVERRIDE       ${DISCORD_NAME_OVERRIDE}
--------------------------------------------------------
-"
-}
-DEBUG=${DEBUG:-false}
-if [ "${DEBUG}" == 'false' ]; then
- envs
- sleep 5
+
+uploaderenv=/config/env/uploader.env
+if [[ ! -f "${uploaderenv}" ]]; then
+echo -e "BANDWITHLIMIT=${BWLIMITSET:-null}
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES:-null}
+ACTIVETRANSFERS=${TRANSFERS:-4}
+USERAGENT=${USERAGENT}
+TZ=${TZ:-Europe/Berlin}
+CLEANUPDOWN=${CLEANUPDOWN:-null}
+CAPACITY_LIMIT=${CAPACITY_LIMIT:-null}
+TVDRIVE=${TVDRIVE:-null}
+LOGHOLDUI=${LOGHOLDUI:=5m}
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-null}
+DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-UPLOADED_COMPLETE}
+DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-UPLOADED}" >> /config/env/serverside.env " >> /config/env/uploader.env
 else
- envs
- sleep 60
+  echo "-->> -------------------- <<--"
+  echo "     --> used stored <--  <<--"
+  echo "          env files       <<--"
+  echo "-->> -------------------- <<--"
 fi
+
+serversideenv=/config/env/serverside.env
+if [[ ! -f "${serverside}" ]]; then
+echo -e "SERVERSIDE=${SERVERSIDE:-false}
+SERVERSIDEDAY=${SERVERSIDEDAY:-Sunday}
+SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
+SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
+REMOTEDRIVE=${REMOTEDRIVE:-null}
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-null}
+DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Server-Side Move}
+DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-Server-Side}" >> /config/env/serverside.env 
+else
+  echo "-->> -------------------- <<--"
+  echo "     --> used stored <--  <<--"
+  echo "       serverside.env     <<--"
+  echo "-->> -------------------- <<--"
+fi
+
+while read -r line; do declare -x "$line"; done < <(egrep -v "(^#|^\s|^$)" /config/env/serverside.env)
+while read -r line; do declare -x "$line"; done < <(egrep -v "(^#|^\s|^$)" /config/env/uploader.env)
+#<EOF>#
