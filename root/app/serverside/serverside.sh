@@ -8,6 +8,7 @@
 function log() {
    echo "[Server Side] ${1}"
 }
+source /config/env/serverside.env
 source /app/functions/functions.sh
 ###execute part 
 SVLOG="serverside"
