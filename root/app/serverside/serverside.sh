@@ -17,13 +17,7 @@ if [[ -f ${LOGFILE} ]]; then
    truncate -s 0 ${LOGFILE}
 fi
 DISCORD="/config/discord/${SVLOG}.discord"
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
-SERVERSIDE=${SERVERSIDE}
-REMOTEDRIVE=${REMOTEDRIVE:-null}
-SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDECHECK=$(cat ${RCLONEDOCKER} | awk '$1 == "server_side_across_configs" {print $3}' | wc -l)
-downcommand=/etc/services.d/serverside/down
 LOCK=/config/json/serverside.lck
 #####
 if [ -e ${LOCK} ]; then
@@ -125,22 +119,18 @@ while true; do
                  --log-file="${LOGFILE}" --use-server-modtime --log-level INFO --stats 10s --no-traverse ${SERVERSIDEAGE} \
                  --exclude="**backup**"--exclude="**plexguide/**" \
                  "${REMOTEDRIVE}:" "${SERVERSIDEDRIVE}:"
-   rclone dedupe skip ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" --drive-use-trash=false --no-traverse --transfers=50
-   rclone rmdirs ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" --drive-use-trash=false --fast-list --transfers=50
-   rclone delete ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent" --fast-list --drive-trashed-only --drive-use-trash=false --transfers=50
-   rclone cleanup ${REMOTEDRIVE} --config=${RCLONEDOCKER} --user-agent="SomeLegitUserAgent"
    ENDTIME=$(date +%s)
-   if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
+   if [ ${DISCORD_WEBHOOK_URL_SERVERSIDE} != 'null' ]; then
       TITEL="Server-Side Move"
-      DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}              
-      DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
+      DISCORD_ICON_OVERRIDE_SERVERSIDE=${DISCORD_ICON_OVERRIDE_SERVERSIDE}              
+      DISCORD_NAME_OVERRIDE_SERVERSIDE=${DISCORD_NAME_OVERRIDE_SERVERSIDE}
       TIME="$((count=${ENDTIME}-${STARTTIME}))"
       duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
       MOVEDFILES=$(cat ${LOGFILE} | grep "Renamed" | tail -n 1 | awk '{print $2}')
       # shellcheck disable=SC2006 
       echo "Finished Server-Side move from ${REMOTEDRIVE} to ${SERVERSIDEDRIVE} \nMoved Files : ${MOVEDFILES} \nTime : ${duration}" >"${DISCORD}"
       msg_content=$(cat "${DISCORD}")
-      curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
+      curl -H "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE_SERVERSIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE_SERVERSIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL_SERVERSIDE
       rm -rf "${DISCORD}"
       rm -rf "${lock}"
    else
