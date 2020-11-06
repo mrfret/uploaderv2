@@ -18,7 +18,7 @@ FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 JSONFILE="/config/json/${FILEBASE}.json"
 CHECKERS="$((${TRANSFERS}*4))"
 TITEL=${DISCORD_EMBED_TITEL}
-DISCORD="/config/discord/${FILEBASE}.discord
+DISCORD="/config/discord/${FILEBASE}.discord"
 
 
 # add to file lock to stop another process being spawned while file is moving
