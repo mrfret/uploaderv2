@@ -11,6 +11,8 @@ chown -hR abc:abc  \
           /move \
           /root
 
+mkdir -p /config/env
+
 find /config -exec chmod a=rx,u+w {} \;
 find /config -exec chown -hR abc:abc {} \;
 find /app -exec chmod a=rx,u+w {} \;
