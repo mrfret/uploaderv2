@@ -7,34 +7,22 @@ function log() {
 echo "[Uploader] ${1}"
 }
 log "-> Setting Permissions || start <-"
-chown -R abc:abc  \
-         /config \
-         /mnt \
-         /move \
-         /config/rclone \
-         /root
-chmod a+x /app/gdrive/uploader.sh \
-         /app/tdrive/uploader.sh \
-         /app/uploader/upload.sh \
-         /app/cleanup/cleanup.sh \
-         /app/serverside/serverside.sh \
-         /app/functions/functions.sh \
-         /app/update-alpine/update-alpine.sh
-chown -hR abc:abc /app/uploader/upload.sh \
-         /app/gdrive/uploader.sh \
-         /app/tdrive/uploader.sh \
-         /app/cleanup/cleanup.sh \
-         /app/functions/functions.sh \
-         /app/serverside/serverside.sh \
-         /app/update-alpine/update-alpine.sh
+chown -hR abc:abc  \
+          /move \
+          /root
+
+find /config -exec chmod a=rx,u+w {} \;
+find /config -exec chown -hR abc:abc {} \;
+find /app -exec chmod a=rx,u+w {} \;
+find /app -exec chown -hR abc:abc {} \;
+
 chown -R abc:abc /run \
-         /var/lib/nginx \
-         /var/log/nginx \
-         /var/www
+          /var/lib/nginx \
+          /var/log/nginx \
+          /var/www
 
 if [[ $(command -v rclone | wc -l) == "1" ]]; then
     chown -cf abc:abc /root
 fi
-
 log "-> Setting Permissions || done <-"
 #EOF
