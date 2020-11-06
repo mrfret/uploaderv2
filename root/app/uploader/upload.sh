@@ -26,7 +26,7 @@ FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 JSONFILE="/config/json/${FILEBASE}.json"
 CHECKERS="$((${TRANSFERS}*4))"
 DISCORD="/config/discord/${FILEBASE}.discord"
-
+PID="/config/pid"
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
 #get Human readable filesize
