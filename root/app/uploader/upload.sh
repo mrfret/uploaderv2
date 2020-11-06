@@ -11,15 +11,20 @@ downloadpath=/move
 IFS=$'\n'
 FILE=$1
 GDSA=$2
-log "[Upload] Upload started for $FILE using $GDSA"
+
+if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone/rclone-docker.conf; then
+   DRIVE=TCRYPT
+else
+   DRIVE=TDRIVE
+fi
+
+log "[Upload] Upload started for $FILE using $GDSA to ${DRIVE}"
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
 JSONFILE="/config/json/${FILEBASE}.json"
 CHECKERS="$((${TRANSFERS}*4))"
-TITEL=${DISCORD_EMBED_TITEL}
 DISCORD="/config/discord/${FILEBASE}.discord"
-
 
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" >"${FILE}.lck"
@@ -50,7 +55,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    # shellcheck disable=SC2003
    TIME="$((count=${ENDTIME}-${STARTTIME}))"
    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
-   echo "FILE: GSUITE/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nUpload queue : ${LEFTTOUPLOAD}Bytes \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
+   echo "FILE: ${DRIVE}/${FILEDIR}/${FILEBASE} \nSIZE : ${HRFILESIZE} \nSpeed : ${BWLIMITSPEED}M \nUpload queue : ${LEFTTOUPLOAD}Bytes \nTime : ${duration} \nActive Transfers : ${TRANSFERS}" >"${DISCORD}"
    msg_content=$(cat "${DISCORD}")
    curl -sH "Content-Type: application/json" -X POST -d "{\"username\": \"${DISCORD_NAME_OVERRIDE}\", \"avatar_url\": \"${DISCORD_ICON_OVERRIDE}\", \"embeds\": [{ \"title\": \"${TITEL}\", \"description\": \"$msg_content\" }]}" $DISCORD_WEBHOOK_URL
 else
