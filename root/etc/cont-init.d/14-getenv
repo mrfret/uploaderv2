@@ -16,12 +16,11 @@ uploaderenv=/config/env/uploader.env
 if [[ ! -f "${uploaderenv}" ]]; then
 echo -e "BANDWITHLIMIT=${BWLIMITSET:-null}
 ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES:-null}
-ACTIVETRANSFERS=${TRANSFERS:-4}
+ACTIVETRANSFERS=${ACTIVTRANSFERS:-4}
 USERAGENT=${USERAGENT}
 TZ=${TZ:-Europe/Berlin}
 CLEANUPDOWN=${CLEANUPDOWN:-null}
 CAPACITY_LIMIT=${CAPACITY_LIMIT:-null}
-TVDRIVE=${TVDRIVE:-null}
 LOGHOLDUI=${LOGHOLDUI:=5m}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-null}
 DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-UPLOADED_COMPLETE}
@@ -41,10 +40,10 @@ SERVERSIDEDAY=${SERVERSIDEDAY:-Sunday}
 SERVERSIDEMINAGE=${SERVERSIDEMINAGE:-null}
 SERVERSIDEDRIVE=${SERVERSIDEDRIVE:-null}
 REMOTEDRIVE=${REMOTEDRIVE:-null}
-DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-null}
-DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-Server-Side Move}
-DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-Server-Side}" >> /config/env/serverside.env 
+DISCORD_WEBHOOK_URL_SERVERSIDE=${DISCORD_WEBHOOK_URL:-null}
+DISCORD_EMBED_TITEL_SERVERSIDE=${DISCORD_EMBED_TITEL:-Server-Side Move}
+DISCORD_ICON_OVERRIDE_SERVERSIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
+DISCORD_NAME_OVERRIDE_SERVERSIDE=${DISCORD_NAME_OVERRIDE:-Server-Side}" >> /config/env/serverside.env 
 else
   echo "-->> -------------------- <<--"
   echo "     --> used stored <--  <<--"
@@ -54,4 +53,17 @@ fi
 
 while read -r line; do declare -x "$line"; done < <(egrep -v "(^#|^\s|^$)" /config/env/serverside.env)
 while read -r line; do declare -x "$line"; done < <(egrep -v "(^#|^\s|^$)" /config/env/uploader.env)
+
+if [ ${CLEANUPDOWN} == 'down' ] || [ "${CLEANUPDOWN}" == 'false' ]; then
+   touch /etc/services.d/cleaning/down
+   echo " [ USER WISH ACTION ] "
+   echo "   Shutdown Cleaning  "
+   echo " [ USER WISH ACTION ] "
+   sleep 10
+else 
+   echo " [ USER WISH ACTION ] "
+   echo "   Starting Cleaning  "
+   echo " [ USER WISH ACTION ] "
+   sleep 5
+fi
 #<EOF>#
