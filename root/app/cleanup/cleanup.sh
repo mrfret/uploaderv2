@@ -56,10 +56,14 @@ eval "${command}"
 }
 
 function cleanup() {
-downloadpath=/move
-CAPACITY_LIMIT=${CAPACITY_LIMIT}
+downloadpath="/move"
+if [[ "${CAPACITY_LIMIT}" == 'null' ]]; then
+   CAPACITY_LIMIT=75
+else
+   CAPACITY_LIMIT=${CAPACITY_LIMIT}
+fi
 set -o errexit
-while [ $(df --output=pcent "${downloadpath}" | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
+while [ $(df --output=pcent /move | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
 do
     FILE=$(find "${downloadpath}" -type f -printf '%A@ %P\n' | \
                   sort | \
