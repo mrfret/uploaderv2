@@ -56,7 +56,6 @@ eval "${command}"
 }
 
 function cleanup() {
-source /config/env/rclone.env 
 downloadpath=/move
 CAPACITY_LIMIT=${CAPACITY_LIMIT}
 set -o errexit
