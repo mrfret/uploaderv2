@@ -5,6 +5,7 @@
 function log() {
     echo "[Server Side] ${1}"
 }
+source /config/env/serverside.env
 RCLONEDOCKER=/config/rclone/rclone-docker.conf
 SERVERSIDE=${SERVERSIDE}
 

@@ -3,7 +3,7 @@
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
 #####
-
+source /config/env/uploader.env
 function cleannzb() {
 downloadpath=/move
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
@@ -56,25 +56,22 @@ eval "${command}"
 }
 
 function cleanup() {
-CAPACITY_LIMIT=${CAPACITY_LIMIT}
-downloadpath=/move
-if [[ ${CAPACITY_LIMIT} == 'null' ]]; then
-    CAPACITY_LIMIT=75
+downloadpath="/move"
+if [[ "${CAPACITY_LIMIT}" == 'null' ]]; then
+   CAPACITY_LIMIT=75
 else
-    CAPACITY_LIMIT=${CAPACITY_LIMIT}
+   CAPACITY_LIMIT=${CAPACITY_LIMIT}
 fi
-CAPACITY=$(df -k ${downloadpath} | awk '{gsub("%",""); capacity=$5}; END {print capacity}')
-if [ "$CAPACITY" -gt "${CAPACITY_LIMIT}" ]; then
-    mapfile -t files < <(eval find ${downloadpath} -type f -printf '%T+ %p\n' | sort | cat | awk '{print $2}')
-     for i in "${files[@]}"; do
-        if [ "$CAPACITY" -le "${CAPACITY_LIMIT}" ]; then
-           echo "cleaning done || $CAPACITY is lower as ${CAPACITY_LIMIT}"
-        else
-           rm -rf "$i" >>/dev/null 2>&1
-           continue
-        fi
-    done
-fi
+set -o errexit
+while [ $(df --output=pcent /move | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
+do
+    FILE=$(find "${downloadpath}" -type f -printf '%A@ %P\n' | \
+                  sort | \
+                  head -n 1 | \
+                  cut -d' ' -f2-)
+    test -n "${FILE}"
+    rm -rf "${downloadpath}/${FILE}"
+done
 }
 
 cleaning() {

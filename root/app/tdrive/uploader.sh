@@ -1,31 +1,46 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
-# Copyright (c) 2020, MrDoob
+
+# Copyright (c) 2020 MrDoob
 # All rights reserved.
-## function source
-source /app/functions/functions.sh
+
+# Logging Function
+function log() {
+    echo "[Uploader] ${1}"
+}
+source /config/env/uploader.env
 #Make sure all the folders we need are created
-base_folder_tdrive
-downloadpath=/move
 path=/config/keys/
+mkdir -p /config/pid/
+mkdir -p /config/json/
+mkdir -p /config/logs/
+mkdir -p /config/vars/
+downloadpath=/move
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
- if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone/rclone-docker.conf; then
-    ENCRYPTED=true
- fi
+    if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone/rclone-docker.conf; then
+          ENCRYPTED=true
+    fi
 fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 BASICIGNORE="! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '**.inProgress/**'"
 DOWNLOADIGNORE="! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**' ! -path '**-vpn/**' ! -path '**_UNPACK_**'"
+ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-   ADDITIONAL_IGNORES=""
+    ADDITIONAL_IGNORES=""
 fi
-discord_start_send_tdrive
-remove_old_files_start_up
-cleanup_start
-bc_start_up_test
+#Header
+log "Uploader  Started"
+log "Started for the First Time - Cleaning up if from reboot"
+# Remove left over webui and transfer files
+rm -f /config/pid/*
+rm -f /config/json/*
+rm -f /config/logs/*
+# delete any lock files for files that failed to upload
+find ${downloadpath} -type f -name '*.lck' -delete
+log "Cleaned up - Sleeping 10 secs"
+sleep 10
 #### Generates the GDSA List from the Processed Keys
 # shellcheck disable=SC2003
 # shellcheck disable=SC2006
@@ -36,40 +51,28 @@ bc_start_up_test
 GDSAARRAY=(`ls -la ${path} | awk '{print $9}' | egrep '(PG|GD|GS)'`)
 # shellcheck disable=SC2003
 GDSACOUNT=$(expr ${#GDSAARRAY[@]} - 1)
+
 # Check to see if we have any keys
 # shellcheck disable=SC2086
 if [ ${GDSACOUNT} -lt 1 ]; then
-   log "No accounts found to upload with, Exit" 
-   exit 1
+    log "No accounts found to upload with, Exit"
+    exit 1
+fi
+# Check if BC is installed
+if [ "$(echo "10 + 10" | bc)" == "20" ]; then
+    log "BC Found! All good :)"
+else
+    log "BC Not installed, Exit"
+    exit 2
 fi
 # Grabs vars from files
 if [ -e /config/vars/lastGDSA ]; then
-   GDSAUSE=$(cat /config/vars/lastGDSA)
-   GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
+    GDSAUSE=$(cat /config/vars/lastGDSA)
+    GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
 else
-   GDSAUSE=0
-   GDSAAMOUNT=0
+    GDSAUSE=0
+    GDSAAMOUNT=0
 fi
-test_2=$(ls /config | grep -c xml)
-test_1=$(ls /app | grep -c xml)
-if [ ${BWLIMITSET} == 'null' ]; then
-   if [[ ${test_1} == "1" || ${test_2} == "1" ]]; then
-      BWLIMITSET=80
-   else
-      BWLIMITSET=100
-   fi
-else
-   BWLIMITSET=${BWLIMITSET}
-fi
-##scaled_bandwith
-USEDUPLOADSPEED=$(echo $(( ( ${BWLIMITSET} )/10*9 | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-if [ ${USEDUPLOADSPEED} -le ${BWLIMITSET} ]; then
-    log "calculator for bandwidth working"
-else
-    log "calculator for bandwidth don't work"
-    exit 1
-fi
-
 # Run Loop
 while true; do
     #Find files to transfer
@@ -94,81 +97,61 @@ while true; do
                         log "File is still getting bigger ${i}"
                         continue
                     fi
+                    # Check if we have any upload slots available
                     # shellcheck disable=SC2010
-                    TRANSFERS=$(ls -la /config/pid/ | grep -c trans)
-                    test1=$(vnstat -i eth0 -tr 2 | awk '$1 == "tx" {print $3}')
-                    if [ ${test1} != "MB/s" ]; then
-                       UPLOADSPEED=1
-                    else
-                       UPLOADSPEED=$(vnstat -i eth0 -tr 5 | awk '$1 == "tx" {print $2}' | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
-                    fi
-                    UPLOADFILE=$(echo $(( ((${BWLIMITSET}-${UPLOADSPEED})) | bc )) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+                    TRANSFERS=${TRANSFERS}
+                    ACTIVETRANSFERS=$(ls -la /config/pid/ | grep -c trans)
                     # shellcheck disable=SC2086
-                    if [[ ! ${UPLOADSPEED} -ge ${BWLIMITSET} && ! ${TRANSFERS} -ge 4 && ! ${UPLOADFILE} -le 10 ]]; then
-                       if [ -e "${i}" ]; then                    
-                          log "attacke .....  ${i} will uploaded" 
-                          log "Upload Bandwith is calculated for ${i}"
-                          log "Starting upload of ${i}"
-                          if [ ${UPLOADFILE} -ge 60 ]; then
-                              UPLOADFILE=40
-                          else
-                              UPLOADFILE=${UPLOADFILE}
-                          fi
-                          FILEBASE=$(basename "${i}")
-                          echo ${UPLOADFILE} >> /config/json/${FILEBASE}.bwlimit
-                          GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
-                          # Set gdsa as crypt or not
-                          if [ ${ENCRYPTED} == "true" ]; then
-                             GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
-                          else
-                             GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
-                          fi
-                          /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
-                          PID=$!
-                          FILEBASE=$(basename "${i}")
-                          echo "${PID}" > "/config/pid/${FILEBASE}.trans"
-                          # shellcheck disable=SC2086
-                          if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
-                             log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
-                             if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
-                                GDSAUSE=0
-                                GDSAAMOUNT=0
-                             else
-                                GDSAUSE=$(("${GDSAUSE}" + 1))
-                                GDSAAMOUNT=0
-                             fi
-                             # Record next GDSA in case of crash/reboot
-                             echo "${GDSAUSE}" >/config/vars/lastGDSA
-                          fi
-                          log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
-                          # Record GDSA transfered in case of crash/reboot
-                          echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
-                          else
-                              log "File ${i} seems to have dissapeared"
-                          fi
-                      else
-                         if [ ${TRANSFERS} -gt 4 ]; then
-                            log "( ︶︿︶) buhhhhh...... ${TRANSFERS} are running"
-                            break
-                         elif [ ${UPLOADSPEED} -gt ${BWLIMITSET} ]; then
-                            log "Upload Bandwith is reached || wait for next loop ( ︶︿︶)_╭∩╮"
-                            break
-                         else
-                            log "uhhhii.... Active ${TRANSFERS} Transfers are running with ${UPLOADSPEED} Mb Upload Bandwith "
-                         fi
-                         sleep 5
-                       fi
-                  else
-                      log "File not found: ${i}"
-                      continue
-                  fi
+                    if [ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]; then
+                        if [ -e "${i}" ]; then
+                            log "Starting upload of ${i}"
+                            # Append filesize to GDSAAMOUNT
+                            GDSAAMOUNT=$(echo "${GDSAAMOUNT} + ${FILESIZE2}" | bc)
+                            # Set gdsa as crypt or not
+                            if [ ${ENCRYPTED} == "true" ]; then
+                                GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}C"
+                            else
+                                GDSA_TO_USE="${GDSAARRAY[$GDSAUSE]}"
+                            fi
+                            # Run upload script demonised
+                            /app/uploader/upload.sh "${i}" "${GDSA_TO_USE}" &
+                            PID=$!
+                            FILEBASE=$(basename "${i}")
+                            # Add transfer to pid directory
+                            echo "${PID}" > "/config/pid/${FILEBASE}.trans"
+                            # Increase or reset $GDSAUSE?
+                            # shellcheck disable=SC2086
+                            if [ ${GDSAAMOUNT} -gt "783831531520" ]; then
+                                log "${GDSAARRAY[$GDSAUSE]} has hit 730GB switching to next SA"
+                                if [ "${GDSAUSE}" -eq "${GDSACOUNT}" ]; then
+                                    GDSAUSE=0
+                                    GDSAAMOUNT=0
+                                else
+                                    GDSAUSE=$(("${GDSAUSE}" + 1))
+                                    GDSAAMOUNT=0
+                                fi
+                                # Record next GDSA in case of crash/reboot
+                                echo "${GDSAUSE}" >/config/vars/lastGDSA
+                            fi
+                            log "${GDSAARRAY[${GDSAUSE}]} is now $(echo "${GDSAAMOUNT}/1024/1024/1024" | bc -l)"
+                            # Record GDSA transfered in case of crash/reboot
+                            echo "${GDSAAMOUNT}" >/config/vars/gdsaAmount
+                        else
+                            log "File ${i} seems to have dissapeared"
+                        fi
+                    else
+                        log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop"
+                        break
+                    fi
+                else
+                    log "File not found: ${i}"
+                    continue
+                fi
             fi
-            log "Sleeping 5s before looking at next file"
-            sleep 10
         done
         log "Finished looking for files, sleeping 5 secs"
     else
-      log "Nothing to upload, sleeping 5 secs"
+        log "Nothing to upload, sleeping 5 secs"
     fi
-    sleep 10
+    sleep 5
 done
