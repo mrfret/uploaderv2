@@ -30,7 +30,7 @@ rm -f /config/pid/* \
 }
 function cleanup_start() {
 # delete any lock files for files that failed to upload
-find /move -type f -name '*.lck' -delete
+find /mnt/downloads -type f -name '*.lck' -delete
 log "Cleaned up - Sleeping 10 secs"
 sleep 10
 }
