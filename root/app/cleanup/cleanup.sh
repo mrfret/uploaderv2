@@ -5,7 +5,7 @@
 #####
 source /config/env/uploader.env
 function cleannzb() {
-downloadpath=/move
+downloadpath=/mnt/downloads
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
 FIND_BASE1='-type f'
@@ -26,7 +26,7 @@ eval "${command3}"
 }
 
 function empty_folder() {
-downloadpath=/move
+downloadpath=/mnt/downloads
 TARGET_FOLDER="${downloadpath}/"
 FIND=$(which find)
 FIND_BASE='-type d'
@@ -56,14 +56,13 @@ eval "${command}"
 }
 
 function cleanup() {
-downloadpath="/move"
+downloadpath="/mnt/downloads"
 if [[ "${CAPACITY_LIMIT}" == 'null' ]]; then
    CAPACITY_LIMIT=75
 else
    CAPACITY_LIMIT=${CAPACITY_LIMIT}
 fi
-set -o errexit
-while [ $(df --output=pcent /move | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
+while [ $(df --output=pcent /mnt/downloads | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
 do
     FILE=$(find "${downloadpath}" -type f -printf '%A@ %P\n' | \
                   sort | \
