@@ -33,7 +33,7 @@ VOLUME [ "/config" ]
 VOLUME [ "/mnt/downloads" ]
 
 RUN chown 911:911 /config && \
-    chown -hR 911:911 /move && \
+    chown -hR 911:911 /mnt/downloads && \
     chown -hR 911:911 /mnt && \
     mkdir -p /var/www/html && \
     addgroup -g 911 abc && \
