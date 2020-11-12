@@ -15,7 +15,7 @@ mkdir -p /config/pid/
 mkdir -p /config/json/
 mkdir -p /config/logs/
 mkdir -p /config/vars/
-downloadpath=/move
+downloadpath=/mnt/downloads
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
