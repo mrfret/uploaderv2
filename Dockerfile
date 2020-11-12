@@ -30,7 +30,7 @@ RUN \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
 
 VOLUME [ "/config" ]
-VOLUME [ "/move" ]
+VOLUME [ "/mnt/downloads" ]
 
 RUN chown 911:911 /config && \
     chown -hR 911:911 /move && \
