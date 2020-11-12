@@ -8,7 +8,7 @@ function log() {
     echo "[Uploader] ${1}"
 }
 source /config/env/uploader.env
-downloadpath=/move
+downloadpath=/mnt/downloads
 IFS=$'\n'
 FILE=$1
 GDSA=$2
