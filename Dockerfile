@@ -30,10 +30,8 @@ RUN \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
 
 VOLUME [ "/config" ]
-VOLUME [ "/mnt/downloads" ]
 
 RUN chown 911:911 /config && \
-    chown -hR 911:911 /mnt/downloads && \
     mkdir -p /var/www/html && \
     addgroup -g 911 abc && \
     adduser -u 911 -D -G abc abc
