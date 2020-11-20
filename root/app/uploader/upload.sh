@@ -52,7 +52,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
    TITEL=${DISCORD_EMBED_TITEL}
    DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE}
    DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE}
-   LEFTTOUPLOAD=$(du -sh ${downloadpath}/ --exclude={torrent,nzb,filezilla,backup,nzbget,jdownloader2,sabnzbd,rutorrent,deluge,qbittorrent} | awk '$2 == "/move/" {print $1}')
+   LEFTTOUPLOAD=$(du -sh ${downloadpath}/ --exclude={torrent,nzb,filezilla,backup,nzbget,jdownloader2,sabnzbd,rutorrent,deluge,qbittorrent} | awk '$2 == "/mnt/downloads" {print $1}')
    # shellcheck disable=SC2003
    TIME="$((count=${ENDTIME}-${STARTTIME}))"
    duration="$(($TIME / 60)) minutes and $(($TIME % 60)) seconds elapsed."
