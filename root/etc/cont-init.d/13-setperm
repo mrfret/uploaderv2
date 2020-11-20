@@ -12,6 +12,7 @@ chown -hR abc:abc  \
           /root
 
 mkdir -p /config/env
+mkdir -p /config/discord
 
 find /config -exec chmod a=rx,u+w {} \;
 find /config -exec chown -hR abc:abc {} \;
