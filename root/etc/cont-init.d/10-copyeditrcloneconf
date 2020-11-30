@@ -21,17 +21,17 @@ if [ ! -f "/config/rclone.conf" ]; then
    fi
 fi
 log "-> Copying rclone.conf <-"
-    rsjon="/config/rclone/rclone-docker.conf"
+    rclonepad="/config/rclone/rclone-docker.conf"
     mkdir -p /config/rclone
-    rm -f "${rjson}"
-    find /config -name "rclone.conf" -type f -exec cp {} "${rclonepad}" \;
+    rm -f ${rclonepad}
+    find /config -name "rclone.conf" -type f -exec cp {} ${rclonepad} \;
     log "-> Make needed edits to rclone-docker.conf <-"
-    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" "${rjson}"
-    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" "${rjson}"
-    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" "${rjson}"
-    sed -i "s#/opt/uploader/keys/#/config/keys/#g" "${rjson}"
-    sed -i '/pgunion/{n;N;d;}' "${rjson}"
-    sed -i '/pgunion/d' "${rjson}"
+    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
+    sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
 log "-> rclone_docker.conf edits done <-"
 
 
