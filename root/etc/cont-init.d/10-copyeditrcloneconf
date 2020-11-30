@@ -16,10 +16,14 @@ if [ -f "/config/rclone.conf" ]; then
    rclone config dump --config=/config/rclone.conf > /config/rclone.json
    #rm -rf /config/rclone.conf
 fi
-if [ ! -f "/config/rclone.josn" ]; then
-   log "-->> [ WARNING ] no rclone.josn file found [ WARNING ] <<--"
-   sleep 60
-   s6-svscanctl -t /var/run/s6/services
+if [ ! -f "/config/rclone.json" ]; then
+   log "-->> [ WARNING ] no rclone.json file found [ WARNING ] <<--"
+   rclone config dump --config=/config/rclone.conf > /config/rclone.json
+   if [ ! -f "/config/rclone.json" ]; then
+      log "-->> [ WARNING ] second check of rclone.sjon failes [ WARNING ] <<--"
+      log "-->> [ WARNING ]    no rclone.json file found       [ WARNING ] <<--"
+      sleep 60
+   fi
 fi
 log "-> Copying rclone.json <-"
     rclonepad=/config/rclone/rclone-docker.json 
