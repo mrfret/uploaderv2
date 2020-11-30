@@ -5,11 +5,17 @@
 function log() {
 echo "[Mount] ${1}"
 }
+
+apk add --quiet --no-cache --no-progress --virtual build-dependencies \
+  wget curl bash unzip
+wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
+unzip -q rclone.zip && rm rclone.zip && \
+mv rclone*/rclone /usr/bin && rm -r rclone*
+
 if [ -f "/config/rclone.conf" ]; then
    rclone config dump --config=/config/rclone.conf > /config/rclone.json
-   rm -rf /config/rclone.conf
+   #rm -rf /config/rclone.conf
 fi
-
 if [ ! -f "/config/rclone.josn" ]; then
    log "-->> [ WARNING ] no rclone.josn file found [ WARNING ] <<--"
    sleep 60
@@ -29,10 +35,5 @@ log "-> Copying rclone.json <-"
     sed -i '/pgunion/d' /config/rclone/rclone-docker.json
 log "-> rclone_docker.conf edits done <-"
 
-log "-> install rclone || start <-"
-    apk add unzip bash curl --quiet
-    wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
-    unzip -q rclone.zip && rm rclone.zip && \
-    mv rclone*/rclone /usr/bin && rm -r rclone*
-log "-> install rclone || done <-"
+
 #<EOF>#
