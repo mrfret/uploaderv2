@@ -15,14 +15,19 @@ FIND_MINAGE='-cmin +5'
 FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 FIND_ACTION2='-regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 FIND_ACTION3='-name "**_FAILED_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
-
+FIND_ACTION4='-name "**abc.xyz**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION1}"
 command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION2}"
-command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION3}"
+command3="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION3}"
+command4="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION4}"
+run="command1 command2 command3 command4"
+for i in ${run}; do
+  eval ${run}
+done
 
-eval "${command1}"
-eval "${command2}"
-eval "${command3}"
+#eval "${command1}"
+#eval "${command2}"
+#eval "${command3}"
 }
 
 function empty_folder() {
@@ -75,8 +80,8 @@ done
 
 cleaning() {
  while true; do
-    cleanup
-    sleep 10
+    #cleanup
+    #sleep 10
     empty_folder
     sleep 10
     cleannzb

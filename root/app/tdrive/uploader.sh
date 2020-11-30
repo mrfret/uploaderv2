@@ -8,19 +8,18 @@
 function log() {
     echo "[Uploader] ${1}"
 }
+
 source /config/env/uploader.env
+
 #Make sure all the folders we need are created
 path=/config/keys/
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
+mkdir -p /config/{pid,json,logs,vars}
 downloadpath=/mnt/downloads
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
-    if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone/rclone-docker.conf; then
+    if grep -q GDSA01C /config/rclone/rclone-docker.json && grep -q GDSA02C /config/rclone/rclone-docker.json; then
           ENCRYPTED=true
     fi
 fi

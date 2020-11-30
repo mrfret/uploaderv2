@@ -5,23 +5,28 @@
 function log() {
 echo "[Mount] ${1}"
 }
-if [ ! -f "/config/rclone.conf" ]; then
-   log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
-   sleep 60
-   exit 0
+if [ -f "/config/rclone.conf" ]; then
+   rclone config dump --config=/config/rclone.conf > /config/rclone.json
+   rm -rf /config/rclone.conf
 fi
-log "-> Copying rclone.conf <-"
-    rclonepad=/config/rclone/rclone-docker.conf 
+
+if [ ! -f "/config/rclone.josn" ]; then
+   log "-->> [ WARNING ] no rclone.josn file found [ WARNING ] <<--"
+   sleep 60
+   s6-svscanctl -t /var/run/s6/services
+fi
+log "-> Copying rclone.json <-"
+    rclonepad=/config/rclone/rclone-docker.json 
     mkdir -p /config/rclone
     rm -f ${rclonepad}
-    find /config -name "rclone.conf" -type f -exec cp {} ${rclonepad} \;
-    log "-> Make needed edits to rclone-docker.conf <-"
-    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
-    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-    sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-    sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
-    sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
+    find /config -name "rclone.json" -type f -exec cp {} ${rclonepad} \;
+    log "-> Make needed edits to rclone-docker.json <-"
+    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.json
+    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.json
+    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.json
+    sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.json
+    sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.json
+    sed -i '/pgunion/d' /config/rclone/rclone-docker.json
 log "-> rclone_docker.conf edits done <-"
 
 log "-> install rclone || start <-"
