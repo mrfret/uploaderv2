@@ -21,13 +21,9 @@ command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${F
 command3="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION3}"
 command4="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION4}"
 run="command1 command2 command3 command4"
-for i in ${run}; do
-  eval ${run}
-done
-
-#eval "${command1}"
-#eval "${command2}"
-#eval "${command3}"
+eval "${command1}"
+eval "${command2}"
+eval "${command3}"
 }
 
 function empty_folder() {

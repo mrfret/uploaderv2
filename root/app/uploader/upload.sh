@@ -12,7 +12,7 @@ downloadpath=/mnt/downloads
 IFS=$'\n'
 FILE=$1
 GDSA=$2
-rjson=/config/rclone/rclone-docker.json
+rjson=/config/rclone/rclone-docker.conf
 
 if grep -q GDSA01C "${rjson}" && grep -q GDSA02C "${rjson}"; then
    DRIVE=TCRYPT
@@ -42,8 +42,9 @@ chmod 777 "${LOGFILE}"
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
-    --config="${rjson}" --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-    --drive-chunk-size=32M --user-agent=${UAGENT} "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
+    --config "${rjson}" --log-file="${LOGFILE}" --log-level INFO --stats 2s \
+    --drive-chunk-size=32M --user-agent=${UAGENT} \
+    "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"

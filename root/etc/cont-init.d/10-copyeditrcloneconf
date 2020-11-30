@@ -3,40 +3,35 @@
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
 function log() {
-echo "[Mount] ${1}"
+echo "[UPLOADER] ${1}"
 }
 
-apk add --quiet --no-cache --no-progress --virtual build-dependencies \
-  wget curl bash unzip
-wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
-unzip -q rclone.zip && rm rclone.zip && \
-mv rclone*/rclone /usr/bin && rm -r rclone*
+apk add --quiet --no-cache --no-progress wget curl bash unzip rclone
 
-if [ -f "/config/rclone.conf" ]; then
-   rclone config dump --config=/config/rclone.conf > /config/rclone.json
-   #rm -rf /config/rclone.conf
-fi
-if [ ! -f "/config/rclone.json" ]; then
-   log "-->> [ WARNING ] no rclone.json file found [ WARNING ] <<--"
-   rclone config dump --config=/config/rclone.conf > /config/rclone.json
-   if [ ! -f "/config/rclone.json" ]; then
-      log "-->> [ WARNING ] second check of rclone.sjon failes [ WARNING ] <<--"
-      log "-->> [ WARNING ]    no rclone.json file found       [ WARNING ] <<--"
-      sleep 60
+wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O /tmp/rclone.zip && \
+unzip -q /tmp/rclone.zip && rm -rf /tmp/rclone.zip && \
+mv /tmp/rclone*/rclone /usr/bin && rm -rf /tmp/rclone*
+
+if [ ! -f "/config/rclone.conf" ]; then
+   log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
+   if [ ! -f "/config/rclone.conf" ]; then
+      log "-->> [ WARNING ] second check of rclone.conf failed [ WARNING ] <<--"
+      log "-->> [ WARNING ]    no rclone.conf file found       [ WARNING ] <<--"
+      sleep 60 && s6-svscanctl -t /var/run/s6/services
    fi
 fi
-log "-> Copying rclone.json <-"
-    rclonepad=/config/rclone/rclone-docker.json 
+log "-> Copying rclone.conf <-"
+    rsjon="/config/rclone/rclone-docker.conf"
     mkdir -p /config/rclone
-    rm -f ${rclonepad}
-    find /config -name "rclone.json" -type f -exec cp {} ${rclonepad} \;
-    log "-> Make needed edits to rclone-docker.json <-"
-    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.json
-    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.json
-    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.json
-    sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.json
-    sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.json
-    sed -i '/pgunion/d' /config/rclone/rclone-docker.json
+    rm -f "${rjson}"
+    find /config -name "rclone.conf" -type f -exec cp {} "${rclonepad}" \;
+    log "-> Make needed edits to rclone-docker.conf <-"
+    sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" "${rjson}"
+    sed -i "s#/opt/appdata/uploader/#/config/keys/#g" "${rjson}"
+    sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" "${rjson}"
+    sed -i "s#/opt/uploader/keys/#/config/keys/#g" "${rjson}"
+    sed -i '/pgunion/{n;N;d;}' "${rjson}"
+    sed -i '/pgunion/d' "${rjson}"
 log "-> rclone_docker.conf edits done <-"
 
 

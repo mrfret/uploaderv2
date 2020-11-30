@@ -12,7 +12,7 @@ source /config/env/serverside.env
 source /app/functions/functions.sh
 ###execute part 
 SVLOG="serverside"
-RCLONEDOCKER="/config/rclone/rclone-docker.json"
+RCLONEDOCKER="/config/rclone/rclone-docker.conf"
 LOGFILE="/config/logs/serverside.log"
 if [[ -f ${LOGFILE} ]]; then
    truncate -s 0 ${LOGFILE}
@@ -44,7 +44,7 @@ if [ "${SERVERSIDECHECK}" -gt "1" ]; then
 else
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ]         Server-Side failed            <<<<< [ WARNING ]"
-   log ">>>>> [ WARNING ]     check your rclone-docker.json     <<<<< [ WARNING ]"
+   log ">>>>> [ WARNING ]     check your rclone-docker.conf     <<<<< [ WARNING ]"
    log ">>>>> [ WARNING ] ------------------------------------- <<<<< [ WARNING ]"
    sleep 60
    exit 0
@@ -106,7 +106,7 @@ while true; do
    if [ $(date '+%A') == "${SERVERSIDEDAY}" ] || [ "${SERVERSIDEDAY}" == 'daily' ]; then
    SERVERSIDE=${SERVERSIDE}
    lock="/config/json/serverside.lck"
-   RCLONEDOCKER="/config/rclone/rclone-docker.json"
+   RCLONEDOCKER="/config/rclone/rclone-docker.conf"
    REMOTEDRIVE=${REMOTEDRIVE}
    SERVERSIDEMINAGE=${SERVERSIDEMINAGE}
    SERVERSIDEDRIVE=${SERVERSIDEDRIVE}
