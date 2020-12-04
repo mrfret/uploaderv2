@@ -7,9 +7,11 @@ function log() {
 echo "[Uploader] ${1}"
 }
 log "-> Setting Permissions || start <-"
+
 mkdir -p /config/{discord,env}
-#find /mnt/downloads -exec chmod a=rx,u+w {} \;
+find /mnt/downloads -exec chmod a=rx,u+w {} \;
 find /mnt/downloads -exec chown -hR abc:abc {} \;
+
 find /config -exec chmod a=rx,u+w {} \;
 find /config -exec chown -hR abc:abc {} \;
 find /app -exec chmod a=rx,u+w {} \;
