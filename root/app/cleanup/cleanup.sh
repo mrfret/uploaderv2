@@ -5,7 +5,7 @@
 #####
 source /config/env/uploader.env
 function cleannzb() {
-downloadpath=/move
+downloadpath=/mnt/downloads
 TARGET_FOLDER="${downloadpath}/{nzb,sabnzbd,nzbget}"
 FIND=$(which find)
 FIND_BASE1='-type f'
@@ -15,18 +15,19 @@ FIND_MINAGE='-cmin +5'
 FIND_ACTION1='-not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 FIND_ACTION2='-regex ".*/.*sample.*\.\(avi\|mkv\|mp4\|vob\)" -not -path "**_UNPACK_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 FIND_ACTION3='-name "**_FAILED_**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
-
+FIND_ACTION4='-name "**abc.xyz**" -exec rm -rf \{\} \; >>/dev/null 2>&1'
 command1="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION1}"
 command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE1} ${FIND_SIZE} ${FIND_MINAGE} ${FIND_ACTION2}"
-command2="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION3}"
-
+command3="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION3}"
+command4="${FIND} ${TARGET_FOLDER} ${FIND_BASE2} ${FIND_MINAGE} ${FIND_ACTION4}"
+run="command1 command2 command3 command4"
 eval "${command1}"
 eval "${command2}"
 eval "${command3}"
 }
 
 function empty_folder() {
-downloadpath=/move
+downloadpath=/mnt/downloads
 TARGET_FOLDER="${downloadpath}/"
 FIND=$(which find)
 FIND_BASE='-type d'
@@ -56,14 +57,13 @@ eval "${command}"
 }
 
 function cleanup() {
-downloadpath="/move"
+downloadpath="/mnt/downloads"
 if [[ "${CAPACITY_LIMIT}" == 'null' ]]; then
    CAPACITY_LIMIT=75
 else
    CAPACITY_LIMIT=${CAPACITY_LIMIT}
 fi
-set -o errexit
-while [ $(df --output=pcent /move | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
+while [ $(df --output=pcent /mnt/downloads | grep -v Use | cut -d'%' -f1) -gt ${CAPACITY_LIMIT} ]
 do
     FILE=$(find "${downloadpath}" -type f -printf '%A@ %P\n' | \
                   sort | \
@@ -76,8 +76,8 @@ done
 
 cleaning() {
  while true; do
-    cleanup
-    sleep 10
+    #cleanup
+    #sleep 10
     empty_folder
     sleep 10
     cleannzb

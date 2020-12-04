@@ -8,14 +8,13 @@
 function log() {
     echo "[Uploader] ${1}"
 }
+
 source /config/env/uploader.env
+
 #Make sure all the folders we need are created
 path=/config/keys/
-mkdir -p /config/pid/
-mkdir -p /config/json/
-mkdir -p /config/logs/
-mkdir -p /config/vars/
-downloadpath=/move
+mkdir -p /config/{pid,json,logs,vars}
+downloadpath=/mnt/downloads
 MOVE_BASE=${MOVE_BASE:-/}
 # Check encryption status
 ENCRYPTED=${ENCRYPTED:-false}
