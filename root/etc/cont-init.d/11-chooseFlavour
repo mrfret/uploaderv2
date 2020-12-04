@@ -12,16 +12,17 @@ FIND_MINDEPTH='-mindepth 1'
 FIND_ACTION='-delete 1>/dev/null 2>&1'
 command="${FIND} ${TARGET_FOLDER} ${FIND_MINDEPTH} ${FIND_FILE_ACTION} ${FIND_FILE} ${FIND_BASE} ${FIND_ACTION}"
 eval ${command}
-
-if grep -q GDSA01 /config/rclone/rclone-docker.conf && grep -q GDSA02 /config/rclone/rclone-docker.conf; then
+rjson=/config/rclone/rclone-docker.conf
+if grep -q GDSA01C "${rjson}" && grep -q GDSA02C "${rjson}"; then
+    echo "-->> -------------------- <<--"
+    echo "-->    TCRYPT UPLOADER    <<--"
+    echo "-->       WILL USED       <<--"
+    echo "-->> -------------------- <<--"
+else
     echo "-->> -------------------- <<--"
     echo "-->    TDRIVE UPLOADER    <<--"
     echo "-->       WILL USED       <<--"
     echo "-->> -------------------- <<--"
-else
-    echo "-->> ---------------------------------------- <<--"
-    echo "-->  I DONT SUPPORT GDRIVE UPLOADER ANYMORE   <<--"
-    echo "-->> ---------------------------------------- <<--"
     exit 0
 fi
 #<EOF>#
