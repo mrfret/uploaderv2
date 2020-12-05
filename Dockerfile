@@ -13,7 +13,7 @@ FROM alpine:latest
 
 LABEL maintainer=doob187@users.noreply.github.com
 
-ADD root/ .
+COPY root/ /
 
 RUN echo "**** update system ****" && \
   apk --quiet --no-cache --no-progress update && \
