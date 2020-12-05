@@ -12,7 +12,8 @@
 FROM alpine:latest AS builder
 
 LABEL maintainer=60312740+doob187@users.noreply.github.com
-#COPY root/ root/
+
+COPY root/ root/
 
 RUN \
  echo "**** install build packages ****" && \
@@ -31,17 +32,18 @@ RUN \
 FROM scratch
 
 COPY --from=builder /root .
-RUN mkdir -p /var/www/html && \
-    addgroup -g 911 abc && \
-    adduser -u 911 -D -G abc abc && \
-    chown 911:911 /config
+
+RUN mkdir -p /var/www/html
+RUN addgroup -g 911 abc
+RUN adduser -u 911 -D -G abc abc
+RUN chown 911:911 /config
 
 VOLUME [ "/config" ]
 
-COPY --chown=abc html/ /var/www/html
-COPY config/nginx.conf /etc/nginx/nginx.conf
-COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
-COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
+ADD --chown=abc html/ /var/www/html
+ADD config/nginx.conf /etc/nginx/nginx.conf
+ADD config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
+ADD config/php.ini /etc/php7/conf.d/zzz_custom.ini
 
 EXPOSE 8080
 
