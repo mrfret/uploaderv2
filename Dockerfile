@@ -15,11 +15,11 @@ LABEL maintainer=60312740+doob187@users.noreply.github.com
 COPY root/ /
 
 
-RUN echo "**** update system ****" && \
+RUN \
+  echo "**** update system ****" && \
   apk --quiet --no-cache --no-progress update && \
   echo "**** install build packages ****" && \
-  apk --quiet --no-cache --no-progress add \
-  shadow bash bc findutils coreutils grep tar && \
+  apk --quiet --no-cache --no-progress add shadow curl wget bash bc findutils coreutils grep tar && \
   echo "**** upgrade system ****" && \
   apk --quiet --no-cache --no-progress upgrade && \
   echo "**** Install s6-overlay ****" && \ 
