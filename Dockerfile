@@ -9,18 +9,17 @@
 ######################################################
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
-FROM alpine:latest
+FROM alpine:latest AS builder
 
 LABEL maintainer=60312740+doob187@users.noreply.github.com
-COPY root/ /
+#COPY root/ root/
 
 RUN \
  echo "**** install build packages ****" && \
  apk add --quiet --no-cache --no-progress \
         ca-certificates logrotate shadow bash bc findutils coreutils openssl php7 php7-fpm php7-mysqli php7-json php7-openssl \
         php7-curl php7-zlib php7-xml php7-phar php7-dom php7-xmlreader php7-ctype php7-mbstring php7-gd \
-        curl nginx libxml2-utils tzdata openntpd grep tar
-
+        curl nginx libxml2-utils tzdata openntpd grep tar musl
 RUN \
   echo "**** Install s6-overlay ****" && \ 
   curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]' > /etc/S6_RELEASE && \
@@ -29,12 +28,15 @@ RUN \
   rm /tmp/s6-overlay-amd64.tar.gz >/dev/null 2>&1 && \
   echo "**** Installed s6-overlay `cat /etc/S6_RELEASE` ****"
 
-VOLUME [ "/config" ]
+FROM scratch
 
-RUN chown 911:911 /config && \
-    mkdir -p /var/www/html && \
+COPY --from=builder /root .
+RUN mkdir -p /var/www/html && \
     addgroup -g 911 abc && \
-    adduser -u 911 -D -G abc abc
+    adduser -u 911 -D -G abc abc && \
+    chown 911:911 /config
+
+VOLUME [ "/config" ]
 
 COPY --chown=abc html/ /var/www/html
 COPY config/nginx.conf /etc/nginx/nginx.conf
