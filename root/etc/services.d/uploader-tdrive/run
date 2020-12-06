@@ -9,4 +9,4 @@ umask 022
 command="/app/tdrive/uploader.sh"
 sleep 10
 echo "-> Starting tdrive Uploader <-"
-exec $command
+exec s6-setuidgid abc $command

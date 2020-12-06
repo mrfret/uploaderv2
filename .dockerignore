@@ -1,3 +1,5 @@
+html/
+config/
 .env
 .editorconfig
 .git

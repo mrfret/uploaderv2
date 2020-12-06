@@ -7,6 +7,6 @@
 # shellcheck disable=SC2086
 umask 022
 serverside_command="/app/serverside/serverside.sh"
-sleep 10
+sleep 3
 echo "-> Starting Server-Side Uploader <-"
-exec $serverside_command
+exec s6-setuidgid abc $serverside_command
