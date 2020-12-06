@@ -3,7 +3,7 @@
 # Copyright (c) 2020, MrDoob
 # All rights reserved.
 # shellcheck disable=SC2086
-#umask 022
-#nginx_command="nginx"
-#echo "-> Starting nginx <-"
-#exec s6-setuidgid abc $nginx_command
+umask 022
+nginx_command="nginx"
+echo "-> Starting nginx <-"
+exec s6-setuidgid abc $nginx_command
