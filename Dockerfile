@@ -32,10 +32,12 @@ RUN \
 
 VOLUME [ "/config" ]
 
-RUN chown 911:911 /config && \
-    addgroup -g 911 abc && \
-    adduser -u 911 -D -G abc abc
+#RUN chown 911:911 /config && \
+#    addgroup -g 911 abc && \
+#    adduser -u 911 -D -G abc abc
 
-#HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
+EXPOSE 8080
+
+HEALTHCHECK --timeout=5s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 # Setup EntryPoint
 ENTRYPOINT [ "/init" ]

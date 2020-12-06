@@ -9,18 +9,25 @@ echo "[Uploader] ${1}"
 log "-> Setting Permissions || start <-"
 
 mkdir -p /config/{discord,env}
-find /mnt/downloads -exec chmod a=rx,u+w {} \;
-find /mnt/downloads -exec chown -hR abc:abc {} \;
 
-find /config -exec chmod a=rx,u+w {} \;
-find /config -exec chown -hR abc:abc {} \;
-find /app -exec chmod a=rx,u+w {} \;
-find /app -exec chown -hR abc:abc {} \;
+folder="/mnt/downloads /config /app /var/www /run /var/lib/nginx /var/log/nginx /root"
+for i in ${folder}; do
+   chmod -R 755 $i
+   chown -hR abc:abc $i
+   chown -cf abc:abc $i
+done
 
-chown -R abc:abc /run \
-          /var/lib/nginx \
-          /var/log/nginx \
-          /var/www
+#find /config -exec chmod a=rx,u+w {} \;
+#find /config -exec chown -hR abc:abc {} \;
+#find /app -exec chmod a=rx,u+w {} \;
+#find /app -exec chown -hR abc:abc {} \;
+
+#find /var/www -exec chmod a=rx,u+w {} \;
+#find /var/www -exec chown -hR abc:abc {} \;
+
+#chown -R abc:abc /run \
+#          /var/lib/nginx \
+#          /var/log/nginx
 
 if [[ $(command -v rclone | wc -l) == "1" ]]; then
     chown -cf abc:abc /root
