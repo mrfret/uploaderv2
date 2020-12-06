@@ -5,13 +5,6 @@
 function log() {
 echo "[UPLOADER] ${1}"
 }
-
-apk add --quiet --no-cache --no-progress wget curl bash unzip rclone
-
-wget --quiet https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O rclone.zip && \
-unzip -q rclone.zip && rm -rf /tmp/rclone.zip && \
-mv rclone*/rclone /usr/bin && rm -rf rclone*
-
 if [ ! -f "/config/rclone.conf" ]; then
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    if [ ! -f "/config/rclone.conf" ]; then
