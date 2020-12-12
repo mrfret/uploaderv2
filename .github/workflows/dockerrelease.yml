@@ -46,7 +46,7 @@ jobs:
         run: |
           REPO=$CI_REPOSITORY_NAME
           DOCKER_IMAGE=${{ secrets.DOCKER_USER }}/${REPO}
-           VERSION=edge
+          VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/v}
           fi
