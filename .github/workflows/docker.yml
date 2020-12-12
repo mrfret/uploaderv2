@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: Print environment variables exposed by this action
+      - name: Print environment variables
         run: |
           echo "CI_REPOSITORY_SLUG=$CI_REPOSITORY_SLUG"
           echo "CI_REPOSITORY_OWNER=$CI_REPOSITORY_OWNER"
@@ -39,7 +39,7 @@ jobs:
           echo "CI_WORKFLOW=$CI_WORKFLOW"
           echo "CI_ACTION=$CI_ACTION"
 
-      - name: Prepare
+      - name: Prepare DockerHub
         id: prepdo
         run: |
           REPO=$CI_REPOSITORY_NAME
@@ -55,12 +55,10 @@ jobs:
           echo ::set-output name=version::${VERSION}
           echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-      - name: Prepare
+      - name: Prepare GHRC.io
         id: prepghrc
         run: |
-          REPO=$CI_REPOSITORY_NAME
-          GHRC=$CI_REPOSITORY_OWNER
-          GHRDOCKER=${GHRC}/${REPO}
+          GHRDOCKER=${GITHUB_REPOSITORY}
           if [ "$CI_REF_NAME" != "dev" ]; then
             VERSION=latest
           else
