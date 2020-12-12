@@ -4,7 +4,7 @@ name: Publish V Releases to Hub
 on:
   push:
     tags:
-      - "v*"
+      - 'v*.*'
 
 jobs:
   docker:
@@ -87,6 +87,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/armhf,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.title }}
