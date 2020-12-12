@@ -96,9 +96,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/armhf,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags:  |
-            ${{ steps.prep.outputs.tags }}
-            ghrc.io/doob187/uploader
+          tags:  ${{ steps.prep.outputs.tags }}
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.title }}
             org.opencontainers.image.version=${{ steps.prep.outputs.version }}
