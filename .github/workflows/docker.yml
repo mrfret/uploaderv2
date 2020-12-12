@@ -40,7 +40,7 @@ jobs:
           echo "CI_ACTION=$CI_ACTION"
 
       - name: Prepare DockerHub
-        id: prepdo
+        id: prep
         run: |
           REPO=$CI_REPOSITORY_NAME
           DOCKER_IMAGE=${{ secrets.DOCKER_USER }}/${REPO}
@@ -51,21 +51,6 @@ jobs:
           fi
           TAGS="${DOCKER_IMAGE}:${VERSION}"
           echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=title::${GITHUB_REPOSITORY}
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-
-      - name: Prepare GHRC.io
-        id: prepghrc
-        run: |
-          GHRDOCKER=${GITHUB_REPOSITORY}
-          if [ "$CI_REF_NAME" != "dev" ]; then
-            VERSION=latest
-          else
-            VERSION=nightly
-          fi
-          GHRC="${GHRDOCKER}:${VERSION}"
-          echo ::set-output name=tags::${GHRC}
           echo ::set-output name=title::${GITHUB_REPOSITORY}
           echo ::set-output name=version::${VERSION}
           echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -103,7 +88,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
 
       - name: Build and push DockerHub
-        id: docker_build_do
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
@@ -111,22 +96,9 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/armhf,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prepdo.outputs.tags }}
-          labels: |
-            org.opencontainers.image.title=${{ steps.prep.outputs.title }}
-            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
-            org.opencontainers.image.created=${{ steps.prep.outputs.date }}
-
-      - name: Build and push GHRC.IO
-        id: docker_build_ghr
-        uses: docker/build-push-action@v2
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/armhf,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/${{ steps.prepghrc.outputs.tag }}
+          tags:  |
+            ${{ steps.prep.outputs.tags }}
+            ghrc.io/${{ steps.prep.outputs.tag }}
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.title }}
             org.opencontainers.image.version=${{ steps.prep.outputs.version }}
