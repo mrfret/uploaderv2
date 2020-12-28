@@ -5,7 +5,7 @@ on:
       - 'dependabot/**'
 
 jobs:
-  DockerHub.io:
+  DockerHub:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -97,7 +97,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-  ghrc.io docker:
+  GHRC:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
