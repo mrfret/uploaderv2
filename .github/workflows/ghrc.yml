@@ -43,7 +43,7 @@ jobs:
         id: prep
         run: |
           REPO=$CI_REPOSITORY_NAME
-          DOCKER_IMAGE=${{ secrets.DOCKER_USER }}/${REPO}
+          DOCKER_IMAGE=${{ github.repository_owner }}/${REPO}
           if [ "$CI_REF_NAME" != "dev" ]; then
             VERSION=latest
           else
@@ -96,7 +96,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/armhf,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: ghcr.io/${{ steps.prep.outputs.tags }}
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.title }}
             org.opencontainers.image.version=${{ steps.prep.outputs.version }}
