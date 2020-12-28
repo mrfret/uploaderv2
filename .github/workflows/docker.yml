@@ -97,7 +97,7 @@ jobs:
           platforms: linux/amd64,linux/armhf,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
-           labels: |
+          labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.title }}
             org.opencontainers.image.version=${{ steps.prep.outputs.version }}
             org.opencontainers.image.created=${{ steps.prep.outputs.date }}
