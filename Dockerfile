@@ -10,7 +10,7 @@
 ########   ich scheiß auf alle ihr hajos   ###########
 ######################################################
 #FROM ghcr.io/linuxserver/baseimage-alpine:latest
-FROM lsiobase/alpine:3.12
+FROM lsiobase/alpine:3.13
 LABEL maintainer=60312740+doob187@users.noreply.github.com
 
 RUN \
