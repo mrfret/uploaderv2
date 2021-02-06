@@ -15,8 +15,15 @@ LABEL maintainer=60312740+doob187@users.noreply.github.com
 
 RUN \
   echo "**** install build packages ****" && \
-  apk --quiet --no-cache --no-progress add shadow bash bc findutils coreutils && \
+  apk --quiet --no-cache --no-progress add curl unzip shadow bash bc findutils coreutils && \
   rm -rf /var/cache/apk/*
+
+RUN \
+  curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
+  unzip -q rclone-current-linux-amd64.zip && \
+  rm -f rclone-current-linux-amd64.zip && \
+  cd rclone-*-linux-amd64 && \
+  cp rclone /usr/bin/
 
 VOLUME [ "/config" ]
 
