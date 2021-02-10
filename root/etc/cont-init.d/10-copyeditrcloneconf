@@ -5,14 +5,15 @@
 function log() {
 echo "[UPLOADER] ${1}"
 }
-if [ ! -f "/config/rclone.conf" ]; then
+log "*** checking rclone.conf"
+while [ ! -f "/config/rclone.conf" ]; do
+   log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
-   if [ ! -f "/config/rclone.conf" ]; then
-      log "-->> [ WARNING ] second check of rclone.conf failed [ WARNING ] <<--"
-      log "-->> [ WARNING ]    no rclone.conf file found       [ WARNING ] <<--"
-      sleep 60 && s6-svscanctl -t /var/run/s6/services
-   fi
-fi
+   log "-->> [ WARNING ]       sleeping for 30s    [ WARNING ] <<--"
+   log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
+   sleep 30 
+done
+
 log "-> Copying rclone.conf <-"
     rclonepad="/config/rclone/rclone-docker.conf"
     mkdir -p /config/rclone
@@ -26,6 +27,5 @@ log "-> Copying rclone.conf <-"
     sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
     sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
 log "-> rclone_docker.conf edits done <-"
-
 
 #<EOF>#
