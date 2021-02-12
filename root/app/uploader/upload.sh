@@ -9,12 +9,7 @@ function log() {
 }
 ## empty folder clean
 function clean() {
-IFS=$'\n'
-filter="$1"
-mapfile -t clean < <(eval find ${downloadpath}/${FILEDIR}/${FILEBASE} -type d -empty -print)
-for i in ${clean[@]}; do
-   find $i -type d -cmin +60 -empty -delete
-done
+find ${downloadpath}/${FILEDIR} -type d -cmin +3 -empty -delete
 }
 
 source /config/env/uploader.env

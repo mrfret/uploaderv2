@@ -24,15 +24,18 @@ fi
 function install_rclone() {
 local AVAILABLE_RCLONE
 local LOCAL_RCLONE
-AVAILABLE_RCLONE=$(curl -fsL "https://api.github.com/repos/ncw/rclone/releases/latest" | grep -Po '"tag_name": "[Vv]?\K.*?(?=")')
+AVAILABLE_RCLONE=$(curl -fsLs "https://api.github.com/repos/ncw/rclone/releases/latest" | grep -oP '"tag_name": "[Vv]?\K.*?(?=")')
 LOCAL_RCLONE=$(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6)
 if [[ ${AVAILABLE_RCLONE} != ${LOCAL_RCLONE} ]]; then
    log "-> please hold the line ...... <- [UPLOADER]"
-   rm -rf /tmp/rclone-** && rm -rf /tmp/rclone.zip
-   wget --quiet https://downloads.rclone.org/rclone-current-linux-amd64.zip -O /tmp/rclone.zip
-   unzip -q /tmp/rclone.zip && rm -rf /tmp/rclone.zip
-   mv /tmp/rclone*/rclone /usr/bin && rm -rf /tmp/rclone*
-   log "-> Install now rclone Version ${AVAILABLE_RCLONE} <- [UPLOADER]"
+   rm -rf /tmp/rclone-*-linux-amd64 && \
+   rm -rf /tmp/rclone.zip && \
+   curl -so /tmp/rclone.zip  https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
+   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
+   unzip -q /tmp/rclone.zip && \
+   rm -rf /tmp/rclone.zip && \
+   mv /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
+   rm -rf /tmp/rclone-*-linux-amd64
    chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
    chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
    log "-> Yippee-ki-yay, motherfucker! it's done <- [UPLOADER]"
