@@ -18,9 +18,9 @@ RUN \
   rm -rf /var/cache/apk/*
 
 RUN \
-   rm -rf /tmp/rclone-*-linux-amd64  && \
+   rm -rf /tmp/rclone-*-linux-amd64 && \
    rm -rf /tmp/rclone.zip && \
-   wget --quiet https://downloads.rclone.org/rclone-current-linux-amd64.zip -O /tmp/rclone.zip && \
+   curl -so /tmp/rclone.zip  https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
    unzip -q /tmp/rclone.zip && \
    rm -rf /tmp/rclone.zip && \
    mv /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
