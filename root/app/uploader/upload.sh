@@ -7,11 +7,6 @@
 function log() {
     echo "[Uploader] ${1}"
 }
-## empty folder clean
-function clean() {
-find ${downloadpath}/${FILEDIR} -type d -cmin +3 -empty -delete
-}
-
 source /config/env/uploader.env
 downloadpath=/mnt/downloads
 IFS=$'\n'
@@ -52,7 +47,7 @@ rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 ## function empyt folder cleanup
-clean
+find ${downloadpath}/${FILEDIR} -type d -cmin +3 -empty -delete
 ## function empyt folder cleanup
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
