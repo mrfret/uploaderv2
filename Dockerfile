@@ -18,11 +18,13 @@ RUN \
   rm -rf /var/cache/apk/*
 
 RUN \
-  curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
-  unzip -q rclone-current-linux-amd64.zip && \
-  rm -f rclone-current-linux-amd64.zip && \
-  cd rclone-*-linux-amd64 && \
-  cp rclone /usr/bin/
+   rm -rf /tmp/rclone-*-linux-amd64  && \
+   rm -rf /tmp/rclone.zip && \
+   wget --quiet https://downloads.rclone.org/rclone-current-linux-amd64.zip -O /tmp/rclone.zip && \
+   unzip -q /tmp/rclone.zip && \
+   rm -rf /tmp/rclone.zip && \
+   mv /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
+   rm -rf /tmp/rclone-*-linux-amd64
 
 VOLUME [ "/config" ]
 
