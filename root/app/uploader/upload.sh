@@ -70,7 +70,7 @@ if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
           "${LOGFILE}" \
           "${PID}/${FILEBASE}.trans" \
           "${DISCORD}" \
-          "${JSONFILE}"    
+          "${JSONFILE}"
 else
    rm -rf "${FILE}.lck" \
           "${PLEX_JSON}" \
@@ -80,4 +80,5 @@ else
    sleep "${LOGHOLDUI}"
    rm -rf "${JSONFILE}"
 fi
+find "${downloadpath}/${FILEDIR}" -mindepth 2 -type d -empty -delete
 #<EoF>#
