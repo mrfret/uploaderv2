@@ -7,6 +7,16 @@
 function log() {
     echo "[Uploader] ${1}"
 }
+## empty folder clean
+function clean() {
+IFS=$'\n'
+filter="$1"
+mapfile -t clean < <(eval find ${downloadpath}/${FILEDIR}/${FILEBASE} -type d -empty -print)
+for i in ${clean[@]}; do
+   find $i -type d -cmin +60 -empty -delete
+done
+}
+
 source /config/env/uploader.env
 downloadpath=/mnt/downloads
 IFS=$'\n'
@@ -46,6 +56,9 @@ rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
     --drive-chunk-size=32M --user-agent=${UAGENT} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
+## function empyt folder cleanup
+clean
+## function empyt folder cleanup
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
@@ -80,5 +93,5 @@ else
    sleep "${LOGHOLDUI}"
    rm -rf "${JSONFILE}"
 fi
-find "${downloadpath}/${FILEDIR}" -mindepth 2 -type d -empty -delete
+
 #<EoF>#
