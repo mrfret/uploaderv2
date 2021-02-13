@@ -5,14 +5,49 @@
 function log() {
 echo "[Uploader] ${1}"
 }
-log "-> update packages || start <-" 
-apk --no-cache update --quiet 
-apk --no-cache upgrade --quiet
-apk --no-cache fix --quiet
+log "-> update packages || start <-"
+package_list="update upgrade fix"
+for i in ${package_list}; do
+    apk --no-cache $i --quiet --no-progress
+done
 apk del --quiet --clean-protected --no-progress
-echo "@weekly bash /app/update-alpine/update-alpine.sh" > /tmp/crontab.conf
+cat <<EOF >/tmp/crontab.conf
+@weekly /bin/bash /app/update-alpine/update-alpine.sh 1>/dev/null 2>&1
+@daily /usr/bin/find /tmp/ -type f -name "*.1" -delete 1>/dev/null 2>&1
+@daily /usr/bin/truncate -s 0 /var/log/**/*.log 1>/dev/null 2>&1
+EOF
 crontab /tmp/crontab.conf
 rm -rf /var/cache/apk/*
 log "-> update packages || done <-"
 sleep 2
 #>EOF<#
+## set logrotate for nginx
+cat <<EOF >/etc/logrotate.d/nginx
+/tmp/nginx*.log{
+        daily
+        rotate 1
+        missingok
+        notifempty
+        compress
+        sharedscripts
+        postrotate
+                 /bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+        endscript
+}
+EOF
+cat <<EOF >/etc/logrotate.d/php-fpm7
+/var/log/php7/*.log {
+        rotate 1
+        daily
+        missingok
+        notifempty
+        delaycompress
+        compress
+        dateext
+        sharedscripts
+        postrotate
+                /etc/init.d/php-fpm7 --ifstarted --quiet reopen
+        endscript
+}
+EOF
+

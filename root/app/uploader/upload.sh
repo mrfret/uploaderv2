@@ -24,6 +24,7 @@ log "[Upload] Upload started for $FILE using $GDSA to ${DRIVE}"
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
 FILEDIR=$(dirname "${FILE}" | sed "s#${downloadpath}/##g")
+CLEANDIR=$(dirname "${FILE}")
 JSONFILE="/config/json/${FILEBASE}.json"
 CHECKERS="$((${TRANSFERS}*4))"
 DISCORD="/config/discord/${FILEBASE}.discord"
@@ -47,7 +48,7 @@ rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 ## function empyt folder cleanup
-find ${downloadpath}/${FILEDIR} -type d -cmin +3 -empty -delete
+find ${CLEANDIR} -mindepth 1 -type d -cmin +2 -empty -delete
 ## function empyt folder cleanup
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"

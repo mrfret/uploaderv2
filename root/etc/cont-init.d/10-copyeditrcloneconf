@@ -26,6 +26,7 @@ log "-> Copying rclone.conf <-"
     sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
     sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
+    sed -i "s#rotate 4#rotate 1#g" /etc/logrotate.conf
+    sed -i "s#weekly#daily#g" /etc/logrotate.conf
 log "-> rclone_docker.conf edits done <-"
-
 #<EOF>#
