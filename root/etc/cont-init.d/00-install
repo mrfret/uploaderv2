@@ -21,6 +21,8 @@ else
    reinstall_rclone
    endbanner
 fi
+}
+
 function install_rclone() {
 local AVAILABLE_RCLONE
 AVAILABLE_RCLONE=$(curl -fsLs "https://api.github.com/repos/ncw/rclone/releases/latest" | grep -oP '"tag_name": "[Vv]?\K.*?(?=")')
