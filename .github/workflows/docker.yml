@@ -1,9 +1,10 @@
-name: Publish Releases to Hub
+name: Docker Build Master
 on:
-  schedule:
-    - cron: '00 0 * * 6'
-#  branches-ignore:
-#    - 'dependabot/**'
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+    schedule:
+      - cron: '00 0 * * 6'
 
 jobs:
   DockerHub:
