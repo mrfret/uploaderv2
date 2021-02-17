@@ -1,6 +1,6 @@
 name: Publish Releases to Hub
 on:
-  push:
+  schedule:
     branches-ignore:
       - 'dependabot/**'
     schedule:
