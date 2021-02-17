@@ -1,10 +1,9 @@
 name: Publish Releases to Hub
 on:
   schedule:
+    - cron: '00 0 * * 6'
     branches-ignore:
       - 'dependabot/**'
-    schedule:
-      - cron: '00 0 * * 6'
 
 jobs:
   DockerHub:
