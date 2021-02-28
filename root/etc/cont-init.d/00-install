@@ -18,7 +18,7 @@ if [[ $(command -v rclone) == "" ]]; then
    update
    endbanner
 else
-   reinstall_rclone
+   install_rclone
    endbanner
 fi
 }
@@ -27,7 +27,8 @@ function install_rclone() {
    log "-> please hold the line ...... <- [UPLOADER]"
    rm -rf /rclone-*-linux-amd64 && \
    rm -rf /rclone.zip && \
-   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
+   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   
+   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
    unzip -q /tmp/rclone.zip && \
    cp /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
    chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
@@ -46,7 +47,8 @@ if [[ ${AVAILABLE_RCLONE} != ${LOCAL_RCLONE} ]]; then
    log "-> please hold the line ...... <- [UPLOADER]"
    rm -rf /rclone-*-linux-amd64 && \
    rm -rf /rclone.zip && \
-   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
+   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   
+   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
    unzip -q /tmp/rclone.zip && \
    cp /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
    chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
