@@ -25,7 +25,7 @@ if [ "${BANDWITHLIMIT}" == 'null' ]; then
    BWLIMIT=""
 else 
    BANDWITHLIMIT=${BANDWITHLIMIT}
-   BWLIMIT="--bwlimit ${BANDWITHLIMIT}"
+   BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
 fi
 
 log "[Upload] Upload started for $FILE using $GDSA to ${DRIVE}"
