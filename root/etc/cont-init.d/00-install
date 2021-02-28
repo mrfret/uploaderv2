@@ -24,19 +24,15 @@ fi
 }
 
 function install_rclone() {
-local AVAILABLE_RCLONE
-AVAILABLE_RCLONE=$(curl -fsLs "https://api.github.com/repos/ncw/rclone/releases/latest" | grep -oP '"tag_name": "[Vv]?\K.*?(?=")')
    log "-> please hold the line ...... <- [UPLOADER]"
-   rm -rf /tmp/rclone-*-linux-amd64 && \
-   rm -rf /tmp/rclone.zip && \
-   curl -so /tmp/rclone.zip  https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
-   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
+   rm -rf /rclone-*-linux-amd64 && \
+   rm -rf /rclone.zip && \
+   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
    unzip -q /tmp/rclone.zip && \
-   rm -rf /tmp/rclone.zip && \
-   mv /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
-   rm -rf /tmp/rclone-*-linux-amd64
+   cp /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
    chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
    chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
+   rm -rf /tmp/rclone** 1>/dev/null 2>&1
    log "-> Yippee-ki-yay, motherfucker! it's done <- [UPLOADER]"
    log "-> Installed rclone Version $(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6) <- [UPLOADER]"
 }
@@ -48,15 +44,14 @@ AVAILABLE_RCLONE=$(curl -fsLs "https://api.github.com/repos/ncw/rclone/releases/
 LOCAL_RCLONE=$(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6)
 if [[ ${AVAILABLE_RCLONE} != ${LOCAL_RCLONE} ]]; then
    log "-> please hold the line ...... <- [UPLOADER]"
-   rm -rf /tmp/rclone-*-linux-amd64 && \
-   rm -rf /tmp/rclone.zip && \
-   curl -so /tmp/rclone.zip  https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
-   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
+   rm -rf /rclone-*-linux-amd64 && \
+   rm -rf /rclone.zip && \
+   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
    unzip -q /tmp/rclone.zip && \
-   rm -rf /tmp/rclone.zip && \
-   mv /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
-   rm -rf /tmp/rclone-*-linux-amd64
+   cp /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
    chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
+   chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
+   rm -rf /tmp/rclone** 1>/dev/null 2>&1
    chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
    log "-> Yippee-ki-yay, motherfucker! it's done <- [UPLOADER]"
    log "-> Installed rclone Version $(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6) <- [UPLOADER]"
