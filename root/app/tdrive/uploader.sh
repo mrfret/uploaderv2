@@ -9,8 +9,6 @@ function log() {
     echo "[Uploader] ${1}"
 }
 
-source /config/env/uploader.env
-
 #Make sure all the folders we need are created
 path=/config/keys/
 mkdir -p /config/{pid,json,logs,vars}
@@ -20,17 +18,11 @@ MOVE_BASE=${MOVE_BASE:-/}
 ENCRYPTED=${ENCRYPTED:-false}
 if [[ "${ENCRYPTED}" == "false" ]]; then
     if grep -q GDSA01C /config/rclone/rclone-docker.conf && grep -q GDSA02C /config/rclone/rclone-docker.conf; then
-          ENCRYPTED=true
+       ENCRYPTED=true
     fi
 fi
-BASICIGNORE="! -name '**.anchor' ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '**.inProgress/**'"
-DOWNLOADIGNORE="! -path '**.anchors/**' ! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**' ! -path '**-vpn/**' ! -path '**_UNPACK_**'"
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-    ADDITIONAL_IGNORES=""
-fi
 #Header
-log "Uploader  Started"
+log "Uploader Started"
 log "Started for the First Time - Cleaning up if from reboot"
 # Remove left over webui and transfer files
 rm -f /config/pid/*
@@ -50,7 +42,6 @@ sleep 10
 GDSAARRAY=(`ls -la ${path} | awk '{print $9}' | egrep '(PG|GD|GS)'`)
 # shellcheck disable=SC2003
 GDSACOUNT=$(expr ${#GDSAARRAY[@]} - 1)
-
 # Check to see if we have any keys
 # shellcheck disable=SC2086
 if [ ${GDSACOUNT} -lt 1 ]; then
@@ -74,6 +65,13 @@ else
 fi
 # Run Loop
 while true; do
+    source /config/env/uploader.env
+    BASICIGNORE="! -name '**.anchor' ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '**.inProgress/**'"
+    DOWNLOADIGNORE="! -path '**.anchors/**' ! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**' ! -path '**-vpn/**' ! -path '**_UNPACK_**'"
+    ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+    if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
+       ADDITIONAL_IGNORES=""
+    fi
     #Find files to transfer
     IFS=$'\n'
     mapfile -t files < <(eval find ${downloadpath} -cmin +2 -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})

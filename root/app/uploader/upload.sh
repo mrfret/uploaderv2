@@ -20,6 +20,14 @@ else
    DRIVE=TDRIVE
 fi
 
+BANDWITHLIMIT=${BANDWITHLIMIT}
+if [ "${BANDWITHLIMIT}" == 'null' ]; then
+   BWLIMIT=""
+else 
+   BANDWITHLIMIT=${BANDWITHLIMIT}
+   BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
+fi
+
 log "[Upload] Upload started for $FILE using $GDSA to ${DRIVE}"
 STARTTIME=$(date +%s)
 FILEBASE=$(basename "${FILE}")
@@ -28,6 +36,7 @@ JSONFILE="/config/json/${FILEBASE}.json"
 CHECKERS="$((${TRANSFERS}*4))"
 DISCORD="/config/discord/${FILEBASE}.discord"
 PID="/config/pid"
+
 # add to file lock to stop another process being spawned while file is moving
 echo "lock" > "${FILE}.lck"
 #get Human readable filesize
@@ -40,12 +49,14 @@ touch "${LOGFILE}"
 chmod 777 "${LOGFILE}"
 #update json file for Uploader GUI
 echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"uploading\",\"logfile\": \"${LOGFILE}\",\"gdsa\": \"${GDSA}\"}" >"${JSONFILE}"
+
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
     --config "${rjson}" --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-    --drive-chunk-size=32M --user-agent=${UAGENT} \
+    --drive-chunk-size=32M --user-agent=${UAGENT} ${BWLIMIT} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
+
 ## function empyt folder cleanup
 find ${downloadpath} -mindepth 1 -type d -empty -delete
 ## function empyt folder cleanup
