@@ -5,64 +5,25 @@
 function log() {
 echo "[UPLOADER] ${1}"
 }
-function startcommand() {
+
 addgroup -g 911 abc 1>/dev/null 2>&1
 adduser -u 911 -D -G abc abc 1>/dev/null 2>&1
-install
-}
-function install() {
 apk add --quiet --no-cache --no-progress wget curl bash unzip
 log "-> Configure RCLONE || start <- [RCLONE]"
-if [[ $(command -v rclone) == "" ]]; then
-   install_rclone
-   update
-   endbanner
-else
-   install_rclone
-   endbanner
-fi
-}
+log "-> please hold the line ...... <- [UPLOADER]"
 
-function install_rclone() {
-   log "-> please hold the line ...... <- [UPLOADER]"
-   rm -rf /rclone-*-linux-amd64 && \
-   rm -rf /rclone.zip && \
-   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   
-   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
-   unzip -q /tmp/rclone.zip && \
-   cp /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
-   chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
-   chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
-   rm -rf /tmp/rclone** 1>/dev/null 2>&1
-   log "-> Yippee-ki-yay, motherfucker! it's done <- [UPLOADER]"
-   log "-> Installed rclone Version $(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6) <- [UPLOADER]"
-}
+rm -rf /rclone-*-linux-amd64 && \
+rm -rf /rclone.zip && \
+wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   
+chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1
+unzip -q /tmp/rclone.zip
+cp /tmp/rclone-*-linux-amd64/rclone /usr/bin 
+chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
+chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
+rm -rf /tmp/rclone** 1>/dev/null 2>&1
+log "-> Yippee-ki-yay, motherfucker! it's done <- [UPLOADER]"
+log "-> Installed rclone Version $(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6) <- [UPLOADER]"
 
-function reinstall_rclone() {
-local AVAILABLE_RCLONE
-local LOCAL_RCLONE
-AVAILABLE_RCLONE=$(curl -fsLs "https://api.github.com/repos/ncw/rclone/releases/latest" | grep -oP '"tag_name": "[Vv]?\K.*?(?=")')
-LOCAL_RCLONE=$(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6)
-if [[ ${AVAILABLE_RCLONE} != ${LOCAL_RCLONE} ]]; then
-   log "-> please hold the line ...... <- [UPLOADER]"
-   rm -rf /rclone-*-linux-amd64 && \
-   rm -rf /rclone.zip && \
-   wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   
-   chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1 && \
-   unzip -q /tmp/rclone.zip && \
-   cp /tmp/rclone-*-linux-amd64/rclone /usr/bin && \
-   chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
-   chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
-   rm -rf /tmp/rclone** 1>/dev/null 2>&1
-   chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
-   log "-> Yippee-ki-yay, motherfucker! it's done <- [UPLOADER]"
-   log "-> Installed rclone Version $(rclone --version | awk '{print $2}' | head -n 1 | sed -e 's/v//g' | cut -c1-6) <- [UPLOADER]"
-   update
-else
-   update
-fi
-}
-function update() {
 log "**** update system ****" 
 apk --quiet --no-cache --no-progress update
 log "**** install build packages ****"
@@ -80,13 +41,11 @@ rm -rf /etc/nginx/nginx.conf
 cp -r /conf/nginx.conf /etc/nginx/nginx.conf
 cp -r /conf/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 cp -r /conf/php.j2 /etc/php7/conf.d/zzz_custom.ini
-}
-function endbanner() {
+
 pids="$(pgrep 'nginx')"
 if [ "$pids" != "" ]; then
   kill -15 $pids
   sleep 2
 fi
-}
-startcommand
+
 #EOF#
