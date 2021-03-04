@@ -17,15 +17,6 @@ RUN \
   apk --quiet --no-cache --no-progress add curl unzip shadow bash bc findutils coreutils && \
   rm -rf /var/cache/apk/*
 
-RUN \
-   rm -rf rclone-*-linux-amd64 && \
-   rm -rf rclone.zip && \
-   curl -so rclone.zip  https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
-   unzip -q rclone.zip && \
-   rm -rf rclone.zip && \
-   mv rclone-*-linux-amd64/rclone /usr/bin && \
-   rm -rf rclone-*-linux-amd64
-
 VOLUME [ "/config" ]
 
 COPY root/ /
