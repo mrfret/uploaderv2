@@ -12,12 +12,12 @@ apk add --quiet --no-cache --no-progress wget curl bash unzip
 log "-> Configure RCLONE || start <- [RCLONE]"
 log "-> please hold the line ...... <- [UPLOADER]"
 
-rm -rf /rclone-*-linux-amd64 && \
-rm -rf /rclone.zip && \
-wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO /tmp/rclone.zip   
-chown abc:abc /tmp/rclone.zip 1>/dev/null 2>&1
-unzip -q /tmp/rclone.zip
-cp /tmp/rclone-*-linux-amd64/rclone /usr/bin 
+wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO rclone.zip && \
+unzip -q rclone.zip && \
+rm -f rclone.zip && \
+mv rclone-*-linux-amd64/rclone /usr/bin/ && \
+rm -rf rclone-**
+
 chown abc:abc /usr/bin/rclone 1>/dev/null 2>&1
 chmod 755 /usr/bin/rclone 1>/dev/null 2>&1
 rm -rf /tmp/rclone** 1>/dev/null 2>&1
@@ -30,7 +30,7 @@ log "**** install build packages ****"
 apk add --quiet --no-cache --no-progress \
     ca-certificates logrotate shadow bash bc findutils coreutils openssl php7 php7-fpm php7-mysqli php7-json php7-openssl \
     php7-curl php7-zlib php7-xml php7-phar php7-dom php7-xmlreader php7-ctype php7-mbstring php7-gd \
-    curl nginx libxml2-utils tzdata openntpd grep tar
+    curl nginx libxml2-utils tzdata openntpd grep tar musl
 log "**** upgrade system ****"
 apk --quiet --no-cache --no-progress upgrade
 apk --quiet --no-progress --no-cache fix
