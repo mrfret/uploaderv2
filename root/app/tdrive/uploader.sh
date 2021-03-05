@@ -74,7 +74,7 @@ while true; do
     fi
     #Find files to transfer
     IFS=$'\n'
-    mapfile -t files < <(eval find ${downloadpath} -cmin +2 -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
+    mapfile -t files < <(eval find ${downloadpath} -cmin +${MIN_AGE_UPLOAD} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
     if [[ ${#files[@]} -gt 0 ]]; then
         # If files are found loop though and upload
         log "Files found to upload"
@@ -88,7 +88,7 @@ while true; do
                 if [ -e "${i}" ]; then
                     # Check if file is still getting bigger
                     FILESIZE1=$(stat -c %s "${i}")
-                    sleep 3
+                    sleep 5
                     FILESIZE2=$(stat -c %s "${i}")
                     if [ "$FILESIZE1" -ne "$FILESIZE2" ]; then
                         log "File is still getting bigger ${i}"
