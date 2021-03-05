@@ -57,7 +57,7 @@ fi
 MODIFIED=$(cat ${uploaderenv} | grep MIN_AGE_UPLOAD && echo true || echo false)
 if [[ $MODIFIED == "false" ]]; then
    echo "\
-   MIN_AGE_UPLOAD=5" >> /config/env/uploader.env
+MIN_AGE_UPLOAD=5" >> /config/env/uploader.env
 else
    echo "Uploader ENV is up2date"
 fi
