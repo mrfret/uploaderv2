@@ -25,7 +25,8 @@ LOGHOLDUI=${LOGHOLDUI:-5m}
 DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-null}
 DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-UPLOADED_COMPLETE}
 DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
-DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-UPLOADED}" >> /config/env/uploader.env
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-UPLOADED}
+MIN_AGE_UPLOAD=${MIN_AGE_UPLOAD:-5}" >> /config/env/uploader.env
 else
   echo "-->> -------------------- <<--"
   echo "     --> used stored <--  <<--"
@@ -51,6 +52,19 @@ else
   echo "-->> -------------------- <<--"
 fi
 
+##MODS
+
+MODIFIED=$(cat ${uploaderenv} | grep MIN_AGE_UPLOAD && echo true || echo false)
+if [[ $MODIFIED == "false" ]]; then
+   echo "\
+MIN_AGE_UPLOAD=5" >> /config/env/uploader.env
+else
+   echo "Uploader ENV is up2date"
+fi
+
+
+
+##EOF##
 #while read -r line; do declare -x "$line"; done < <(egrep -v "(^#|^\s|^$)" /config/env/serverside.env)
 #while read -r line; do declare -x "$line"; done < <(egrep -v "(^#|^\s|^$)" /config/env/uploader.env)
 touch /etc/services.d/cleaning/down
