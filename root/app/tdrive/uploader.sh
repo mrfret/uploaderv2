@@ -71,9 +71,6 @@ fi
 #
 BASICIGNORE="! -name '**.anchor' ! -name '*partial~' ! -name '*_HIDDEN~' ! -name '*.fuse_hidden*' ! -name '*.lck' ! -name '*.version' ! -path '.unionfs-fuse/*' ! -path '.unionfs/*' ! -path '**.inProgress/**'"
 DOWNLOADIGNORE="! -path '**.anchors/**' ! -path '**torrent/**' ! -path '**nzb/**' ! -path '**backup/**' ! -path '**nzbget/**' ! -path '**jdownloader2/**' ! -path '**sabnzbd/**' ! -path '**rutorrent/**' ! -path '**deluge/**' ! -path '**qbittorrent/**' ! -path '**-vpn/**' ! -path '**_UNPACK_**'"
-if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
-    ADDITIONAL_IGNORES=""
-fi
 #
 # Run Loop
 while true; do
