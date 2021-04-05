@@ -74,12 +74,11 @@ DOWNLOADIGNORE="! -path '**.anchors/**' ! -path '**torrent/**' ! -path '**nzb/**
 if [ "${ADDITIONAL_IGNORES}" == 'null' ]; then
     ADDITIONAL_IGNORES=""
 fi
-ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
 #
 # Run Loop
 while true; do
     source /config/env/uploader.env
-    ADDITIONAL_IGNORES=${ADDITIONAL_IGNORES}
+    if [[ ${ADDITIONAL_IGNORES} == 'null' ]];then ADDITIONAL_IGNORES="";fi
     #Find files to transfer
     IFS=$'\n'
     mapfile -t files < <(eval find ${downloadpath} -cmin +${MIN_AGE_UPLOAD} -type f ${BASICIGNORE} ${DOWNLOADIGNORE} ${ADDITIONAL_IGNORES})
