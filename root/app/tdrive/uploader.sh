@@ -55,8 +55,13 @@ else
     log "BC Not installed, Exit"
     exit 2
 fi
+
+if [[ ! -f /config/vars/lastGDSA ]];then touch /config/vars/lastGDSA 1>/dev/null 2>&1;fi
+if [[ ! -f /config/vars/gdsaAmount ]];then touch /config/vars/gdsaAmount 1>/dev/null 2>&1;fi
+if [[ -d /config/vars ]];then chown -hR 1000:1000 /config/vars/ 1>/dev/null 2>&1;fi
+
 # Grabs vars from files
-if [ -e /config/vars/lastGDSA ]; then
+if [[ -e /config/vars/lastGDSA ]]; then
     GDSAUSE=$(cat /config/vars/lastGDSA)
     GDSAAMOUNT=$(cat /config/vars/gdsaAmount)
 else
