@@ -13,6 +13,19 @@ while [ ! -f "/config/rclone.conf" ]; do
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    sleep 30 
 done
+
+while true; do
+KEYS=$(ls -1p /config/keys/ | wc -l)
+if [ ${KEYS} -lt "1" ]; then
+    log "-->> [ WARNING ] ---------------- [ WARNING ] <<--"
+    log "-->> [ WARNING ]  No GDSAS found  [ WARNING ] <<--"
+    log "-->> [ WARNING ] ---------------- [ WARNING ] <<--"
+    sleep 30 && continue
+else
+    sleep 1 && break
+fi
+done
+
 if [[ ! -f "/root/.config/rclone/rclone.conf" ]];then
    mkdir -p /root/.config/rclone/
    cp /config/rclone.conf /root/.config/rclone/rclone.conf
