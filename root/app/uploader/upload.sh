@@ -57,9 +57,6 @@ rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 
-## function empyt folder cleanup
-find ${downloadpath}/${FILEDIR}/ -mindepth 1 -type d -empty -delete
-## function empyt folder cleanup
 #update json file for Uploader GUI
 echo "{\"filedir\": \"/${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \"${HRFILESIZE}\",\"status\": \"done\",\"gdsa\": \"${GDSA}\",\"starttime\": \"${STARTTIME}\",\"endtime\": \"${ENDTIME}\"}" >"${JSONFILE}"
 if [ ${DISCORD_WEBHOOK_URL} != 'null' ]; then
