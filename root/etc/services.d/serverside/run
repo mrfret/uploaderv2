@@ -9,4 +9,4 @@ umask 022
 serverside_command="/app/serverside/serverside.sh"
 sleep 3
 echo "-> Starting Server-Side Uploader <-"
-exec s6-setuidgid abc $serverside_command
+exec $serverside_command

@@ -13,7 +13,10 @@ while [ ! -f "/config/rclone.conf" ]; do
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    sleep 30 
 done
-
+if [[ ! -f "/root/.config/rclone/rclone.conf" ]];then
+   mkdir -p /root/.config/rclone/
+   cp /config/rclone.conf /root/.config/rclone/rclone.conf
+fi
 log "-> Copying rclone.conf <-"
     rclonepad="/config/rclone/rclone-docker.conf"
     mkdir -p /config/rclone
