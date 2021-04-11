@@ -8,26 +8,17 @@ echo "[Uploader] ${1}"
 }
 log "-> Setting Permissions || start <-"
 
-mkdir -p /config/{discord,env}
+mkdir -p /config/{vars,discord,env}
+
+if [[ ! -f /config/vars/lastGDSA ]];then touch /config/vars/lastGDSA 1>/dev/null 2>&1;fi
+if [[ ! -f /config/vars/gdsaAmount ]];then touch /config/vars/gdsaAmount 1>/dev/null 2>&1;fi
+#if [[ -d /config/vars ]];then chown -cR abc:abc /config/vars/ 1>/dev/null 2>&1;fi
 
 folder="/mnt/downloads /config /app /var/www /run /var/lib/nginx /var/log/nginx /root"
 for i in ${folder}; do
-   chmod -R 755 $i
-   chown -hR abc:abc $i
-   chown -cf abc:abc $i
+   chown -cR abc:abc $i 1>/dev/null 2>&1
+   chmod -cR a=rx,u+w $i 1>/dev/null 2>&1
 done
-
-#find /config -exec chmod a=rx,u+w {} \;
-#find /config -exec chown -hR abc:abc {} \;
-#find /app -exec chmod a=rx,u+w {} \;
-#find /app -exec chown -hR abc:abc {} \;
-
-#find /var/www -exec chmod a=rx,u+w {} \;
-#find /var/www -exec chown -hR abc:abc {} \;
-
-#chown -R abc:abc /run \
-#          /var/lib/nginx \
-#          /var/log/nginx
 
 if [[ $(command -v rclone | wc -l) == "1" ]]; then
     chown -cf abc:abc /root
