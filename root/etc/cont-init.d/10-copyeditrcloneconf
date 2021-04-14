@@ -16,7 +16,8 @@ done
 
 while true; do
 KEYS=$(ls -1p /config/keys/ | wc -l)
-if [ ${KEYS} -lt "1" ]; then
+GDSA=$(ls -f /config/keys/ grep -E 'GDSA' 1>/dev/null 2>&1 && echo true || echo false)
+if [ ${KEYS} -lt "1" ] && [ ${GDSA} == "false" ]; then
     log "-->> [ WARNING ] ---------------- [ WARNING ] <<--"
     log "-->> [ WARNING ]  No GDSAS found  [ WARNING ] <<--"
     log "-->> [ WARNING ] ---------------- [ WARNING ] <<--"
