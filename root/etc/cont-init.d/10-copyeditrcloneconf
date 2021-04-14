@@ -29,13 +29,11 @@ done
 
 if [[ ! -f "/root/.config/rclone/rclone.conf" ]];then
    mkdir -p /root/.config/rclone/
-   cp /config/rclone.conf /root/.config/rclone/rclone.conf
+   ln -s /config/rclone.conf /root/.config/rclone/rclone.conf
 fi
-log "-> Copying rclone.conf <-"
-    rclonepad="/config/rclone/rclone-docker.conf"
+log "-> Copying rclone.conf <-""
     mkdir -p /config/rclone
-    rm -f ${rclonepad}
-    find /config -name "rclone.conf" -type f -exec cp {} ${rclonepad} \;
+    find /config -name "rclone.conf" -type f -exec cp {} /config/rclone/rclone-docker.conf \;
     log "-> Make needed edits to rclone-docker.conf <-"
     sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
