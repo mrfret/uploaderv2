@@ -76,6 +76,18 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+          repository: ${{ secrets.DOCKER_USER }}/uploaderv2
+          readme-filepath: ./README.md
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+
   GHRC:
     runs-on: ubuntu-latest
     steps:
