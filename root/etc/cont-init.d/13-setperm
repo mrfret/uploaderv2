@@ -10,9 +10,15 @@ log "-> Setting Permissions || start <-"
 
 mkdir -p /config/{vars,discord,env}
 
-if [[ ! -f /config/vars/lastGDSA ]];then touch /config/vars/lastGDSA 1>/dev/null 2>&1;fi
-if [[ ! -f /config/vars/gdsaAmount ]];then touch /config/vars/gdsaAmount 1>/dev/null 2>&1;fi
-#if [[ -d /config/vars ]];then chown -cR abc:abc /config/vars/ 1>/dev/null 2>&1;fi
+if [[ ! -f /config/vars/lastGDSA ]];then
+   touch /config/vars/lastGDSA 1>/dev/null 2>&1
+   echo "1" > /config/vars/lastGDSA
+fi
+if [[ ! -f /config/vars/gdsaAmount ]];then
+   touch /config/vars/gdsaAmount 1>/dev/null 2>&1
+   echo "1" > /config/vars/gdsaAmount
+fi
+if [[ -d /config/vars ]];then chown -cR abc:abc /config/vars/ 1>/dev/null 2>&1;fi
 
 folder="/mnt/downloads /config /app /var/www /run /var/lib/nginx /var/log/nginx /root"
 for i in ${folder}; do
