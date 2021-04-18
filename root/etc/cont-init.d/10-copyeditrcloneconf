@@ -34,7 +34,7 @@ if [[ ! -f "/root/.config/rclone/rclone.conf" ]];then
    mkdir -p /root/.config/rclone/
    ln -s /config/rclone.conf /root/.config/rclone/rclone.conf
 fi
-log "-> Copying rclone.conf <-""
+log "-> Copying rclone.conf <-"
     mkdir -p /config/rclone
     find /config -name "rclone.conf" -type f -exec cp {} /config/rclone/rclone-docker.conf \;
     log "-> Make needed edits to rclone-docker.conf <-"
