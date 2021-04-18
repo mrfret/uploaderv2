@@ -6,12 +6,16 @@ function log() {
 echo "[UPLOADER] ${1}"
 }
 log "*** checking rclone.conf"
-while [ ! -f "/config/rclone.conf" ]; do
+while true;do
+if [[ ! -f "/config/rclone.conf" ]];then
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    log "-->> [ WARNING ]       sleeping for 30s    [ WARNING ] <<--"
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
-   sleep 30 
+   sleep 3 && continue
+else
+   sleep 1 && break
+fi
 done
 
 while true; do
@@ -26,7 +30,6 @@ else
     sleep 1 && break
 fi
 done
-
 if [[ ! -f "/root/.config/rclone/rclone.conf" ]];then
    mkdir -p /root/.config/rclone/
    ln -s /config/rclone.conf /root/.config/rclone/rclone.conf
