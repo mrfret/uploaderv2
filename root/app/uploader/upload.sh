@@ -53,7 +53,7 @@ echo "{\"filedir\": \"${FILEDIR}\",\"filebase\": \"${FILEBASE}\",\"filesize\": \
 log "[Upload] Starting Upload"
 rclone moveto --tpslimit 8 --checkers=${CHECKERS} \
     --config "${rjson}" --log-file="${LOGFILE}" --log-level INFO --stats 2s \
-    --drive-chunk-size=32M --user-agent=${UAGENT} ${BWLIMIT} \
+    --drive-chunk-size=32M --user-agent=${UAGENT} ${BWLIMIT} --delete-empty-src-dirs \
     "${FILE}" "${REMOTE}:${FILEDIR}/${FILEBASE}"
 ENDTIME=$(date +%s)
 
