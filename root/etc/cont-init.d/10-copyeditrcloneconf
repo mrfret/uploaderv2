@@ -7,7 +7,7 @@ echo "[UPLOADER] ${1}"
 }
 log "*** checking rclone.conf"
 while true; do
-if [ ! -f "/config/rclone.conf" ] || [ ! -f "/config/rclone_gdsa.conf" ];then
+if [ ! -f "/config/rclone.conf" ];then
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    log "-->> [ WARNING ]       sleeping for 30s    [ WARNING ] <<--"
