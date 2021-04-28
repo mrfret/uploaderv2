@@ -7,7 +7,7 @@ echo "[UPLOADER] ${1}"
 }
 log "*** checking rclone.conf"
 while true; do
-if [[ ! -f "/config/rclone.conf" ]];then
+if [ ! -f "/config/rclone.conf" ] || ;then
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    log "-->> [ WARNING ]       sleeping for 30s    [ WARNING ] <<--"
@@ -30,18 +30,22 @@ else
     sleep 1 && break
 fi
 done
+if [[ -f "/root/.config/rclone/rclone.conf" ]];then rm -rf /root/.config/rclone/rclone.conf;fi
 if [[ ! -f "/root/.config/rclone/rclone.conf" ]];then
    mkdir -p /root/.config/rclone/
-   ln -s /config/rclone.conf /root/.config/rclone/rclone.conf
+   if [[ -f "/config/rclone.conf" ]];then ln -s /config/rclone.conf /root/.config/rclone/rclone.conf;fi
+   if [[ -f "/config/rclone_gdsa.conf" ]];then ln -s /config/rclone_gdsa.conf /root/.config/rclone/rclone.conf;fi
 fi
 log "-> Copying rclone.conf <-"
     mkdir -p /config/rclone
     find /config -name "rclone.conf" -type f -exec cp {} /config/rclone/rclone-docker.conf \;
+    find /config -name "rclone_gdsa.conf" -type f -exec cp {} /config/rclone/rclone-docker.conf \;
     log "-> Make needed edits to rclone-docker.conf <-"
     sed -i "s#/opt/appdata/plexguide/.blitzkeys/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/GDSA/keys/##/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
     sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
     sed -i "s#rotate 4#rotate 1#g" /etc/logrotate.conf
