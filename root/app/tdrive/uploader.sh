@@ -21,6 +21,11 @@ if [[ "${ENCRYPTED}" == "false" ]]; then
        ENCRYPTED=true
     fi
 fi
+if [[ "${ENCRYPTED}" == "false" ]]; then
+    if grep -q GDSA1C /config/rclone/rclone-docker.conf && grep -q GDSA2C /config/rclone/rclone-docker.conf; then
+       ENCRYPTED=true
+    fi
+fi
 #Header
 log "Uploader Started"
 log "Started for the First Time - Cleaning up if from reboot"
