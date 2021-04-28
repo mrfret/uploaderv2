@@ -7,7 +7,7 @@ echo "[UPLOADER] ${1}"
 }
 log "*** checking rclone.conf"
 while true; do
-if [ ! -f "/config/rclone.conf" ] || ;then
+if [ ! -f "/config/rclone.conf" ] || [ ! -f "/config/rclone_gdsa.conf" ];then
    log "-->> [ WARNING ] ------------------------- [ WARNING ] <<--"
    log "-->> [ WARNING ] no rclone.conf file found [ WARNING ] <<--"
    log "-->> [ WARNING ]       sleeping for 30s    [ WARNING ] <<--"
@@ -45,7 +45,7 @@ log "-> Copying rclone.conf <-"
     sed -i "s#/opt/appdata/uploader/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i "s#/opt/appdata/services/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i "s#/opt/uploader/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
-    sed -i "s#/GDSA/keys/##/config/keys/#g" /config/rclone/rclone-docker.conf
+    sed -i "s#/GDSA/keys/#/config/keys/#g" /config/rclone/rclone-docker.conf
     sed -i '/pgunion/{n;N;d;}' /config/rclone/rclone-docker.conf
     sed -i '/pgunion/d' /config/rclone/rclone-docker.conf
     sed -i "s#rotate 4#rotate 1#g" /etc/logrotate.conf
