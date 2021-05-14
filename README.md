@@ -10,6 +10,10 @@
 
 ---
 
+## SUPPORT FOR PG | PTS WILL ENDED IN 2 WEEKS 
+
+---
+
 ## You need Help 
 
 ```
