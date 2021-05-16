@@ -4,9 +4,10 @@
 .DS_Store?
 .vscode
 .Trashes
+.circleci
 ehthumbs.db
 Thumbs.db
 .AppleDouble
 .LSOverride
 .metadata_never_index
-.github/workflows
+.github
