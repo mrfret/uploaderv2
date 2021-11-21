@@ -11,7 +11,7 @@
 ######################################################
 FROM lsiobase/alpine:3.13
 LABEL maintainer=doob187
-LABEL org.opencontainers.image.source https://github.com/doob187/uploaderv2
+LABEL org.opencontainers.image.source https://github.com/mrfret/uploaderv2
 RUN \
   echo "**** install build packages ****" && \
   apk --quiet --no-cache --no-progress add curl unzip shadow bash bc findutils coreutils && \

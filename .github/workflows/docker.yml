@@ -26,7 +26,7 @@ jobs:
           if [ "$CI_REF_NAME" != "dev" ]; then
             VERSION=latest
           else
-            VERSION=nightly
+            VERSION=latest
           fi
           TAGS="${DOCKER_IMAGE}:${VERSION}"
           echo ::set-output name=tags::${TAGS}
@@ -107,7 +107,7 @@ jobs:
           if [ "$CI_REF_NAME" != "dev" ]; then
             VERSION=latest
           else
-            VERSION=nightly
+            VERSION=latest
           fi
           TAGS="${DOCKER_IMAGE}:${VERSION}"
           echo ::set-output name=tags::${TAGS}
