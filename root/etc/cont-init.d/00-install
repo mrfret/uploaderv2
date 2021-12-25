@@ -12,7 +12,7 @@ apk add --quiet --no-cache --no-progress wget curl bash unzip
 log "-> Configure RCLONE || start <- [RCLONE]"
 log "-> please hold the line ...... <- [UPLOADER]"
 
-wget https://downloads.rclone.org/rclone-current-linux-amd64.zip -qO rclone.zip && \
+wget --quiet https://github.com/rclone/rclone/releases/download/v1.55.1/rclone-v1.55.1-linux-amd64.zip -qO rclone.zip && \
 unzip -q rclone.zip && \
 rm -f rclone.zip && \
 mv rclone-*-linux-amd64/rclone /usr/bin/ && \
@@ -38,9 +38,9 @@ apk del --quiet --clean-protected --no-progress
 rm -rf /var/cache/apk/*
 
 rm -rf /etc/nginx/nginx.conf
-cp -r /conf/nginx.conf /etc/nginx/nginx.conf
-cp -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
-cp -r /conf/php.j2 /etc/php8/conf.d/zzz_custom.ini
+cp -rv /conf/nginx.conf /etc/nginx/nginx.conf
+cp -rv /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
+cp -rv /conf/php.j2 /etc/php8/conf.d/zzz_custom.ini
 
 pids="$(pgrep 'nginx')"
 if [ "$pids" != "" ]; then
