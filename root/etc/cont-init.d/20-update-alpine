@@ -35,8 +35,8 @@ cat <<EOF >/etc/logrotate.d/nginx
         endscript
 }
 EOF
-cat <<EOF >/etc/logrotate.d/php-fpm8
-/var/log/php8/*.log {
+cat <<EOF >/etc/logrotate.d/php-fpm7
+/var/log/php7/*.log {
         rotate 1
         daily
         missingok
@@ -46,7 +46,7 @@ cat <<EOF >/etc/logrotate.d/php-fpm8
         dateext
         sharedscripts
         postrotate
-                /etc/init.d/php-fpm8 --ifstarted --quiet reopen
+                /etc/init.d/php-fpm7 --ifstarted --quiet reopen
         endscript
 }
 EOF

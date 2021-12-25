@@ -6,6 +6,6 @@
 
 # shellcheck disable=SC2086
 umask 022
-phpfpm_command="php-fpm8 -F"
+phpfpm_command="php-fpm7 -F"
 echo "-> Starting php-fpm <-"
 exec s6-setuidgid abc $phpfpm_command
