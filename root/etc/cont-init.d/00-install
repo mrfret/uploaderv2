@@ -28,8 +28,8 @@ log "**** update system ****"
 apk --quiet --no-cache --no-progress update
 log "**** install build packages ****"
 apk add --quiet --no-cache --no-progress \
-    ca-certificates logrotate shadow bash bc findutils coreutils openssl php8 php8-dev php8-bcmath php8-intl php8-fpm php8-json php8-openssl \
-    php8-curl php8-zlib php8-xml php8-dom php8-xmlreader php8-ctype php8-mbstring php8-gd php8-opcache php8-session \
+    ca-certificates logrotate shadow bash bc findutils coreutils openssl php7 php7-fpm php7-mysqli php7-json php7-openssl \
+    php7-curl php7-zlib php7-xml php7-phar php7-dom php7-xmlreader php7-ctype php7-mbstring php7-gd \
     curl nginx libxml2-utils tzdata openntpd grep tar musl
 log "**** upgrade system ****"
 apk --quiet --no-cache --no-progress upgrade
@@ -39,8 +39,8 @@ rm -rf /var/cache/apk/*
 
 rm -rf /etc/nginx/nginx.conf
 cp -r /conf/nginx.conf /etc/nginx/nginx.conf
-cp -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
-cp -r /conf/php.j2 /etc/php8/conf.d/zzz_custom.ini
+cp -r /conf/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
+cp -r /conf/php.j2 /etc/php7/conf.d/zzz_custom.ini
 
 pids="$(pgrep 'nginx')"
 if [ "$pids" != "" ]; then
